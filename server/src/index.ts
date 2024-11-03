@@ -7,7 +7,20 @@ const app = express();
 const port = process.env.PORT;
 
 app.get('/', async (req, res) => {
-  const users = await db.user.findMany();
+  const users = await db.user.findMany({
+    select: {
+      id: true,
+      name: true,
+    },
+    include: {
+      image: {
+        select: {
+          id: true,
+          url: true,
+        },
+      },
+    },
+  });
   res.json(users);
 });
 

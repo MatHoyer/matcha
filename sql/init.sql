@@ -40,11 +40,11 @@ CREATE TABLE "UserTag" (
 DROP TABLE IF EXISTS "Message";
 CREATE TABLE "Message" (
   "id" SERIAL PRIMARY KEY,
-  "senderId" INT NOT NULL,
+  "userId" INT NOT NULL,
   "receiverId" INT NOT NULL,
   "message" VARCHAR(1000) NOT NULL,
   "date" TIMESTAMP NOT NULL,
-  FOREIGN KEY ("senderId") REFERENCES "User" ("id"),
+  FOREIGN KEY ("userId") REFERENCES "User" ("id"),
   FOREIGN KEY ("receiverId") REFERENCES "User" ("id")
 );
 

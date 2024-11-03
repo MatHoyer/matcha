@@ -1,10 +1,10 @@
 import pg from 'pg';
-import type { User } from '../query/type.js';
+import type { User, UserIncludes } from '../query/type.js';
 import GenericRepository from './GenericRepository.js';
 
-class UserRepository extends GenericRepository<User> {
+class UserRepository extends GenericRepository<User, UserIncludes> {
   constructor(pool: pg.Pool) {
-    super('User', pool);
+    super('user', pool);
   }
 }
 
