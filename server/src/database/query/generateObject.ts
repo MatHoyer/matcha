@@ -1,9 +1,10 @@
-export const generateObject = (rows: any[]) => {
+export const generateObject = (rows: any[], shouldGetId: Record<string, boolean>) => {
   const object: Record<string, any> = {};
 
   for (const row of rows) {
     if (!row || typeof row !== 'object') continue;
     for (const [key, value] of Object.entries(row as Record<string, any>)) {
+      console.log(object);
       const splitKey = key.split('_');
       const underObject = splitKey[0];
 
@@ -32,10 +33,15 @@ export const generateObject = (rows: any[]) => {
     if (Array.isArray(object[key]) && object[key].length === 1) {
       object[key] = object[key][0];
     }
+    const isFullNull = Object.values(object[key]).every((value) => value === null);
+    if (isFullNull) {
+      object[key] = null;
+    }
     if (object[key] && typeof object[key] === 'object') {
-      const isFullNull = Object.values(object[key]).every((value) => value === null);
-      if (isFullNull) {
-        object[key] = null;
+      for (const [index, element] of object[key].entries()) {
+        if (!shouldGetId[key] && 'id' in element) {
+          delete object[key][index].id;
+        }
       }
     }
   }

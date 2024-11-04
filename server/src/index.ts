@@ -14,7 +14,11 @@ app.get('/', async (req, res) => {
       lastName: true,
     },
     include: {
-      image: true,
+      image: {
+        select: {
+          url: true,
+        },
+      },
       location: true,
     },
   });

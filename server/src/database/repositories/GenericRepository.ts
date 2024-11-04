@@ -24,7 +24,7 @@ class GenericRepository<T, I> {
 
     const { query, values } = generateWhereClauseSql(where);
 
-    const { join, joinColumns } = generateIncludeSql(this.alias, include);
+    const { join, joinColumns, shouldGetId } = generateIncludeSql(this.alias, include);
     const { selectColumns } = generateSelectSql(this.alias, select);
     selectColumns.push(...joinColumns);
     const columns = selectColumns.join(', ');
@@ -34,7 +34,7 @@ class GenericRepository<T, I> {
     console.log(queryString, values);
     const { rows } = await this.pool.query(queryString, values);
     console.log(rows);
-    return generateObject(rows);
+    return generateObject(rows, shouldGetId);
   }
 
   async create(data: Omit<T, 'id'>): Promise<T> {
