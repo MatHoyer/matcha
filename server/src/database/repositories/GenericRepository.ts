@@ -1,6 +1,8 @@
 import pg from 'pg';
 
 import { capitalize } from '../../utils/capitalized.js';
+import { quoteUppercase } from '../../utils/quoteUppercase.js';
+import { generateObject } from '../query/generateObject.js';
 import { generateIncludeSql } from '../query/generateSql/include.js';
 import { generateSelectSql } from '../query/generateSql/select.js';
 import { generateWhereClauseSql } from '../query/generateSql/whereClause.js';
@@ -31,11 +33,14 @@ class GenericRepository<T, I> {
 
     console.log(queryString, values);
     const { rows } = await this.pool.query(queryString, values);
-    return rows;
+    console.log(rows);
+    return generateObject(rows);
   }
 
   async create(data: Omit<T, 'id'>): Promise<T> {
-    const columns = Object.keys(data).join(', ');
+    const columns = Object.keys(data)
+      .map((column) => quoteUppercase(column))
+      .join(', ');
     const values = Object.values(data);
     const { rows } = await this.pool.query(
       `INSERT INTO ${this.tableName} (${columns}) VALUES (${values

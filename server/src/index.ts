@@ -9,16 +9,13 @@ const port = process.env.PORT;
 app.get('/', async (req, res) => {
   const users = await db.user.findMany({
     select: {
-      id: true,
       name: true,
+      age: true,
+      lastName: true,
     },
     include: {
-      image: {
-        select: {
-          id: true,
-          url: true,
-        },
-      },
+      image: true,
+      location: true,
     },
   });
   res.json(users);

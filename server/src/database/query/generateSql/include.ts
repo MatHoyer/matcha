@@ -13,16 +13,14 @@ type TReturnType = {
 
 export const generateIncludeSql = <T>(mainAlias: string, include?: Include<T>): TReturnType => {
   if (!include) return { join: '', joinColumns: [] };
-  console.log(include);
   const query: string[] = [];
   const joinColumns: string[] = [];
   for (const [key, value] of Object.entries(include)) {
-    if (typeof value === 'boolean') console.log(key, value);
     const { select } = value as {
       select?: Select<T>;
     };
     const { selectColumns } = generateSelectSql(tableAlias[key], select);
-    joinColumns.push(...selectColumns.map((column) => `${column} as ${key}_${column.split('.')[1]}`));
+    joinColumns.push(...selectColumns.map((column) => `${column} as ${key}_${column.split('.')[1].replace(/"/g, '')}`));
     query.push(
       `LEFT JOIN public."${capitalize(key)}" as ${tableAlias[key]} ON ${mainAlias}.id = ${tableAlias[key]}."userId"`
     );
