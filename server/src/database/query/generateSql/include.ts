@@ -26,7 +26,7 @@ export const generateIncludeSql = <T>(mainAlias: string, include?: Include<T>): 
       if ('id' in Object.keys(select)) {
         shouldGetId[key] = select['id' as keyof Select<T>] || false;
       } else {
-        const newSelect = { id: true, ...select };
+        const newSelect = { id: Object.values(select).every((v) => v === false) ? false : true, ...select };
         shouldGetId[key] = false;
         include[key as keyof Include<T>] = { select: newSelect };
       }
@@ -36,6 +36,7 @@ export const generateIncludeSql = <T>(mainAlias: string, include?: Include<T>): 
   }
 
   for (const [key, value] of Object.entries(include)) {
+    if (!value) continue;
     const { select } = value as {
       select?: Select<T>;
     };

@@ -11,7 +11,6 @@ app.get('/', async (req, res) => {
     select: {
       name: true,
       age: true,
-      lastName: true,
     },
     include: {
       image: {
@@ -27,9 +26,9 @@ app.get('/', async (req, res) => {
 
 app.post('/create', async (req, res) => {
   const user = await db.user.create({
-    name: 'Alice',
+    name: 'crass',
     age: 25,
-    email: 'alice@gmail.com',
+    email: 'gsgsdrgdg',
     lastName: 'Doe',
     gender: Gender.Female,
     password: '1234',

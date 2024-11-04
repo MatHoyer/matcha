@@ -1,10 +1,11 @@
-export const generateObject = (rows: any[], shouldGetId: Record<string, boolean>) => {
+import { tableKeys } from './type.js';
+
+export const generateObject = (rows: any[], shouldGetId: Record<string, boolean>, name: string) => {
   const object: Record<string, any> = {};
 
   for (const row of rows) {
     if (!row || typeof row !== 'object') continue;
     for (const [key, value] of Object.entries(row as Record<string, any>)) {
-      console.log(object);
       const splitKey = key.split('_');
       const underObject = splitKey[0];
 
@@ -30,13 +31,13 @@ export const generateObject = (rows: any[], shouldGetId: Record<string, boolean>
   }
 
   for (const key in object) {
+    if (Object.keys(tableKeys[name]).includes(key)) continue;
     if (Array.isArray(object[key]) && object[key].length === 1) {
       object[key] = object[key][0];
     }
+    console.log(object[key]);
     const isFullNull = Object.values(object[key]).every((value) => value === null);
-    if (isFullNull) {
-      object[key] = null;
-    }
+    if (isFullNull) object[key] = null;
     if (object[key] && typeof object[key] === 'object') {
       for (const [index, element] of object[key].entries()) {
         if (!shouldGetId[key] && 'id' in element) {

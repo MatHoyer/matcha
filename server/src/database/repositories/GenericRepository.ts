@@ -10,11 +10,13 @@ import { tableAlias, type Include, type Select, type WhereClause } from '../quer
 
 class GenericRepository<T, I> {
   alias: string;
+  name: string;
   tableName: string;
   pool: pg.Pool;
 
   constructor(tableName: string, pool: pg.Pool) {
     this.alias = tableAlias[tableName];
+    this.name = tableName;
     this.tableName = `public."${capitalize(tableName)}"`;
     this.pool = pool;
   }
@@ -34,7 +36,7 @@ class GenericRepository<T, I> {
     console.log(queryString, values);
     const { rows } = await this.pool.query(queryString, values);
     console.log(rows);
-    return generateObject(rows, shouldGetId);
+    return generateObject(rows, shouldGetId, this.name);
   }
 
   async create(data: Omit<T, 'id'>): Promise<T> {
