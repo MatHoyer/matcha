@@ -35,7 +35,6 @@ export const generateObject = (rows: any[], shouldGetId: Record<string, boolean>
     if (Array.isArray(object[key]) && object[key].length === 1) {
       object[key] = object[key][0];
     }
-    console.log(object[key]);
     const isFullNull = Object.values(object[key]).every((value) => value === null);
     if (isFullNull) object[key] = null;
     if (object[key] && typeof object[key] === 'object') {
