@@ -26,8 +26,10 @@ class GenericRepository<T, I> {
 
     const { query, values } = generateWhereClauseSql(where);
 
-    const { join, joinColumns, shouldGetId } = generateIncludeSql(this.alias, include);
-    const { selectColumns } = generateSelectSql(this.alias, select);
+    const { selectColumns, shouldGetId } = generateSelectSql(this.name, this.alias, select);
+
+    const { join, joinColumns, shouldGetIdList } = generateIncludeSql(this.alias, include);
+    shouldGetIdList['main'] = shouldGetId;
     selectColumns.push(...joinColumns);
     const columns = selectColumns.join(', ');
 
@@ -36,7 +38,8 @@ class GenericRepository<T, I> {
     console.log(queryString, values);
     const { rows } = await this.pool.query(queryString, values);
     console.log(rows);
-    return generateObject(rows, shouldGetId, this.name);
+    console.log(shouldGetIdList);
+    return generateObject(rows, shouldGetIdList);
   }
 
   async create(data: Omit<T, 'id'>): Promise<T> {
