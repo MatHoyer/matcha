@@ -1,50 +1,85 @@
-import { tableKeys } from './type.js';
+import { removeDuplicate } from '../../utils/removeDuplicate.js';
 
-export const generateObject = (rows: any[], shouldGetId: Record<string, boolean>, name: string) => {
-  const object: Record<string, any> = {};
+const idAlreadyExist = (list: Record<string, any>[], id: number) => {
+  return list.some((object) => object.id === id);
+};
+
+const generateMainObject = (row: Record<string, any>) => {
+  let formated: Record<string, any> = {};
+
+  for (const [key, value] of Object.entries(row)) {
+    const splitKey = key.split('_');
+    if (splitKey.length === 1) {
+      formated = { ...formated, [key]: value };
+    }
+  }
+
+  return formated;
+};
+
+const generateUnderObject = (row: Record<string, any>, underObjectKey: string) => {
+  const formated: Record<string, any> = {};
+
+  for (const [key, value] of Object.entries(row)) {
+    const splitKey = key.split('_');
+    if (splitKey[0] === underObjectKey) {
+      formated[splitKey[1]] = value;
+    }
+  }
+
+  return formated;
+};
+
+const cleanObject = (object: Record<string, any>, shouldGetId: Record<string, boolean>) => {
+  for (const [key, value] of Object.entries(object)) {
+    if (Array.isArray(value)) {
+      if (value.length === 1) object[key] = value[0];
+      else if (Object.values(object[key]).every((value) => value === null)) object[key] = null;
+      else {
+        for (const [index, element] of object[key].entries()) {
+          if (!shouldGetId[key] && 'id' in element) delete object[key][index].id;
+        }
+      }
+    } else {
+      if (key === 'id' && !shouldGetId['main']) delete object[key];
+    }
+  }
+};
+
+export const generateObject = (rows: any[], shouldGetIdList: Record<string, boolean>) => {
+  const returnList: Record<string, any>[] = [];
 
   for (const row of rows) {
     if (!row || typeof row !== 'object') continue;
-    for (const [key, value] of Object.entries(row as Record<string, any>)) {
-      const splitKey = key.split('_');
-      const underObject = splitKey[0];
 
-      if (splitKey.length === 1) {
-        object[underObject] = value;
-      } else if (underObject in object) {
-        let found = false;
-        for (const objectValue of object[underObject]) {
-          if (!(splitKey[1] in objectValue)) {
-            objectValue[splitKey[1]] = value;
-            found = true;
-          } else if (objectValue[splitKey[1]] === value) {
-            found = true;
-          }
-        }
-        if (!found) {
-          object[underObject].push({ [splitKey[1]]: value });
-        }
-      } else {
-        object[underObject] = [{ [splitKey[1]]: value }];
-      }
+    const id = row.id;
+    if (!idAlreadyExist(returnList, id)) {
+      returnList.push({ id });
+      delete row.id;
+    }
+    const listId = returnList.findIndex((object) => object.id === id);
+
+    returnList[listId] = { ...returnList[listId], ...generateMainObject(row) };
+
+    const underObjects = removeDuplicate(
+      Object.keys(row)
+        .map((key) => {
+          const splitKey = key.split('_');
+          return splitKey.length === 1 ? '' : splitKey[0];
+        })
+        .filter((key) => key !== '')
+    );
+
+    for (const underObject of underObjects) {
+      if (!(underObject in returnList[listId])) returnList[listId][underObject] = [];
+      const tmpObject = generateUnderObject(row, underObject);
+      if (tmpObject.id) returnList[listId][underObject].push(generateUnderObject(row, underObject));
     }
   }
 
-  for (const key in object) {
-    if (Object.keys(tableKeys[name]).includes(key)) continue;
-    if (Array.isArray(object[key]) && object[key].length === 1) {
-      object[key] = object[key][0];
-    }
-    const isFullNull = Object.values(object[key]).every((value) => value === null);
-    if (isFullNull) object[key] = null;
-    if (object[key] && typeof object[key] === 'object') {
-      for (const [index, element] of object[key].entries()) {
-        if (!shouldGetId[key] && 'id' in element) {
-          delete object[key][index].id;
-        }
-      }
-    }
+  for (const object of returnList) {
+    cleanObject(object, shouldGetIdList);
   }
 
-  return object;
+  return returnList.length === 1 ? returnList[0] : returnList;
 };

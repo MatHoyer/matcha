@@ -1,20 +1,37 @@
 import { quoteUppercase } from '../../../utils/quoteUppercase.js';
-import { tableAlias, tableKeys, type Select } from '../type.js';
+import { tableKeys, type Select } from '../type.js';
 
 type TReturnType = {
   selectColumns: string[];
+  shouldGetId: boolean;
 };
 
-export const generateSelectSql = <T>(alias: string, select?: Select<T>): TReturnType => {
-  if (!select) {
-    const tableName = Object.keys(tableAlias).find((key) => tableAlias[key] === alias);
-    const object = tableKeys[tableName as keyof typeof tableKeys];
-    return { selectColumns: Object.keys(object).map((key) => `${alias}.${quoteUppercase(key)}`) };
+const selectAllKeys = (tableName: string, tableAlias: string, selectColumns: string[]) => {
+  const tableType = tableKeys[tableName as keyof typeof tableKeys];
+  for (const key of Object.keys(tableType)) {
+    selectColumns.push(`${tableAlias}.${quoteUppercase(key)}`);
   }
+};
+
+export const generateSelectSql = <T>(tableName: string, tableAlias: string, select?: Select<T>): TReturnType => {
   const selectColumns: string[] = [];
-  for (const [key, value] of Object.entries(select)) {
-    if (!value) continue;
-    selectColumns.push(`${alias}.${quoteUppercase(key)}`);
+  let shouldGetId = false;
+
+  switch (typeof select) {
+    case 'undefined':
+      selectAllKeys(tableName, tableAlias, selectColumns);
+      shouldGetId = true;
+      break;
+
+    case 'object':
+      for (const [key, value] of Object.entries(select)) {
+        if (!value) continue;
+        if (key === 'id') shouldGetId = true;
+        selectColumns.push(`${tableAlias}.${quoteUppercase(key)}`);
+      }
+      if (!shouldGetId) selectColumns.push(`${tableAlias}.id`);
+      break;
   }
-  return { selectColumns: selectColumns };
+
+  return { selectColumns, shouldGetId };
 };
