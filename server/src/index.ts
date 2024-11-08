@@ -7,34 +7,34 @@ const app = express();
 const port = process.env.PORT;
 
 app.get('/', async (req, res) => {
-  const users = await db.user.findMany({
-    select: {
-      name: true,
-      age: true,
-    },
-    include: {
-      image: {
-        select: {
-          url: true,
-        },
+  try {
+    await db.user.remove({
+      where: {
+        name: 'crass',
       },
-      location: true,
-    },
-  });
-  res.json(users);
+    });
+    const users = await db.user.findMany({});
+    res.json(users);
+  } catch (error) {
+    if (error instanceof Error) res.json({ error: error.message });
+  }
 });
 
 app.post('/create', async (req, res) => {
-  const user = await db.user.create({
-    name: 'crass',
-    age: 25,
-    email: 'gsgsdrgdg',
-    lastName: 'Doe',
-    gender: Gender.Female,
-    password: '1234',
-    preference: Orientation.Bisexual,
-  });
-  res.json(user);
+  try {
+    const user = await db.user.create({
+      name: 'crass',
+      age: 25,
+      email: 'gsgsdrgdg',
+      lastName: 'Doe',
+      gender: Gender.Female,
+      password: '1234',
+      preference: Orientation.Bisexual,
+    });
+    res.json(user);
+  } catch (error) {
+    if (error instanceof Error) res.json({ error: error.message });
+  }
 });
 
 app.listen(port, () => {

@@ -6,7 +6,7 @@ import { generateObject } from '../query/generateObject.js';
 import { generateIncludeSql } from '../query/generateSql/include.js';
 import { generateSelectSql } from '../query/generateSql/select.js';
 import { generateWhereClauseSql } from '../query/generateSql/whereClause.js';
-import { tableAlias, type Include, type Select, type WhereClause } from '../query/type.js';
+import { tableAlias, type CommonOptions, type WhereClause } from '../query/type.js';
 
 class GenericRepository<T, I> {
   alias: string;
@@ -21,28 +21,29 @@ class GenericRepository<T, I> {
     this.pool = pool;
   }
 
-  async findMany(data: { where?: WhereClause<T>; include?: Include<I>; select?: Select<T> }) {
-    const { where, include, select } = data;
+  async #find(options: CommonOptions<T, I>) {
+    const { where, include, select, take, skip } = options;
 
-    const { query, values } = generateWhereClauseSql(where);
-
+    const { whereClause, values } = generateWhereClauseSql(where);
     const { selectColumns, shouldGetId } = generateSelectSql(this.name, this.alias, select);
-
     const { join, joinColumns, shouldGetIdList } = generateIncludeSql(this.alias, include);
+
     shouldGetIdList['main'] = shouldGetId;
     selectColumns.push(...joinColumns);
     const columns = selectColumns.join(', ');
 
-    const queryString = `SELECT ${columns} FROM ${this.tableName} as ${this.alias} ${join} ${query}`;
+    const queryString = `SELECT ${columns} FROM ${this.tableName} as ${this.alias} 
+      ${join} 
+      ${whereClause} 
+      ${'LIMIT ' + (take ?? 'ALL')} 
+      ${skip ? `OFFSET ${skip}` : ''}
+      `;
 
-    console.log(queryString, values);
     const { rows } = await this.pool.query(queryString, values);
-    console.log(rows);
-    console.log(shouldGetIdList);
     return generateObject(rows, shouldGetIdList);
   }
 
-  async create(data: Omit<T, 'id'>): Promise<T> {
+  async #create(data: Omit<T, 'id'>) {
     const columns = Object.keys(data)
       .map((column) => quoteUppercase(column))
       .join(', ');
@@ -54,6 +55,30 @@ class GenericRepository<T, I> {
       values
     );
     return rows[0];
+  }
+
+  async #remove(option: { where: WhereClause<T> }) {
+    const { where } = option;
+    const { whereClause, values } = generateWhereClauseSql(where);
+    if (!whereClause) throw new Error('No where clause provided');
+    const { rows } = await this.pool.query(`DELETE FROM ${this.tableName} ${whereClause}`, values);
+    return rows[0];
+  }
+
+  async findFirst(options: Omit<CommonOptions<T, I>, 'take' | 'skip'>) {
+    return await this.#find({ ...options, take: 1 });
+  }
+
+  async findMany(options: CommonOptions<T, I>) {
+    return await this.#find(options);
+  }
+
+  async create(data: Omit<T, 'id'>) {
+    return await this.#create(data);
+  }
+
+  async remove(options: { where: WhereClause<T> }) {
+    return await this.#remove(options);
   }
 }
 

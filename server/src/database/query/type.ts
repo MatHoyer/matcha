@@ -203,3 +203,11 @@ export type OrderBy<T> = {
 export type WhereClause<T> = {
   [P in keyof T]?: T[P] | { $gt?: T[P]; $lt?: T[P]; $gte?: T[P]; $lte?: T[P]; $not?: T[P] };
 };
+
+export type CommonOptions<T, I> = {
+  where?: WhereClause<T>;
+  include?: Include<I>;
+  select?: Select<T>;
+  take?: number;
+  skip?: number;
+};

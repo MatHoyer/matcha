@@ -1,12 +1,12 @@
 import type { WhereClause } from '../type.js';
 
 type TReturnType = {
-  query: string;
+  whereClause: string;
   values: any[];
 };
 
 export const generateWhereClauseSql = <T>(where?: WhereClause<T>, parentKey?: string, index?: number): TReturnType => {
-  if (!where) return { query: '', values: [] };
+  if (!where) return { whereClause: '', values: [] };
   const sql: string[] = [];
   const values: any[] = [];
   let indexCounter = index || 1;
@@ -36,13 +36,13 @@ export const generateWhereClauseSql = <T>(where?: WhereClause<T>, parentKey?: st
       indexCounter++;
     } else {
       if (value !== null) {
-        const { query, values: resultValues } = generateWhereClauseSql(value, key, indexCounter);
+        const { whereClause: query, values: resultValues } = generateWhereClauseSql(value, key, indexCounter);
         sql.push(query);
         values.push(...resultValues);
         indexCounter += values.length;
       }
     }
   }
-  if (parentKey) return { query: `(${sql.join(' AND ')})`, values };
-  return { query: `WHERE ${sql.join(' AND ')}`, values };
+  if (parentKey) return { whereClause: `(${sql.join(' AND ')})`, values };
+  return { whereClause: `WHERE ${sql.join(' AND ')}`, values };
 };

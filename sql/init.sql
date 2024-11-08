@@ -33,8 +33,8 @@ CREATE TABLE "UserTag" (
   "id" SERIAL PRIMARY KEY,
   "userId" INT NOT NULL,
   "tagId" INT NOT NULL,
-  FOREIGN KEY ("userId") REFERENCES "User" ("id"),
-  FOREIGN KEY ("tagId") REFERENCES "Tag" ("id")
+  FOREIGN KEY ("userId") REFERENCES "User" ("id")  ON DELETE CASCADE,
+  FOREIGN KEY ("tagId") REFERENCES "Tag" ("id")  ON DELETE CASCADE
 );
 
 DROP TABLE IF EXISTS "Message";
@@ -44,8 +44,8 @@ CREATE TABLE "Message" (
   "receiverId" INT NOT NULL,
   "message" VARCHAR(1000) NOT NULL,
   "date" TIMESTAMP NOT NULL,
-  FOREIGN KEY ("userId") REFERENCES "User" ("id"),
-  FOREIGN KEY ("receiverId") REFERENCES "User" ("id")
+  FOREIGN KEY ("userId") REFERENCES "User" ("id")  ON DELETE CASCADE,
+  FOREIGN KEY ("receiverId") REFERENCES "User" ("id")  ON DELETE CASCADE
 );
 
 DROP TABLE IF EXISTS "Report";
@@ -54,7 +54,7 @@ CREATE TABLE "Report" (
   "userId" INT NOT NULL,
   "reportedId" INT NOT NULL,
   "reason" VARCHAR(1000) NOT NULL,
-  FOREIGN KEY ("userId") REFERENCES "User" ("id"),
+  FOREIGN KEY ("userId") REFERENCES "User" ("id") ON DELETE CASCADE,
   FOREIGN KEY ("reportedId") REFERENCES "User" ("id")
 );
 
@@ -63,8 +63,8 @@ CREATE TABLE "Like" (
   "id" SERIAL PRIMARY KEY,
   "userId" INT NOT NULL,
   "likedId" INT NOT NULL,
-  FOREIGN KEY ("userId") REFERENCES "User" ("id"),
-  FOREIGN KEY ("likedId") REFERENCES "User" ("id")
+  FOREIGN KEY ("userId") REFERENCES "User" ("id")  ON DELETE CASCADE,
+  FOREIGN KEY ("likedId") REFERENCES "User" ("id")  ON DELETE CASCADE
 );
 
 DROP TABLE IF EXISTS "Notification";
@@ -73,7 +73,7 @@ CREATE TABLE "Notification" (
   "userId" INT NOT NULL,
   "message" VARCHAR(1000) NOT NULL,
   "date" TIMESTAMP NOT NULL,
-  FOREIGN KEY ("userId") REFERENCES "User" ("id")
+  FOREIGN KEY ("userId") REFERENCES "User" ("id")  ON DELETE CASCADE
 );
 
 DROP TABLE IF EXISTS "Block";
@@ -81,8 +81,8 @@ CREATE TABLE "Block" (
   "id" SERIAL PRIMARY KEY,
   "userId" INT NOT NULL,
   "blockedId" INT NOT NULL,
-  FOREIGN KEY ("userId") REFERENCES "User" ("id"),
-  FOREIGN KEY ("blockedId") REFERENCES "User" ("id")
+  FOREIGN KEY ("userId") REFERENCES "User" ("id")  ON DELETE CASCADE,
+  FOREIGN KEY ("blockedId") REFERENCES "User" ("id")  ON DELETE CASCADE
 );
 
 DROP TABLE IF EXISTS "Location";
@@ -92,7 +92,7 @@ CREATE TABLE "Location" (
   "latitude" FLOAT NOT NULL,
   "longitude" FLOAT NOT NULL,
   "date" TIMESTAMP NOT NULL,
-  FOREIGN KEY ("userId") REFERENCES "User" ("id")
+  FOREIGN KEY ("userId") REFERENCES "User" ("id")  ON DELETE CASCADE
 );
 
 DROP TABLE IF EXISTS "View";
@@ -101,8 +101,8 @@ CREATE TABLE "View" (
   "userId" INT NOT NULL,
   "viewerId" INT NOT NULL,
   "date" TIMESTAMP NOT NULL,
-  FOREIGN KEY ("userId") REFERENCES "User" ("id"),
-  FOREIGN KEY ("viewerId") REFERENCES "User" ("id")
+  FOREIGN KEY ("userId") REFERENCES "User" ("id")  ON DELETE CASCADE,
+  FOREIGN KEY ("viewerId") REFERENCES "User" ("id")  ON DELETE CASCADE
 );
 
 DROP TABLE IF EXISTS "Image";
@@ -111,5 +111,5 @@ CREATE TABLE "Image" (
   "userId" INT NOT NULL,
   "url" VARCHAR(255) NOT NULL,
   "isProfile" BOOLEAN NOT NULL,
-  FOREIGN KEY ("userId") REFERENCES "User" ("id")
+  FOREIGN KEY ("userId") REFERENCES "User" ("id")  ON DELETE CASCADE
 );
