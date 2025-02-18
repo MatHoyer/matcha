@@ -7,11 +7,11 @@ class Database {
 
   constructor() {
     this.pool = new pg.Pool({
-      host: process.env.DB_HOST,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-      port: parseInt(process.env.DB_PORT as string),
+      host: process.env.POSTGRES_HOST,
+      user: process.env.POSTGRES_USER,
+      password: process.env.POSTGRES_PASSWORD,
+      database: process.env.POSTGRES_NAME,
+      port: parseInt(process.env.POSTGRES_PORT as string),
     });
 
     this.pool.connect();

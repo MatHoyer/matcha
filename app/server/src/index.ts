@@ -4,15 +4,15 @@ import db from './database/Database.js';
 import { Gender, Orientation } from './database/query/type.js';
 
 const app = express();
-const port = process.env.PORT;
+const port = process.env.APP_PORT;
 
 app.get('/', async (req, res) => {
   try {
-    await db.user.remove({
-      where: {
-        name: 'crass',
-      },
-    });
+    // await db.user.remove({
+    //   where: {
+    //     name: 'crass',
+    //   },
+    // });
     const users = await db.user.findMany({});
     res.json(users);
   } catch (error) {
@@ -22,6 +22,7 @@ app.get('/', async (req, res) => {
 
 app.post('/create', async (req, res) => {
   try {
+    console.log('creating user');
     const user = await db.user.create({
       name: 'crass',
       age: 25,

@@ -1,7 +1,3 @@
-CREATE DATABASE matcha;
-
-\c matcha;
-
 DROP TYPE IF EXISTS "Gender" CASCADE;
 CREATE TYPE "Gender" AS ENUM ('Male', 'Female');
 
