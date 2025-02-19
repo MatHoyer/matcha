@@ -1,7 +1,6 @@
 import pg from 'pg';
 
-import { capitalize } from '../../utils/capitalized.js';
-import { quoteUppercase } from '../../utils/quoteUppercase.js';
+import { capitalize, quoteUppercase } from '../../utils/globals.utils.js';
 import { generateObject } from '../query/generateObject.js';
 import { generateIncludeSql } from '../query/generateSql/include.js';
 import { generateSelectSql } from '../query/generateSql/select.js';

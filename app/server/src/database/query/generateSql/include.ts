@@ -1,5 +1,4 @@
-import { capitalize } from '../../../utils/capitalized.js';
-import { typedEntries } from '../../../utils/typedEntries.js';
+import { capitalize, typedEntries } from '../../../utils/globals.utils.js';
 import { tableAlias, type Include } from '../type.js';
 import { generateSelectSql } from './select.js';
 

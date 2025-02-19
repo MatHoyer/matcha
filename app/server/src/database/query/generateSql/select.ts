@@ -1,4 +1,4 @@
-import { quoteUppercase } from '../../../utils/quoteUppercase.js';
+import { quoteUppercase } from '../../../utils/globals.utils.js';
 import { tableKeys, type Select } from '../type.js';
 
 type TReturnType = {

@@ -1,4 +1,4 @@
-import { removeDuplicate } from '../../utils/removeDuplicate.js';
+import { removeDuplicate } from '../../utils/globals.utils.js';
 
 const idAlreadyExist = (list: Record<string, any>[], id: number) => {
   return list.some((object) => object.id === id);
