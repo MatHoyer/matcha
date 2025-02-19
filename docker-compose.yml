@@ -25,10 +25,11 @@ services:
       - '${SERVER_PORT}:${SERVER_PORT}'
     volumes:
       - ./app/server:/app/server
-      - server_node_modules:/app/server/node_modules
+      - ./app/server/node_modules:/app/server/node_modules
     depends_on:
       db:
         condition: service_healthy
+    command: bash -c "npm install && npm run dev"
 
   # client:
   #   container_name: matcha_client
@@ -42,4 +43,3 @@ services:
 
 volumes:
   matcha_data:
-  server_node_modules:

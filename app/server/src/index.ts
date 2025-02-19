@@ -22,7 +22,7 @@ app.get('/', async (req, res) => {
 
 app.post('/create', async (req, res) => {
   try {
-    console.log('test');
+    console.log('re');
     const user = await db.user.create({
       name: 'crass',
       age: 25,
