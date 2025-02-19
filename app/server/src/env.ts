@@ -9,6 +9,7 @@ export const envSchema = z.object({
   SERVER_PORT: z.string(),
   CLIENT_PORT: z.string(),
   AUTH_SECRET: z.string(),
+  JWT_SECRET: z.string(),
 });
 export type TEnv = Infer<typeof envSchema>;
 
@@ -24,4 +25,5 @@ export const env = {
   CLIENT_PORT: process.env.CLIENT_PORT,
 
   AUTH_SECRET: process.env.AUTH_SECRET,
+  JWT_SECRET: process.env.JWT_SECRET,
 } as TEnv;
