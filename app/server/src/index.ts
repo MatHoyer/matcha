@@ -1,10 +1,17 @@
 import cors from 'cors';
-import 'dotenv/config';
 import express from 'express';
+import { env, envSchema } from './env.js';
 import { default as authRouter } from './routes/auth.route.js';
 
+try {
+  envSchema.parse(process.env);
+} catch (error) {
+  console.error('Error: Bad environment variables');
+  process.exit(1);
+}
+
 const app = express();
-const port = process.env.SERVER_PORT;
+const port = env.SERVER_PORT;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

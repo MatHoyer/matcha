@@ -25,6 +25,18 @@ abstract class ZodType<T> {
       }
     })();
   }
+
+  optional() {
+    const self = this;
+    return new (class extends ZodType<T | undefined> {
+      parse(data: unknown): T | undefined {
+        if (data === undefined) {
+          return undefined;
+        }
+        return self.parse(data);
+      }
+    })();
+  }
 }
 
 // String schema
@@ -51,6 +63,32 @@ class ZodNumber extends ZodType<number> {
   parse(data: unknown): number {
     if (typeof data !== 'number') {
       throw new Error('Expected number');
+    }
+    return data;
+  }
+  min(minLength: number) {
+    return this.refine((data) => data >= minLength, `Must be at least ${minLength}`);
+  }
+  max(maxLength: number) {
+    return this.refine((data) => data <= maxLength, `Must be at most ${maxLength}`);
+  }
+}
+
+// Boolean schema
+class ZodBoolean extends ZodType<boolean> {
+  parse(data: unknown): boolean {
+    if (typeof data !== 'boolean') {
+      throw new Error('Expected boolean');
+    }
+    return data;
+  }
+}
+
+// Date schema
+class ZodDate extends ZodType<Date> {
+  parse(data: unknown): Date {
+    if (!(data instanceof Date)) {
+      throw new Error('Expected date');
     }
     return data;
   }
@@ -99,6 +137,8 @@ class ZodArray<T> extends ZodType<T[]> {
 const z = {
   string: () => new ZodString(),
   number: () => new ZodNumber(),
+  boolean: () => new ZodBoolean(),
+  date: () => new ZodDate(),
   object: <T extends { [key: string]: any }>(shape: { [K in keyof T]: ZodType<T[K]> }) => new ZodObject<T>(shape),
   array: <T>(itemType: ZodType<T>) => new ZodArray(itemType),
 };
