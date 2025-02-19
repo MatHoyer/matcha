@@ -1,10 +1,10 @@
-FROM node:23
+FROM node:22
 
 WORKDIR /app/server
 
-COPY ./app/server/ /app/server/
+COPY package*.json .
 
-RUN npm install
+RUN npm i
 
 EXPOSE 3000
 

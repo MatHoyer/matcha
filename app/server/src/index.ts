@@ -4,7 +4,7 @@ import db from './database/Database.js';
 import { Gender, Orientation } from './database/query/type.js';
 
 const app = express();
-const port = process.env.APP_PORT;
+const port = process.env.SERVER_PORT;
 
 app.get('/', async (req, res) => {
   try {
@@ -22,7 +22,7 @@ app.get('/', async (req, res) => {
 
 app.post('/create', async (req, res) => {
   try {
-    console.log('creating user');
+    console.log('test');
     const user = await db.user.create({
       name: 'crass',
       age: 25,
