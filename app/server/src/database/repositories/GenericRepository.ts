@@ -90,15 +90,17 @@ class GenericRepository<T, I> {
     return rows ? rows[0] : null;
   }
 
-  async findFirst(options: Omit<CommonOptions<T, I>, 'take' | 'skip'>) {
-    return await this.#find({ ...options, take: 1 });
+  async findFirst(
+    options: Omit<CommonOptions<T, I>, 'take' | 'skip'>
+  ): Promise<T | null> {
+    return (await this.#find({ ...options, take: 1 })) as T | null;
   }
 
   async findMany(options: CommonOptions<T, I>) {
     return await this.#find(options);
   }
 
-  async create(content: { data: Omit<T, 'id'> }) {
+  async create(content: { data: Omit<T, 'id'> }): Promise<T | null> {
     return await this.#create(content.data);
   }
 

@@ -1,17 +1,9 @@
-import { useState } from 'react';
-import { Button } from './components/ui/button';
+import { Pages } from './pages/Pages';
 
 const App = () => {
-  const [count, setCount] = useState(0);
-
   return (
-    <div className="size-full flex justify-center items-center">
-      <Button
-        className="cursor-pointer"
-        onClick={() => setCount((count) => count + 1)}
-      >
-        Count is {count}
-      </Button>
+    <div className="size-full">
+      <Pages />
     </div>
   );
 };

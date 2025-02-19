@@ -1,3 +1,4 @@
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
 import { env, envSchema } from './env.ts';
@@ -14,8 +15,14 @@ const app = express();
 const port = env.SERVER_PORT;
 
 app.use(express.json());
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+app.use(
+  cors({
+    origin: 'http://localhost:3001',
+    credentials: true,
+  })
+);
 
 app.use('/auth', authRouter);
 

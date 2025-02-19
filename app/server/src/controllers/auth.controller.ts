@@ -15,7 +15,7 @@ export const signin = async (req: Request, res: Response) => {
       email,
     },
   });
-  if (user && user.length > 0) {
+  if (user) {
     res.status(409).json({ message: 'User already exists' });
     return;
   }
@@ -32,7 +32,7 @@ export const signin = async (req: Request, res: Response) => {
     },
   });
   // remove cringe check after good prisma update
-  if (!user || user.length === 0 || Array.isArray(user)) {
+  if (!user) {
     res.status(500).json({ message: 'Error creating user' });
     return;
   }
@@ -43,11 +43,17 @@ export const signin = async (req: Request, res: Response) => {
     expiresIn: 30 * 24 * 60 * 60,
   });
 
-  res.status(200).json({
-    data: {
-      token,
-    },
-  });
+  res
+    .status(200)
+    .cookie('auth-token', token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    })
+    .json({
+      message: 'Signed in',
+    });
 };
 
 export const login = async (req: Request, res: Response) => {
@@ -61,7 +67,7 @@ export const login = async (req: Request, res: Response) => {
     },
   });
   // remove cringe check after good prisma update
-  if (!user || user.length === 0 || Array.isArray(user)) {
+  if (!user) {
     res.status(401).json({ message: 'Invalid credentials' });
     return;
   }
@@ -72,9 +78,30 @@ export const login = async (req: Request, res: Response) => {
     expiresIn: 30 * 24 * 60 * 60,
   });
 
-  res.status(200).json({
-    data: {
-      token,
-    },
-  });
+  res
+    .status(200)
+    .cookie('auth-token', token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+      maxAge: 30 * 24 * 60 * 60 * 1000,
+    })
+    .json({
+      message: 'Logged in',
+    });
+};
+
+export const session = async (req: Request, res: Response) => {
+  const token = req.cookies['auth-token'] as string;
+  if (!token) {
+    res.status(401).json({ message: 'Unauthorized' });
+    return;
+  }
+
+  try {
+    const user = jwt.verify(token, env.JWT_SECRET);
+    res.status(200).json({ user });
+  } catch (error) {
+    res.status(401).json({ message: 'Unauthorized' });
+  }
 };

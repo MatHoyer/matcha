@@ -96,5 +96,6 @@ export const generateObject = (
     cleanObject(object, shouldGetIdList);
   }
 
+  if (returnList.length === 0) return null;
   return returnList.length === 1 ? returnList[0] : returnList;
 };
