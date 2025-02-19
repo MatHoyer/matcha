@@ -1,4 +1,4 @@
-import { z, type Infer } from './utils/validator.js';
+import { z, type Infer } from './utils/validator.ts';
 
 export const envSchema = z.object({
   POSTGRES_HOST: z.string(),

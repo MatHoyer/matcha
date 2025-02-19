@@ -6,7 +6,10 @@ const App = () => {
 
   return (
     <div className="size-full flex justify-center items-center">
-      <Button className="cursor-pointer" onClick={() => setCount((count) => count + 1)}>
+      <Button
+        className="cursor-pointer"
+        onClick={() => setCount((count) => count + 1)}
+      >
         Count is {count}
       </Button>
     </div>

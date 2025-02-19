@@ -1,11 +1,15 @@
-import type { WhereClause } from '../type.js';
+import type { WhereClause } from '../type.ts';
 
 type TReturnType = {
   whereClause: string;
   values: any[];
 };
 
-export const generateWhereClauseSql = <T>(where?: WhereClause<T>, parentKey?: string, index?: number): TReturnType => {
+export const generateWhereClauseSql = <T>(
+  where?: WhereClause<T>,
+  parentKey?: string,
+  index?: number
+): TReturnType => {
   if (!where) return { whereClause: '', values: [] };
   const sql: string[] = [];
   const values: any[] = [];
@@ -36,7 +40,8 @@ export const generateWhereClauseSql = <T>(where?: WhereClause<T>, parentKey?: st
       indexCounter++;
     } else {
       if (value !== null) {
-        const { whereClause: query, values: resultValues } = generateWhereClauseSql(value, key, indexCounter);
+        const { whereClause: query, values: resultValues } =
+          generateWhereClauseSql(value, key, indexCounter);
         sql.push(query);
         values.push(...resultValues);
         indexCounter += values.length;

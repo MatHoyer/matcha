@@ -1,5 +1,5 @@
 import pg from 'pg';
-import UserRepository from './repositories/UserRepository.js';
+import UserRepository from './repositories/UserRepository.ts';
 
 class Database {
   pool: pg.Pool;

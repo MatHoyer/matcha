@@ -1,7 +1,7 @@
 import cors from 'cors';
 import express from 'express';
-import { env, envSchema } from './env.js';
-import { default as authRouter } from './routes/auth.route.js';
+import { env, envSchema } from './env.ts';
+import { default as authRouter } from './routes/auth.route.ts';
 
 try {
   envSchema.parse(process.env);

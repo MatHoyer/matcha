@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { login, signin } from '../controllers/auth.controller.js';
-import { bodyParser } from '../controllers/bodyParser.js';
-import { loginSchema, signinSchema } from '../schemas/auth.schema.js';
+import { login, signin } from '../controllers/auth.controller.ts';
+import { loginSchema, signinSchema } from '../schemas/auth.schema.ts';
+import { bodyParser } from './bodyParser.ts';
 
 const authRouter = Router();
 

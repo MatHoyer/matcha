@@ -1,19 +1,27 @@
-import { quoteUppercase } from '../../../utils/globals.utils.js';
-import { tableKeys, type Select } from '../type.js';
+import { quoteUppercase } from '../../../utils/globals.utils.ts';
+import { tableKeys, type Select } from '../type.ts';
 
 type TReturnType = {
   selectColumns: string[];
   shouldGetId: boolean;
 };
 
-const selectAllKeys = (tableName: string, tableAlias: string, selectColumns: string[]) => {
+const selectAllKeys = (
+  tableName: string,
+  tableAlias: string,
+  selectColumns: string[]
+) => {
   const tableType = tableKeys[tableName as keyof typeof tableKeys];
   for (const key of Object.keys(tableType)) {
     selectColumns.push(`${tableAlias}.${quoteUppercase(key)}`);
   }
 };
 
-export const generateSelectSql = <T>(tableName: string, tableAlias: string, select?: Select<T>): TReturnType => {
+export const generateSelectSql = <T>(
+  tableName: string,
+  tableAlias: string,
+  select?: Select<T>
+): TReturnType => {
   const selectColumns: string[] = [];
   let shouldGetId = false;
 

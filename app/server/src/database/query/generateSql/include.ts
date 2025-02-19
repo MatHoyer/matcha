@@ -1,6 +1,6 @@
-import { capitalize, typedEntries } from '../../../utils/globals.utils.js';
-import { tableAlias, type Include } from '../type.js';
-import { generateSelectSql } from './select.js';
+import { capitalize, typedEntries } from '../../../utils/globals.utils.ts';
+import { tableAlias, type Include } from '../type.ts';
+import { generateSelectSql } from './select.ts';
 
 type TReturnType = {
   join: string;
@@ -8,7 +8,10 @@ type TReturnType = {
   shouldGetIdList: Record<string, boolean>;
 };
 
-export const generateIncludeSql = <T>(mainAlias: string, include?: Include<T>): TReturnType => {
+export const generateIncludeSql = <T>(
+  mainAlias: string,
+  include?: Include<T>
+): TReturnType => {
   const query: string[] = [];
   const joinColumns: string[] = [];
   const shouldGetIdList: Record<string, boolean> = {};
@@ -19,16 +22,23 @@ export const generateIncludeSql = <T>(mainAlias: string, include?: Include<T>): 
         const { selectColumns, shouldGetId } = generateSelectSql(
           includeTableName,
           tableAlias[includeTableName],
-          typeof includeTableValue === 'object' ? includeTableValue.select : undefined
+          typeof includeTableValue === 'object'
+            ? includeTableValue.select
+            : undefined
         );
         shouldGetIdList[includeTableName] = shouldGetId;
         joinColumns.push(
-          ...selectColumns.map((column) => `${column} as ${includeTableName}_${column.split('.')[1].replace(/"/g, '')}`)
+          ...selectColumns.map(
+            (column) =>
+              `${column} as ${includeTableName}_${column
+                .split('.')[1]
+                .replace(/"/g, '')}`
+          )
         );
         query.push(
-          `LEFT JOIN public."${capitalize(includeTableName)}" as ${tableAlias[includeTableName]} ON ${mainAlias}.id = ${
+          `LEFT JOIN public."${capitalize(includeTableName)}" as ${
             tableAlias[includeTableName]
-          }."userId"`
+          } ON ${mainAlias}.id = ${tableAlias[includeTableName]}."userId"`
         );
       }
     }

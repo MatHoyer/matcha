@@ -1,4 +1,4 @@
-import { z, type Infer } from '../utils/validator.js';
+import { z, type Infer } from '../utils/validator.ts';
 
 export const signinSchema = z.object({
   email: z.string().email(),

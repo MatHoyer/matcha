@@ -1,10 +1,10 @@
 import type { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import db from '../database/Database.js';
-import { Gender, Orientation } from '../database/query/type.js';
-import { env } from '../env.js';
-import type { TLoginSchema, TSigninSchema } from '../schemas/auth.schema.js';
-import { hashPassword } from '../services/auth.service.js';
+import db from '../database/Database.ts';
+import { Gender, Orientation } from '../database/query/type.ts';
+import { env } from '../env.ts';
+import type { TLoginSchema, TSigninSchema } from '../schemas/auth.schema.ts';
+import { hashPassword } from '../services/auth.service.ts';
 
 export const signin = async (req: Request, res: Response) => {
   const { email, password } = req.body as TSigninSchema;

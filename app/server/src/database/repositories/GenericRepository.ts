@@ -1,15 +1,15 @@
 import pg from 'pg';
 
-import { capitalize, quoteUppercase } from '../../utils/globals.utils.js';
-import { generateObject } from '../query/generateObject.js';
-import { generateIncludeSql } from '../query/generateSql/include.js';
-import { generateSelectSql } from '../query/generateSql/select.js';
-import { generateWhereClauseSql } from '../query/generateSql/whereClause.js';
+import { capitalize, quoteUppercase } from '../../utils/globals.utils.ts';
+import { generateObject } from '../query/generateObject.ts';
+import { generateIncludeSql } from '../query/generateSql/include.ts';
+import { generateSelectSql } from '../query/generateSql/select.ts';
+import { generateWhereClauseSql } from '../query/generateSql/whereClause.ts';
 import {
   tableAlias,
   type CommonOptions,
   type WhereClause,
-} from '../query/type.js';
+} from '../query/type.ts';
 
 class GenericRepository<T, I> {
   alias: string;
