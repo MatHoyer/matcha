@@ -1,11 +1,5 @@
 FROM node:22
 
-WORKDIR /app
+WORKDIR /app/client
 
-COPY . ./client
-
-RUN npm install
-
-EXPOSE 3001
-
-CMD ["npm", "run", "dev"]
+COPY package*.json .

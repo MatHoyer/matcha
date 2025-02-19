@@ -1,3 +1,4 @@
+import cors from 'cors';
 import 'dotenv/config';
 import express from 'express';
 import db from './database/Database.js';
@@ -5,6 +6,10 @@ import { Gender, Orientation } from './database/query/type.js';
 
 const app = express();
 const port = process.env.SERVER_PORT;
+
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 
 app.get('/', async (req, res) => {
   try {
