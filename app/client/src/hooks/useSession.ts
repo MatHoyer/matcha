@@ -40,9 +40,5 @@ export const useSession = () => {
     fetchSession();
   }, []);
 
-  useEffect(() => {
-    console.log('🎯 user mis à jour :', userState);
-  }, [userState]);
-
   return { user: userState, loading };
 };

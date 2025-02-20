@@ -1,8 +1,9 @@
 import { useSession } from '@/hooks/useSession';
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
-import { NotFound } from './NotFound';
 import LoginPage from './auth/Login';
 import SigninPage from './auth/Signin';
+import { Home } from './Home';
+import { NotFound } from './NotFound';
 
 const AuthRoute = () => {
   const { user, loading } = useSession();
@@ -37,7 +38,7 @@ export const Pages = () => {
         <Route path="/auth/login" element={<LoginPage />} />
       </Route>
       <Route element={<PrivateRoute />}>
-        <Route path="/" element={<div />} />
+        <Route path="/" element={<Home />} />
       </Route>
     </Routes>
   );
