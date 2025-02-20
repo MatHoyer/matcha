@@ -89,6 +89,20 @@ export const login = async (req: Request, res: Response) => {
     });
 };
 
+export const logout = async (req: Request, res: Response) => {
+  res
+    .status(200)
+    .cookie('auth-token', '', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+      maxAge: 0,
+    })
+    .json({
+      message: 'Logged out',
+    });
+};
+
 export const session = async (req: Request, res: Response) => {
   const token = req.cookies['auth-token'] as string;
   if (!token) {

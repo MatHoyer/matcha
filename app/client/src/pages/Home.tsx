@@ -1,3 +1,4 @@
+import { LogoutButton } from '@/components/LogoutButton';
 import { Typography } from '@/components/ui/typography';
 import { useSession } from '@/hooks/useSession';
 
@@ -16,6 +17,7 @@ export const Home = () => {
             </Typography>
           ))}
       </div>
+      <LogoutButton />
     </div>
   );
 };
