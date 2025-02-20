@@ -1,6 +1,7 @@
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
+import { Server } from 'socket.io';
 import { env, envSchema } from './env.ts';
 import { default as authRouter } from './routes/auth.route.ts';
 
@@ -26,6 +27,41 @@ app.use(
 
 app.use('/auth', authRouter);
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Server started at http://localhost:${port}`);
 });
+
+// add for chat ---------------------
+const io = new Server(server, {
+  cors: {
+    origin: 'http://localhost:3001',
+  },
+});
+
+// let socketsConnected = new Set<string>();
+let clientsTotal = 0;
+
+io.on('connection', (socket) => {
+  // console.log(socket.id);
+  // socketsConnected.add(socket.id);
+  clientsTotal++;
+  io.emit('clients-total', clientsTotal);
+  console.log(clientsTotal);
+
+  socket.on('message', (data) => {
+    // console.log(data);
+    socket.broadcast.emit('chat-message', data);
+  });
+
+  socket.on('feedback', (data) => {
+    socket.broadcast.emit('feedback', data);
+  });
+
+  socket.on('disconnect', () => {
+    console.log('Socket disconnected', socket.id);
+    // socketsConnected.delete(socket.id);
+    clientsTotal--;
+    io.emit('clients-total', clientsTotal);
+  });
+});
+// add for chat end -------------------
