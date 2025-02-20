@@ -188,7 +188,7 @@ const SigninPage: React.FC = () => {
               <Typography
                 variant="link"
                 className="cursor-pointer text-xs"
-                onClick={() => navigate('/auth/signin')}
+                onClick={() => navigate('/auth/login')}
               >
                 Log in
               </Typography>
