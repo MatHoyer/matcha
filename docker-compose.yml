@@ -44,5 +44,14 @@ services:
       - server
     command: bash -c "npm install && npm run dev"
 
+  adminer:
+    container_name: matcha_adminer
+    image: adminer
+    restart: always
+    ports:
+      - '8080:8080'
+    depends_on:
+      - db
+
 volumes:
   matcha_data:
