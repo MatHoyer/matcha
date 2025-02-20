@@ -1,19 +1,12 @@
 import cors from 'cors';
 import 'dotenv/config';
 import express from 'express';
+import { Server } from 'socket.io';
 import db from './database/Database.js';
 import { Gender, Orientation } from './database/query/type.js';
-import { Server as SocketIOServer, Socket } from 'socket.io';
-import http from 'http';
-
 
 const app = express();
 const port = process.env.SERVER_PORT;
-
-// add for chat
-const { on } = import('events');
-const path = import('path');
-// add for chat
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -56,32 +49,31 @@ const server = app.listen(port, () => {
 });
 
 // add for chat ---------------------
-const io = new SocketIOServer(server);
+const io = new Server(server, {
+  cors: {
+    origin: 'http://localhost:3001',
+  },
+});
 
 // let socketsConnected = new Set<string>();
 let clientsTotal = 0;
 
-app.use(express.static(path.join(__dirname, 'public')));
-
-
-io.on('connection', (socket: Socket) => {
+io.on('connection', (socket) => {
   // console.log(socket.id);
   // socketsConnected.add(socket.id);
   clientsTotal++;
   io.emit('clients-total', clientsTotal);
-
-
+  console.log(clientsTotal);
 
   socket.on('message', (data) => {
-      // console.log(data);
-      socket.broadcast.emit('chat-message', data);
+    // console.log(data);
+    socket.broadcast.emit('chat-message', data);
   });
 
   socket.on('feedback', (data) => {
-      socket.broadcast.emit('feedback', data);
+    socket.broadcast.emit('feedback', data);
+  });
 
-  });  
-  
   socket.on('disconnect', () => {
     console.log('Socket disconnected', socket.id);
     // socketsConnected.delete(socket.id);
