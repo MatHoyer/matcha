@@ -12,6 +12,7 @@ import PasswordInput from '@/components/ui/password-input';
 import { Typography } from '@/components/ui/typography';
 import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 
 type TForm = {
   email: string;
@@ -19,6 +20,8 @@ type TForm = {
 };
 
 const LoginPage: React.FC = () => {
+  const navigate = useNavigate();
+
   const form = useForm<TForm>({
     defaultValues: {
       email: '',
@@ -58,8 +61,12 @@ const LoginPage: React.FC = () => {
             <Typography variant="h2">Login</Typography>
           </CardTitle>
         </CardHeader>
-        <CardContent className="flex flex-col gap-2">
-          <Form form={form} onSubmit={() => onSubmit()}>
+        <CardContent>
+          <Form
+            form={form}
+            onSubmit={() => onSubmit()}
+            className="flex flex-col gap-2"
+          >
             <FormField
               control={form.control}
               {...form.register('email', { required: 'Email is required' })}
@@ -93,6 +100,16 @@ const LoginPage: React.FC = () => {
             <LoadingButton type="submit" loading={form.formState.isLoading}>
               Login
             </LoadingButton>
+            <div className="flex items-center gap-2 w-full justify-center">
+              <Typography className="text-xs">New here ?</Typography>
+              <Typography
+                variant="link"
+                className="cursor-pointer text-xs"
+                onClick={() => navigate('/auth/signin')}
+              >
+                Create an account
+              </Typography>
+            </div>
           </Form>
         </CardContent>
       </Card>

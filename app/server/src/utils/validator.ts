@@ -48,13 +48,22 @@ class ZodString extends ZodType<string> {
     return data;
   }
   email() {
-    return this.refine((data) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data), 'Invalid email');
+    return this.refine(
+      (data) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data),
+      'Invalid email'
+    );
   }
   min(minLength: number) {
-    return this.refine((data) => data.length >= minLength, `Must be at least ${minLength} characters long`);
+    return this.refine(
+      (data) => data.length >= minLength,
+      `Must be at least ${minLength} characters long`
+    );
   }
   max(maxLength: number) {
-    return this.refine((data) => data.length <= maxLength, `Must be at most ${maxLength} characters long`);
+    return this.refine(
+      (data) => data.length <= maxLength,
+      `Must be at most ${maxLength} characters long`
+    );
   }
 }
 
@@ -67,10 +76,16 @@ class ZodNumber extends ZodType<number> {
     return data;
   }
   min(minLength: number) {
-    return this.refine((data) => data >= minLength, `Must be at least ${minLength}`);
+    return this.refine(
+      (data) => data >= minLength,
+      `Must be at least ${minLength}`
+    );
   }
   max(maxLength: number) {
-    return this.refine((data) => data <= maxLength, `Must be at most ${maxLength}`);
+    return this.refine(
+      (data) => data <= maxLength,
+      `Must be at most ${maxLength}`
+    );
   }
 }
 
@@ -91,6 +106,23 @@ class ZodDate extends ZodType<Date> {
       throw new Error('Expected date');
     }
     return data;
+  }
+}
+
+// Enum schema
+class ZodEnum<T extends string> extends ZodType<T> {
+  private values: readonly T[];
+
+  constructor(values: readonly T[]) {
+    super();
+    this.values = values;
+  }
+
+  parse(data: unknown): T {
+    if (typeof data !== 'string' || !this.values.includes(data as T)) {
+      throw new Error(`Expected one of: ${this.values.join(', ')}`);
+    }
+    return data as T;
   }
 }
 
@@ -139,7 +171,11 @@ const z = {
   number: () => new ZodNumber(),
   boolean: () => new ZodBoolean(),
   date: () => new ZodDate(),
-  object: <T extends { [key: string]: any }>(shape: { [K in keyof T]: ZodType<T[K]> }) => new ZodObject<T>(shape),
+  enum: <T extends readonly string[]>(values: T) =>
+    new ZodEnum<T[number]>(values),
+  object: <T extends { [key: string]: any }>(shape: {
+    [K in keyof T]: ZodType<T[K]>;
+  }) => new ZodObject<T>(shape),
   array: <T>(itemType: ZodType<T>) => new ZodArray(itemType),
 };
 

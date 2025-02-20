@@ -1,18 +1,19 @@
 import type { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import db from '../database/Database.ts';
-import { Gender, Orientation } from '../database/query/type.ts';
+import type { Gender, Orientation } from '../database/query/type.ts';
 import { env } from '../env.ts';
 import type { TLoginSchema, TSigninSchema } from '../schemas/auth.schema.ts';
 import { hashPassword } from '../services/auth.service.ts';
 
 export const signin = async (req: Request, res: Response) => {
-  const { email, password } = req.body as TSigninSchema;
+  const { password, gender, preference, ...userData } =
+    req.body as TSigninSchema;
   const hashedPassword = hashPassword(password, env.AUTH_SECRET);
 
   let user = await db.user.findFirst({
     where: {
-      email,
+      email: userData.email,
     },
   });
   if (user) {
@@ -22,13 +23,10 @@ export const signin = async (req: Request, res: Response) => {
 
   user = await db.user.create({
     data: {
-      email,
+      gender: gender as Gender,
+      preference: preference as Orientation,
       password: hashedPassword,
-      age: 0,
-      name: 'John',
-      lastName: 'Doe',
-      gender: Gender.Female,
-      preference: Orientation.Bisexual,
+      ...userData,
     },
   });
   // remove cringe check after good prisma update
@@ -88,6 +86,20 @@ export const login = async (req: Request, res: Response) => {
     })
     .json({
       message: 'Logged in',
+    });
+};
+
+export const logout = async (req: Request, res: Response) => {
+  res
+    .status(200)
+    .cookie('auth-token', '', {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+      maxAge: 0,
+    })
+    .json({
+      message: 'Logged out',
     });
 };
 

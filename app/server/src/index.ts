@@ -42,7 +42,6 @@ const io = new Server(server, {
 let clientsTotal = 0;
 
 io.on('connection', (socket) => {
-  // console.log(socket.id);
   // socketsConnected.add(socket.id);
   clientsTotal++;
   io.emit('clients-total', clientsTotal);
