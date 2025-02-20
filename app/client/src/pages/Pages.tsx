@@ -3,6 +3,7 @@ import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import { NotFound } from './NotFound';
 import LoginPage from './auth/Login';
 import SigninPage from './auth/Signin';
+import Chat from '../Chat';
 
 const AuthRoute = () => {
   const { user, loading } = useSession();
@@ -31,6 +32,7 @@ const PrivateRoute = () => {
 export const Pages = () => {
   return (
     <Routes>
+      <Route path="/chat" element={<Chat />} />  
       <Route path="*" element={<NotFound />} />
       <Route element={<AuthRoute />}>
         <Route path="/auth/signin" element={<SigninPage />} />
