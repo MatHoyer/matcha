@@ -17,31 +17,22 @@ services:
       timeout: 5s
       retries: 5
 
-  server:
-    container_name: matcha_server
-    build: ./app/server
+  app:
+    container_name: matcha_app
+    build: ./matcha_app
     env_file: .env
     ports:
       - '${SERVER_PORT}:${SERVER_PORT}'
+      - '${CLIENT_PORT}:${CLIENT_PORT}'
     volumes:
-      - ./app/server:/app/server
-      - ./app/server/node_modules:/app/server/node_modules
+      - ./matcha_app:/matcha_app
+      - ./matcha_app/node_modules:/matcha_app/node_modules
+      - ./matcha_app/apps/server/node_modules:/matcha_app/apps/server/node_modules
+      - ./matcha_app/apps/client/node_modules:/matcha_app/apps/client/node_modules
+      - ./matcha_app/apps/common/node_modules:/matcha_app/apps/common/node_modules
     depends_on:
       db:
         condition: service_healthy
-    command: bash -c "npm install && npm run dev"
-
-  client:
-    container_name: matcha_client
-    build: ./app/client
-    env_file: .env
-    ports:
-      - '${CLIENT_PORT}:${CLIENT_PORT}'
-    volumes:
-      - ./app/client:/app/client
-      - ./app/client/node_modules:/app/client/node_modules
-    depends_on:
-      - server
     command: bash -c "npm install && npm run dev"
 
   adminer:
