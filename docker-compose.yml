@@ -33,7 +33,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    command: bash -c "npm install && npm run build && npm run start"
+    command: bash -c "npm install && npm run dev"
 
   adminer:
     container_name: matcha_adminer
