@@ -3,7 +3,7 @@
   "scripts": {
     "dev": "concurrently --names \"COMMON,CLIENT,SERVER\" \"npm run dev -w @matcha/common\" \"npm run dev -w @matcha/client\" \"npm run dev -w @matcha/server\"",
     "build": "npm run build --workspaces",
-    "start": "npm run start -w server"
+    "start": "npm run start -w @matcha/server"
   },
   "workspaces": [
     "apps/*"

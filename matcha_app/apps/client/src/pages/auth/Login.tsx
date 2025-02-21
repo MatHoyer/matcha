@@ -105,7 +105,7 @@ const LoginPage: React.FC = () => {
               <Typography
                 variant="link"
                 className="cursor-pointer text-xs"
-                onClick={() => navigate('/auth/signin')}
+                onClick={() => navigate('/auth/signup')}
               >
                 Create an account
               </Typography>

@@ -3,7 +3,6 @@ import cors from 'cors';
 import express from 'express';
 import path from 'path';
 import { Server } from 'socket.io';
-import { fileURLToPath } from 'url';
 import { env, envSchema } from './env.js';
 import { default as authRouter } from './routes/auth.route.js';
 
@@ -29,11 +28,9 @@ app.use(
 
 app.use('/api/auth', authRouter);
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-app.use(express.static(path.join(__dirname, '../public/dist')));
+app.use(express.static(path.join(__dirname, '../../../public/dist')));
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../public/dist/index.html'));
+  res.sendFile(path.join(__dirname, '../../../public/dist/index.html'));
 });
 
 const server = app.listen(port, () => {
