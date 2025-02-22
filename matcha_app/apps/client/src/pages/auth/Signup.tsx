@@ -57,6 +57,7 @@ const SignupPage: React.FC = () => {
         },
         handleEnding: {
           successMessage: 'Signup successful',
+          errorMessage: 'Signup failed',
           cb: () => {
             navigate('/');
           },

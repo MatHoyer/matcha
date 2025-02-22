@@ -17,9 +17,11 @@ export const defaultMutationEnding = async <T, D>(data: {
 }) => {
   const { cb, res, successMessage, errorMessage } = data;
 
-  console.log('erreur', res);
   if (!isActionSuccessful(res)) {
-    toast.error(res?.statusText || errorMessage || 'Une erreur est survenue');
+    console.log('Error: ', res);
+    if (errorMessage) {
+      toast.error(errorMessage);
+    }
     return;
   }
 

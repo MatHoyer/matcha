@@ -1,3 +1,4 @@
+import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import { getUrl } from '@matcha/common';
 import { useEffect, useState } from 'react';
 
@@ -22,22 +23,20 @@ export const useSession = () => {
   useEffect(() => {
     const fetchSession = async () => {
       try {
-        const response = await fetch(
-          getUrl('api-auth', {
+        await axiosFetch({
+          method: 'get',
+          url: getUrl('api-auth', {
             type: 'session',
           }),
-          {
-            credentials: 'include',
-          }
-        );
-
-        if (!response.ok) throw new Error('Non authentifié');
-
-        const { user } = await response.json();
-        setUser(user);
-      } catch (error) {
-        console.error(error);
-        setUser(null);
+          config: {
+            withCredentials: true,
+          },
+          handleEnding: {
+            cb: (data) => {
+              setUser(data.user);
+            },
+          },
+        });
       } finally {
         setLoading(false);
       }

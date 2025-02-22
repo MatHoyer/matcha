@@ -45,6 +45,7 @@ const LoginPage: React.FC = () => {
         },
         handleEnding: {
           successMessage: 'Login successful',
+          errorMessage: 'Login failed',
           cb: () => {
             navigate('/');
           },

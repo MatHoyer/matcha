@@ -16,6 +16,7 @@ export const LogoutButton = () => {
           withCredentials: true,
         },
         handleEnding: {
+          errorMessage: 'Logout failed',
           cb: () => {
             window.location.reload();
           },
