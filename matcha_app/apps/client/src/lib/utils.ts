@@ -1,6 +1,6 @@
+import { DECIMAL_SEPARATOR, THOUSAND_SEPARATOR } from '@matcha/common';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { DECIMAL_SEPARATOR, THOUSAND_SEPARATOR } from './data';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));

@@ -1,3 +1,4 @@
+import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import { getUrl } from '@matcha/common';
 import { useMutation } from '@tanstack/react-query';
 import { LoadingButton } from './ui/loaders';
@@ -5,18 +6,21 @@ import { LoadingButton } from './ui/loaders';
 export const LogoutButton = () => {
   const removeCookieMutation = useMutation({
     mutationFn: async () => {
-      const res = await fetch(
-        getUrl('api-auth', {
-          type: 'logout',
-        }),
-        {
-          method: 'GET',
-          credentials: 'include',
-        }
-      );
-      if (!res.ok) throw new Error('Error while logout');
-      window.location.reload();
-      return await res.json();
+      await axiosFetch({
+        method: 'get',
+        url: getUrl('api-auth', { type: 'logout' }),
+        config: {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          withCredentials: true,
+        },
+        handleEnding: {
+          cb: () => {
+            window.location.reload();
+          },
+        },
+      });
     },
   });
 

@@ -23,7 +23,7 @@ services:
     env_file: .env
     ports:
       - '${SERVER_PORT}:${SERVER_PORT}'
-      - '${CLIENT_PORT}:${CLIENT_PORT}'
+      - '${CLIENT_PORT}:${CLIENT_PORT}' # for development only
     volumes:
       - ./matcha_app:/matcha_app
       - ./matcha_app/node_modules:/matcha_app/node_modules

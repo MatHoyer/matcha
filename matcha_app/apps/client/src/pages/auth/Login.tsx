@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { LoadingButton } from '@/components/ui/loaders';
 import PasswordInput from '@/components/ui/password-input';
 import { Typography } from '@/components/ui/typography';
+import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import { getUrl } from '@matcha/common';
 import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
@@ -32,22 +33,23 @@ const LoginPage: React.FC = () => {
 
   const mutation = useMutation({
     mutationFn: async (data: TForm) => {
-      const res = await fetch(
-        getUrl('api-auth', {
-          type: 'login',
-        }),
-        {
-          method: 'POST',
+      await axiosFetch({
+        method: 'post',
+        url: getUrl('api-auth', { type: 'login' }),
+        data,
+        config: {
           headers: {
             'Content-Type': 'application/json',
           },
-          credentials: 'include',
-          body: JSON.stringify(data),
-        }
-      );
-      if (!res.ok) throw new Error('Invalid credentials');
-      window.location.reload();
-      return await res.json();
+          withCredentials: true,
+        },
+        handleEnding: {
+          successMessage: 'Login successful',
+          cb: () => {
+            navigate('/');
+          },
+        },
+      });
     },
   });
 

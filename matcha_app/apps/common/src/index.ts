@@ -7,7 +7,14 @@ export { getServerUrl } from './getServer';
 export { getUrl } from './getUrl';
 
 //-----------------------Datas-----------------------
-export { AUTH_COOKIE_NAME, GENDERS, ORIENTATIONS } from './datas';
+export {
+  AUTH_COOKIE_NAME,
+  DECIMAL_SEPARATOR,
+  EMPTY_FIND_SEARCH,
+  GENDERS,
+  ORIENTATIONS,
+  THOUSAND_SEPARATOR,
+} from './datas';
 
 //-----------------------Utils-----------------------
 export {

@@ -2,8 +2,8 @@
 import { Button } from '@/components/ui/button';
 import { useFormField } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { DECIMAL_SEPARATOR, THOUSAND_SEPARATOR } from '@/lib/data';
 import { clamp, cn, exists, formatNumber } from '@/lib/utils';
+import { DECIMAL_SEPARATOR, THOUSAND_SEPARATOR } from '@matcha/common';
 import { Minus, Plus } from 'lucide-react';
 import { ComponentProps, useEffect, useRef, useState } from 'react';
 

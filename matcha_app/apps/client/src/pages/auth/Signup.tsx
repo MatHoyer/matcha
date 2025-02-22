@@ -12,6 +12,7 @@ import NumberInput from '@/components/ui/NumberField';
 import PasswordInput from '@/components/ui/password-input';
 import Selector from '@/components/ui/selector';
 import { Typography } from '@/components/ui/typography';
+import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import { GENDERS, getUrl, ORIENTATIONS } from '@matcha/common';
 import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
@@ -44,22 +45,23 @@ const SignupPage: React.FC = () => {
 
   const mutation = useMutation({
     mutationFn: async (data: TForm) => {
-      const res = await fetch(
-        getUrl('api-auth', {
-          type: 'signup',
-        }),
-        {
-          method: 'POST',
+      await axiosFetch({
+        method: 'post',
+        url: getUrl('api-auth', { type: 'signup' }),
+        data,
+        config: {
           headers: {
             'Content-Type': 'application/json',
           },
-          credentials: 'include',
-          body: JSON.stringify(data),
-        }
-      );
-      if (!res.ok) throw new Error('Invalid datas');
-      window.location.reload();
-      return await res.json();
+          withCredentials: true,
+        },
+        handleEnding: {
+          successMessage: 'Signup successful',
+          cb: () => {
+            navigate('/');
+          },
+        },
+      });
     },
   });
 

@@ -5,6 +5,7 @@ type TRouteDataRequirements = {
   'client-auth': {
     type: 'signup' | 'login';
   };
+  'client-home': undefined;
 
   // --------------------- API Routes ---------------------
   'api-auth': {
@@ -22,6 +23,7 @@ const routes: {
   [T in TRoute]: (params: TRouteDataMap<T>) => string;
 } = {
   'client-auth': ({ type }) => `/auth/${type}`,
+  'client-home': () => '/',
 
   'api-auth': ({ type }) => (type ? `/api/auth/${type}` : '/api/auth'),
 };
