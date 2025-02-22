@@ -7,7 +7,7 @@ import { env, envSchema } from './env.js';
 import { default as authRouter } from './routes/auth.route.js';
 
 try {
-  envSchema.parse(process.env);
+  envSchema.parse(env);
 } catch (error) {
   console.error('Error: Bad environment variables');
   process.exit(1);

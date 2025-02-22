@@ -9,6 +9,21 @@ export abstract class ZodType<T> {
   abstract parse(data: unknown): T;
 
   /**
+   * Parse the input data.
+   * If invalid, return error.
+   */
+  safeParse(
+    data: unknown
+  ): { success: true; data: T } | { success: false; error: unknown } {
+    try {
+      const parsed = this.parse(data);
+      return { success: true, data: parsed };
+    } catch (error) {
+      return { success: false, error };
+    }
+  }
+
+  /**
    * Adds a custom validation to the schema.
    * @param check A function that returns true if the data is valid.
    * @param message The error message to throw if validation fails.
@@ -74,6 +89,12 @@ class ZodNumber extends ZodType<number> {
       throw new Error('Expected number');
     }
     return data;
+  }
+  positive() {
+    return this.refine((data) => data > 0, 'Must be positive');
+  }
+  negative() {
+    return this.refine((data) => data < 0, 'Must be negative');
   }
   min(minLength: number) {
     return this.refine(
