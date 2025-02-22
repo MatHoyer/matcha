@@ -45,6 +45,7 @@ const server = app.listen(env.SERVER_PORT, () => {
 const io = new Server(server, {
   cors: {
     origin: `http://localhost:${env.CLIENT_PORT}`,
+    credentials: true,
   },
 });
 socketHandler(io);

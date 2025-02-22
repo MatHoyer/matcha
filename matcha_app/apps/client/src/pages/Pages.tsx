@@ -1,9 +1,9 @@
-import Chat from '@/Chat';
 import { useSession } from '@/hooks/useSession';
 import { getUrl } from '@matcha/common';
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import LoginPage from './auth/Login';
 import SignupPage from './auth/Signup';
+import Chat from './Chat';
 import { Home } from './Home';
 import { NotFound } from './NotFound';
 
@@ -34,7 +34,6 @@ const PrivateRoute = () => {
 export const Pages = () => {
   return (
     <Routes>
-      <Route path="/chat" element={<Chat />} />
       <Route path="*" element={<NotFound />} />
       <Route element={<AuthRoute />}>
         <Route
@@ -52,6 +51,7 @@ export const Pages = () => {
       </Route>
       <Route element={<PrivateRoute />}>
         <Route path="/" element={<Home />} />
+        <Route path="/chat" element={<Chat />} />
       </Route>
     </Routes>
   );

@@ -24,3 +24,6 @@ export {
   typedEntries,
   wait,
 } from './utils';
+
+//-----------------------Socket-----------------------
+export { SOCKETS_EVENTS } from './sockets';

@@ -1,27 +1,38 @@
+import { useSession } from '@/hooks/useSession';
+import { socket } from '@/lib/socket';
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
-import { socket } from './lib/socket';
 
 const Chat: React.FC = () => {
   const [clientsTotal, setClientsTotal] = useState<number>(0);
-  const [messages, setMessages] = useState<{ name: string; message: string; dateTime: Date; isOwnMessage: boolean }[]>(
-    []
-  );
-  const [name, setName] = useState<string>('anonymous');
+  const [messages, setMessages] = useState<
+    { name: string; message: string; dateTime: Date; isOwnMessage: boolean }[]
+  >([]);
+  // const [name, setName] = useState<string>('anonymous');
   const [message, setMessage] = useState<string>('');
   const [feedback, setFeedback] = useState('');
 
   const messageContainerRef = useRef<HTMLUListElement>(null);
 
+  const { user } = useSession();
+  const name = user?.name || 'anonymous';
+
   useEffect(() => {
+    console.log('This user : ', user?.name);
     socket.on('clients-total', (data: number) => {
       setClientsTotal(data);
     });
 
-    socket.on('chat-message', (data: { name: string; message: string; dateTime: Date }) => {
-      console.log('Received message : ', data);
-      setMessages((prevMessages) => [...prevMessages, { ...data, isOwnMessage: false }]);
-    });
+    socket.on(
+      'chat-message',
+      (data: { name: string; message: string; dateTime: Date }) => {
+        console.log('Received message : ', data);
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          { ...data, isOwnMessage: false },
+        ]);
+      }
+    );
 
     socket.on('feedback', (data: { feedback: string }) => {
       setFeedback(data.feedback);
@@ -49,7 +60,10 @@ const Chat: React.FC = () => {
     };
 
     socket.emit('message', data);
-    setMessages((prevMessages) => [...prevMessages, { ...data, isOwnMessage: true }]);
+    setMessages((prevMessages) => [
+      ...prevMessages,
+      { ...data, isOwnMessage: true },
+    ]);
     setMessage('');
   };
 
@@ -59,7 +73,10 @@ const Chat: React.FC = () => {
 
   const scrollToBottom = () => {
     if (messageContainerRef.current) {
-      messageContainerRef.current.scrollTo(0, messageContainerRef.current.scrollHeight);
+      messageContainerRef.current.scrollTo(
+        0,
+        messageContainerRef.current.scrollHeight
+      );
     }
   };
 
@@ -68,7 +85,10 @@ const Chat: React.FC = () => {
       <p>Total clients connected: {clientsTotal}</p>
       <ul ref={messageContainerRef} id="message-container">
         {messages.map((data, index) => (
-          <li key={index} className={data.isOwnMessage ? 'message-right' : 'message-left'}>
+          <li
+            key={index}
+            className={data.isOwnMessage ? 'message-right' : 'message-left'}
+          >
             <p className="message">
               {data.message}
               <span>
@@ -85,7 +105,8 @@ const Chat: React.FC = () => {
         )}
       </ul>
       <form id="message-form" onSubmit={sendMessage}>
-        <input id="name-input" type="text" placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
+        <p>{name} : </p>
+        {/* <input id="name-input" type="text" placeholder="Name" value={name1} onChange={(e) => setName(e.target.value)} /> */}
         <input
           id="message-input"
           type="text"
@@ -97,6 +118,10 @@ const Chat: React.FC = () => {
           onBlur={() => handleFeedback('')}
         />
         <button type="submit">Send</button>
+        {/* list of users online : */}
+        <ul>
+          <li>Users online:</li>
+        </ul>
       </form>
     </div>
   );

@@ -10,11 +10,13 @@
   "dependencies": {
     "@matcha/common": "file:../common",
     "@types/socket.io": "^3.0.2",
+    "cookie": "^1.0.2",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "express": "^4.21.1",
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.13.3",
+    "nanoid": "^5.1.0",
     "socket.io": "^4.8.1",
     "tsx": "^4.19.3"
   },
