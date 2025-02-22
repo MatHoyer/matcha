@@ -5,6 +5,7 @@ import path from 'path';
 import { Server } from 'socket.io';
 import { env, envSchema } from './env.js';
 import { default as authRouter } from './routes/auth.route.js';
+import { socketHandler } from './sockets/sockets.js';
 
 try {
   envSchema.parse(env);
@@ -46,30 +47,4 @@ const io = new Server(server, {
     origin: 'http://localhost:3001',
   },
 });
-
-// let socketsConnected = new Set<string>();
-let clientsTotal = 0;
-
-io.on('connection', (socket) => {
-  // socketsConnected.add(socket.id);
-  clientsTotal++;
-  io.emit('clients-total', clientsTotal);
-  console.log(clientsTotal);
-
-  socket.on('message', (data) => {
-    // console.log(data);
-    socket.broadcast.emit('chat-message', data);
-  });
-
-  socket.on('feedback', (data) => {
-    socket.broadcast.emit('feedback', data);
-  });
-
-  socket.on('disconnect', () => {
-    console.log('Socket disconnected', socket.id);
-    // socketsConnected.delete(socket.id);
-    clientsTotal--;
-    io.emit('clients-total', clientsTotal);
-  });
-});
-// add for chat end -------------------
+socketHandler(io);

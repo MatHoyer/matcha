@@ -1,3 +1,4 @@
+import Chat from '@/Chat';
 import { useSession } from '@/hooks/useSession';
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import LoginPage from './auth/Login';
@@ -32,6 +33,7 @@ const PrivateRoute = () => {
 export const Pages = () => {
   return (
     <Routes>
+      <Route path="/chat" element={<Chat />} />
       <Route path="*" element={<NotFound />} />
       <Route element={<AuthRoute />}>
         <Route path="/auth/signup" element={<SignupPage />} />
