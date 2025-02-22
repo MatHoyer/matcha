@@ -33,7 +33,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    command: bash -c "if [ \"$NODE_ENV\" = \"PROD\" ]; then npm run build && npm start; else npm run dev; fi"
+    command: bash -c "npm i; if [ \"$NODE_ENV\" = \"PROD\" ]; then npm run build && npm start; else npm run dev; fi"
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:${SERVER_PORT}/api/health']
       interval: 30s

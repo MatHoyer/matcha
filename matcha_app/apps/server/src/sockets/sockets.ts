@@ -1,5 +1,5 @@
 import { SOCKETS_EVENTS } from '@matcha/common';
-import cookie from 'cookie';
+import { parse } from 'cookie';
 import jwt from 'jsonwebtoken';
 import { Server, Socket } from 'socket.io';
 import { env } from '../env';
@@ -37,7 +37,7 @@ export const socketHandler = (io: Server) => {
   io.on('connection', (socket: Socket) => {
     console.log('User connected : ', socket.id);
 
-    const cookies = cookie.parse(socket.handshake.headers.cookie || '');
+    const cookies = parse(socket.handshake.headers.cookie || '');
     console.log('cookies :', cookies);
     const token = cookies['auth-token'];
 
