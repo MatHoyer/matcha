@@ -1,4 +1,4 @@
-import { quoteUppercase } from '../../../utils/globals.utils.js';
+import { quoteUppercase } from '@matcha/common';
 import { tableKeys, type Select } from '../type.js';
 
 type TReturnType = {

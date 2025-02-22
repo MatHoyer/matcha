@@ -12,7 +12,7 @@ import NumberInput from '@/components/ui/NumberField';
 import PasswordInput from '@/components/ui/password-input';
 import Selector from '@/components/ui/selector';
 import { Typography } from '@/components/ui/typography';
-import { getUrl } from '@matcha/common';
+import { GENDERS, getUrl, ORIENTATIONS } from '@matcha/common';
 import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
@@ -162,7 +162,7 @@ const SignupPage: React.FC = () => {
                   <FormLabel>Gender</FormLabel>
                   <FormControl>
                     <Selector
-                      list={['Male', 'Female']}
+                      list={[...GENDERS]}
                       value={field.value || 'Select gender'}
                       onChange={(value) => field.onChange(value)}
                     />
@@ -175,10 +175,10 @@ const SignupPage: React.FC = () => {
               name="preference"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Gender</FormLabel>
+                  <FormLabel>Orientation</FormLabel>
                   <FormControl>
                     <Selector
-                      list={['Heterosexual', 'Bisexual', 'Homosexual']}
+                      list={[...ORIENTATIONS]}
                       value={field.value || 'Select orientation'}
                       onChange={(value) => field.onChange(value)}
                     />

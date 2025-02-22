@@ -11,7 +11,7 @@ import { socketHandler } from './sockets/sockets.js';
 try {
   envSchema.parse(env);
 } catch (error) {
-  console.error('Error: Bad environment variables');
+  console.error('Error: Bad environment variables: ' + error);
   process.exit(1);
 }
 

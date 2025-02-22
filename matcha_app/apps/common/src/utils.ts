@@ -12,6 +12,8 @@ export const removeDuplicate = <T>(list: T[]): T[] => {
   return [...tmp];
 };
 
-export const typedEntries = <T extends object>(obj: T): [[string, T[keyof T]]] => {
+export const typedEntries = <T extends object>(
+  obj: T
+): [[string, T[keyof T]]] => {
   return Object.entries(obj) as [[string, T[keyof T]]];
 };

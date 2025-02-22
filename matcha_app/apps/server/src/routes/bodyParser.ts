@@ -9,6 +9,6 @@ export const bodyParser =
       next();
     } catch (error) {
       console.error(`Error at ${req.url}:`, error);
-      res.status(500).json({ error: 'Body not good' });
+      res.status(500).json({ error: 'Bad body' });
     }
   };

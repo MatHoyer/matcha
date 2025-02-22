@@ -1,4 +1,4 @@
-import { removeDuplicate } from '../../utils/globals.utils.js';
+import { removeDuplicate } from '@matcha/common';
 
 const idAlreadyExist = (list: Record<string, any>[], id: number) => {
   return list.some((object) => object.id === id);

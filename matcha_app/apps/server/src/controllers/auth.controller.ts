@@ -1,3 +1,4 @@
+import { AUTH_COOKIE_NAME } from '@matcha/common';
 import type { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import db from '../database/Database.js';
@@ -43,7 +44,7 @@ export const signup = async (req: Request, res: Response) => {
 
   res
     .status(200)
-    .cookie('auth-token', token, {
+    .cookie(AUTH_COOKIE_NAME, token, {
       httpOnly: true,
       secure: true,
       sameSite: 'strict',
@@ -78,7 +79,7 @@ export const login = async (req: Request, res: Response) => {
 
   res
     .status(200)
-    .cookie('auth-token', token, {
+    .cookie(AUTH_COOKIE_NAME, token, {
       httpOnly: true,
       secure: true,
       sameSite: 'strict',
@@ -92,7 +93,7 @@ export const login = async (req: Request, res: Response) => {
 export const logout = async (req: Request, res: Response) => {
   res
     .status(200)
-    .cookie('auth-token', '', {
+    .cookie(AUTH_COOKIE_NAME, '', {
       httpOnly: true,
       secure: true,
       sameSite: 'strict',
@@ -104,7 +105,7 @@ export const logout = async (req: Request, res: Response) => {
 };
 
 export const session = async (req: Request, res: Response) => {
-  const token = req.cookies['auth-token'] as string;
+  const token = req.cookies[AUTH_COOKIE_NAME] as string;
   if (!token) {
     res.status(401).json({ message: 'Unauthorized' });
     return;

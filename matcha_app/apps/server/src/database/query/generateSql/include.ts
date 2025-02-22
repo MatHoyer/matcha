@@ -1,4 +1,4 @@
-import { capitalize, typedEntries } from '../../../utils/globals.utils.js';
+import { capitalize, typedEntries } from '@matcha/common';
 import { tableAlias, type Include } from '../type.js';
 import { generateSelectSql } from './select.js';
 

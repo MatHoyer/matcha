@@ -1,6 +1,6 @@
 import pg from 'pg';
 
-import { capitalize, quoteUppercase } from '../../utils/globals.utils.js';
+import { capitalize, quoteUppercase } from '@matcha/common';
 import { generateObject } from '../query/generateObject.js';
 import { generateIncludeSql } from '../query/generateSql/include.js';
 import { generateSelectSql } from '../query/generateSql/select.js';
