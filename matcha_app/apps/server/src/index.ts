@@ -26,6 +26,9 @@ app.use(
   })
 );
 
+app.get('/api/health', (req, res) => {
+  res.send('OK');
+});
 app.use('/api/auth', authRouter);
 
 app.use(express.static(path.join(__dirname, '../../../public/dist')));
