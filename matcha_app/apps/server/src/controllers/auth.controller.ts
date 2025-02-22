@@ -1,4 +1,4 @@
-import { AUTH_COOKIE_NAME } from '@matcha/common';
+import { AUTH_COOKIE_NAME, wait } from '@matcha/common';
 import type { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import db from '../database/Database.js';
@@ -58,6 +58,7 @@ export const signup = async (req: Request, res: Response) => {
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body as TLoginSchema;
   const hashedPassword = hashPassword(password, env.AUTH_SECRET);
+  await wait(2000);
 
   const user = await db.user.findFirst({
     where: {

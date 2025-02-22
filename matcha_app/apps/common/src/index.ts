@@ -22,4 +22,5 @@ export {
   quoteUppercase,
   removeDuplicate,
   typedEntries,
+  wait,
 } from './utils';

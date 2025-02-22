@@ -5,6 +5,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { LoadingButton } from '@/components/ui/loaders';
@@ -15,6 +16,7 @@ import { Typography } from '@/components/ui/typography';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import { GENDERS, getUrl, ORIENTATIONS } from '@matcha/common';
 import { useMutation } from '@tanstack/react-query';
+import axios from 'axios';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
@@ -45,7 +47,7 @@ const SignupPage: React.FC = () => {
 
   const mutation = useMutation({
     mutationFn: async (data: TForm) => {
-      await axiosFetch({
+      return await axiosFetch({
         method: 'post',
         url: getUrl('api-auth', { type: 'signup' }),
         data,
@@ -67,10 +69,12 @@ const SignupPage: React.FC = () => {
   });
 
   const onSubmit = form.handleSubmit(async (data) => {
-    try {
-      await mutation.mutateAsync(data);
-    } catch (error) {
-      console.error(error);
+    const res = await mutation.mutateAsync(data);
+    if (axios.isAxiosError(res)) {
+      form.setError('root', {
+        type: 'manual',
+        message: res.response?.data.message,
+      });
     }
   });
 
@@ -90,6 +94,9 @@ const SignupPage: React.FC = () => {
           >
             <FormField
               control={form.control}
+              {...form.register('name', {
+                required: 'Name is required',
+              })}
               name="name"
               render={({ field }) => (
                 <FormItem>
@@ -97,11 +104,15 @@ const SignupPage: React.FC = () => {
                   <FormControl>
                     <Input {...field} placeholder="Jean" autoComplete="name" />
                   </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
             <FormField
               control={form.control}
+              {...form.register('lastName', {
+                required: 'Lastname is required',
+              })}
               name="lastName"
               render={({ field }) => (
                 <FormItem>
@@ -113,11 +124,15 @@ const SignupPage: React.FC = () => {
                       autoComplete="family-name"
                     />
                   </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
             <FormField
               control={form.control}
+              {...form.register('email', {
+                required: 'Email is required',
+              })}
               name="email"
               render={({ field }) => (
                 <FormItem>
@@ -130,11 +145,15 @@ const SignupPage: React.FC = () => {
                       autoComplete="email"
                     />
                   </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
             <FormField
               control={form.control}
+              {...form.register('password', {
+                required: 'Password is required',
+              })}
               name="password"
               render={({ field }) => (
                 <FormItem>
@@ -142,11 +161,15 @@ const SignupPage: React.FC = () => {
                   <FormControl>
                     <PasswordInput {...field} autoComplete="current-password" />
                   </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
             <FormField
               control={form.control}
+              {...form.register('age', {
+                required: 'Age is required',
+              })}
               name="age"
               render={({ field }) => (
                 <FormItem>
@@ -154,11 +177,15 @@ const SignupPage: React.FC = () => {
                   <FormControl>
                     <NumberInput {...field} scale={0} step={1} />
                   </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
             <FormField
               control={form.control}
+              {...form.register('gender', {
+                required: 'Gender is required',
+              })}
               name="gender"
               render={({ field }) => (
                 <FormItem>
@@ -170,11 +197,15 @@ const SignupPage: React.FC = () => {
                       onChange={(value) => field.onChange(value)}
                     />
                   </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
             <FormField
               control={form.control}
+              {...form.register('preference', {
+                required: 'Orientation is required',
+              })}
               name="preference"
               render={({ field }) => (
                 <FormItem>
@@ -186,10 +217,11 @@ const SignupPage: React.FC = () => {
                       onChange={(value) => field.onChange(value)}
                     />
                   </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
-            <LoadingButton type="submit" loading={form.formState.isLoading}>
+            <LoadingButton type="submit" loading={mutation.isPending}>
               Sign up
             </LoadingButton>
             <div className="flex items-center gap-2 w-full justify-center">

@@ -17,3 +17,7 @@ export const typedEntries = <T extends object>(
 ): [[string, T[keyof T]]] => {
   return Object.entries(obj) as [[string, T[keyof T]]];
 };
+
+export const wait = (ms: number): Promise<void> => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};

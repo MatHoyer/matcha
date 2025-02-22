@@ -6,13 +6,7 @@ export const axiosFetch = async ({
   url,
   data = null,
   config = {},
-  handleEnding = {
-    successMessage: 'Request successful',
-    errorMessage: 'Failed to make request',
-    cb: () => {
-      console.log('Request successful');
-    },
-  },
+  handleEnding,
 }: {
   method: 'get' | 'post' | 'put' | 'delete';
   url: string;
@@ -33,7 +27,7 @@ export const axiosFetch = async ({
       ...config,
     });
 
-    return defaultMutationEnding({
+    return await defaultMutationEnding({
       res: response,
       ...handleEnding,
     });
@@ -41,10 +35,11 @@ export const axiosFetch = async ({
     console.error(error);
     if (axios.isAxiosError(error)) {
       const axiosError = error as AxiosError;
-      return defaultMutationEnding({
+      await defaultMutationEnding({
         res: axiosError.response,
         ...handleEnding,
       });
     }
+    return error;
   }
 };
