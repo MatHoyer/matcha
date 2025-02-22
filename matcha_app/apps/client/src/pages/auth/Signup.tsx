@@ -12,6 +12,7 @@ import NumberInput from '@/components/ui/NumberField';
 import PasswordInput from '@/components/ui/password-input';
 import Selector from '@/components/ui/selector';
 import { Typography } from '@/components/ui/typography';
+import { getUrl } from '@matcha/common';
 import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
@@ -43,14 +44,19 @@ const SignupPage: React.FC = () => {
 
   const mutation = useMutation({
     mutationFn: async (data: TForm) => {
-      const res = await fetch('/api/auth/signin', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify(data),
-      });
+      const res = await fetch(
+        getUrl('api-auth', {
+          type: 'signup',
+        }),
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify(data),
+        }
+      );
       if (!res.ok) throw new Error('Invalid datas');
       window.location.reload();
       return await res.json();
@@ -188,7 +194,13 @@ const SignupPage: React.FC = () => {
               <Typography
                 variant="link"
                 className="cursor-pointer text-xs"
-                onClick={() => navigate('/auth/login')}
+                onClick={() =>
+                  navigate(
+                    getUrl('client-auth', {
+                      type: 'login',
+                    })
+                  )
+                }
               >
                 Log in
               </Typography>

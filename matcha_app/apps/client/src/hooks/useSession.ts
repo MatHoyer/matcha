@@ -1,3 +1,4 @@
+import { getUrl } from '@matcha/common';
 import { useEffect, useState } from 'react';
 
 export type User = {
@@ -21,9 +22,14 @@ export const useSession = () => {
   useEffect(() => {
     const fetchSession = async () => {
       try {
-        const response = await fetch('/api/auth/session', {
-          credentials: 'include',
-        });
+        const response = await fetch(
+          getUrl('api-auth', {
+            type: 'session',
+          }),
+          {
+            credentials: 'include',
+          }
+        );
 
         if (!response.ok) throw new Error('Non authentifié');
 

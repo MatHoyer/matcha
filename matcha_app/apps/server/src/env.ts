@@ -7,6 +7,7 @@ export const envSchema = z.object({
   POSTGRES_PASSWORD: z.string(),
   POSTGRES_DB: z.string(),
   POSTGRES_PORT: z.number().positive(),
+  SERVER_URL: z.string().url(),
   SERVER_PORT: z.number().positive(),
   CLIENT_PORT: z.number().positive(),
   AUTH_SECRET: z.string(),
@@ -22,6 +23,7 @@ export const env = {
   POSTGRES_DB: process.env.POSTGRES_DB,
   POSTGRES_PORT: +(process.env.POSTGRES_PORT || -1),
 
+  SERVER_URL: process.env.SERVER_URL,
   SERVER_PORT: +(process.env.SERVER_PORT || -1),
 
   CLIENT_PORT: +(process.env.CLIENT_PORT || -1),

@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { LoadingButton } from '@/components/ui/loaders';
 import PasswordInput from '@/components/ui/password-input';
 import { Typography } from '@/components/ui/typography';
+import { getUrl } from '@matcha/common';
 import { useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
@@ -31,14 +32,19 @@ const LoginPage: React.FC = () => {
 
   const mutation = useMutation({
     mutationFn: async (data: TForm) => {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify(data),
-      });
+      const res = await fetch(
+        getUrl('api-auth', {
+          type: 'login',
+        }),
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          credentials: 'include',
+          body: JSON.stringify(data),
+        }
+      );
       if (!res.ok) throw new Error('Invalid credentials');
       window.location.reload();
       return await res.json();
@@ -105,7 +111,13 @@ const LoginPage: React.FC = () => {
               <Typography
                 variant="link"
                 className="cursor-pointer text-xs"
-                onClick={() => navigate('/auth/signup')}
+                onClick={() =>
+                  navigate(
+                    getUrl('client-auth', {
+                      type: 'signup',
+                    })
+                  )
+                }
               >
                 Create an account
               </Typography>
