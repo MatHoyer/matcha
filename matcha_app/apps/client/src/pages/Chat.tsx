@@ -17,9 +17,13 @@ const Chat: React.FC = () => {
   const { user } = useSession();
   const name = user?.name || 'anonymous';
 
+  const channel = new BroadcastChannel('websocket_channel');
+  
+
   useEffect(() => {
     console.log('This user : ', user?.name);
     socket.on('clients-total', (data: number) => {
+      console.log('Received clients-total : ', data);
       setClientsTotal(data);
     });
 
@@ -35,6 +39,7 @@ const Chat: React.FC = () => {
     );
 
     socket.on('feedback', (data: { feedback: string }) => {
+      console.log('Feedback ! ');
       setFeedback(data.feedback);
     });
 
@@ -42,7 +47,9 @@ const Chat: React.FC = () => {
       socket.off('clients-total');
       socket.off('chat-message');
       socket.off('feedback');
-    };
+    };    
+    
+
   }, []);
 
   useEffect(() => {
@@ -114,7 +121,7 @@ const Chat: React.FC = () => {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onFocus={() => handleFeedback(`${name} is typing a message...`)}
-          onKeyPress={() => handleFeedback(`${name} is typing a message...`)}
+          onKeyPress={() => handleFeedback(`${name} is typing a xmessage...`)}
           onBlur={() => handleFeedback('')}
         />
         <button type="submit">Send</button>
