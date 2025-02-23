@@ -1,10 +1,13 @@
 import { removeDuplicate } from '@matcha/common';
 
+// eslint-disable-next-line
 const idAlreadyExist = (list: Record<string, any>[], id: number) => {
   return list.some((object) => object.id === id);
 };
 
+// eslint-disable-next-line
 const generateMainObject = (row: Record<string, any>) => {
+  // eslint-disable-next-line
   let formated: Record<string, any> = {};
 
   for (const [key, value] of Object.entries(row)) {
@@ -18,9 +21,11 @@ const generateMainObject = (row: Record<string, any>) => {
 };
 
 const generateUnderObject = (
+  // eslint-disable-next-line
   row: Record<string, any>,
   underObjectKey: string
 ) => {
+  // eslint-disable-next-line
   const formated: Record<string, any> = {};
 
   for (const [key, value] of Object.entries(row)) {
@@ -34,6 +39,7 @@ const generateUnderObject = (
 };
 
 const cleanObject = (
+  // eslint-disable-next-line
   object: Record<string, any>,
   shouldGetId: Record<string, boolean>
 ) => {
@@ -55,9 +61,11 @@ const cleanObject = (
 };
 
 export const generateObject = (
+  // eslint-disable-next-line
   rows: any[],
   shouldGetIdList: Record<string, boolean>
 ) => {
+  // eslint-disable-next-line
   const returnList: Record<string, any>[] = [];
 
   for (const row of rows) {

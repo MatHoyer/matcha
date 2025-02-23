@@ -225,7 +225,7 @@ class ZodArray<T> extends ZodType<T[]> {
 
 // Union schema
 class ZodUnion<T extends ZodType<any>[]> extends ZodType<Infer<T[number]>> {
-  private schemas: T;
+  public schemas: T;
 
   constructor(schemas: T) {
     super();

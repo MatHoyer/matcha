@@ -101,7 +101,7 @@ export const login = async (req: Request, res: Response) => {
     } as Infer<typeof loginSchemas.response>);
 };
 
-export const logout = async (req: Request, res: Response) => {
+export const logout = async (_req: Request, res: Response) => {
   res
     .status(200)
     .cookie(AUTH_COOKIE_NAME, '', {
@@ -125,7 +125,7 @@ export const session = async (req: Request, res: Response) => {
   try {
     const user = jwt.verify(token, env.JWT_SECRET);
     res.status(200).json({ user } as Infer<typeof sessionSchemas.response>);
-  } catch (error) {
+  } catch (_error) {
     res.status(401).json({ message: 'Unauthorized' } as TErrorSchema);
   }
 };

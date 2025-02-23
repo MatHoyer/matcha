@@ -1,23 +1,9 @@
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
-import { getUrl, sessionSchemas } from '@matcha/common';
+import { getUrl, sessionSchemas, TUser } from '@matcha/common';
 import { useEffect, useState } from 'react';
 
-export type User = {
-  age: number;
-  biography: string | null;
-  email: string;
-  exp: number;
-  gender: string;
-  iat: number;
-  id: number;
-  lastName: string;
-  lastTimeOnline: number | null;
-  name: string;
-  preference: string;
-};
-
 export const useSession = () => {
-  const [userState, setUser] = useState<User | null>(null);
+  const [userState, setUser] = useState<Omit<TUser, 'password'> | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
