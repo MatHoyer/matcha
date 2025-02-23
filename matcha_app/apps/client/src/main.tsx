@@ -14,11 +14,9 @@ createRoot(document.getElementById('root')!).render(
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <Toaster />
-        <main className="h-dvh w-full">
-          <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
-            <App />
-          </ThemeProvider>
-        </main>
+        <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+          <App />
+        </ThemeProvider>
       </BrowserRouter>
     </QueryClientProvider>
   </StrictMode>

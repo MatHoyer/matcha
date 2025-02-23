@@ -26,6 +26,7 @@ export const LogoutButton = () => {
       onClick={() => {
         removeCookieMutation.mutate();
       }}
+      className="w-full"
       loading={removeCookieMutation.isPending}
     >
       Logout

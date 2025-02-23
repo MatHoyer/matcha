@@ -45,6 +45,7 @@ const LoginPage: React.FC = () => {
           errorMessage: 'Login failed',
           cb: () => {
             navigate('/');
+            window.location.reload();
           },
         },
       });
