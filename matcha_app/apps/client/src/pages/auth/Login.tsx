@@ -39,12 +39,6 @@ const LoginPage: React.FC = () => {
         method: 'POST',
         url: getUrl('api-auth', { type: 'login' }),
         data,
-        config: {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          withCredentials: true,
-        },
         schemas: loginSchemas,
         handleEnding: {
           successMessage: 'Login successful',

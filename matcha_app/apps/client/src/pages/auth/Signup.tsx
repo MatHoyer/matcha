@@ -26,8 +26,8 @@ type TForm = {
   email: string;
   password: string;
   age: number;
-  gender: 'Male' | 'Female';
-  preference: 'Heterosexual' | 'Bisexual' | 'Homosexual';
+  gender: 'Male' | 'Female' | null;
+  preference: 'Heterosexual' | 'Bisexual' | 'Homosexual' | null;
 };
 
 const SignupPage: React.FC = () => {
@@ -40,23 +40,22 @@ const SignupPage: React.FC = () => {
       email: '',
       password: '',
       age: 0,
-      gender: 'Male',
-      preference: 'Heterosexual',
+      gender: null,
+      preference: null,
     },
   });
 
   const mutation = useMutation({
     mutationFn: async (data: TForm) => {
+      const parsedData = signupSchemas.requirements.safeParse(data);
+      if (!parsedData.success) {
+        throw new Error('Invalid data');
+      }
+
       return await axiosFetch({
         method: 'POST',
         url: getUrl('api-auth', { type: 'signup' }),
-        data,
-        config: {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          withCredentials: true,
-        },
+        data: parsedData.data,
         schemas: signupSchemas,
         handleEnding: {
           successMessage: 'Signup successful',

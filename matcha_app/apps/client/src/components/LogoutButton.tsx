@@ -9,12 +9,6 @@ export const LogoutButton = () => {
       await axiosFetch({
         method: 'GET',
         url: getUrl('api-auth', { type: 'logout' }),
-        config: {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          withCredentials: true,
-        },
         schemas: logoutSchemas,
         handleEnding: {
           errorMessage: 'Logout failed',

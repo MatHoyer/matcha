@@ -28,9 +28,6 @@ export const useSession = () => {
           url: getUrl('api-auth', {
             type: 'session',
           }),
-          config: {
-            withCredentials: true,
-          },
           schemas: sessionSchemas,
           handleEnding: {
             cb: (data) => {

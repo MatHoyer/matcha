@@ -12,14 +12,19 @@ export const axiosFetch = async <
   method,
   url,
   data,
-  config = {},
+  config = {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    withCredentials: true,
+  },
   schemas,
   handleEnding,
 }: {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE';
   url: string;
   data?: Infer<R>;
-  config: AxiosRequestConfig;
+  config?: AxiosRequestConfig;
   schemas: {
     requirements?: R;
     response: T;
@@ -51,7 +56,7 @@ export const axiosFetch = async <
       })) as Infer<T>,
     };
   } catch (error) {
-    console.error(error);
+    // console.error(error);
     if (axios.isAxiosError(error)) {
       const axiosError = error as AxiosError<TErrorSchema>;
       if (handleEnding?.errorMessage) {

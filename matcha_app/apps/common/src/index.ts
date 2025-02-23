@@ -5,6 +5,10 @@ export type { Infer } from './validator';
 //-----------------------Get URL-----------------------
 export { getServerUrl } from './getServer';
 export { getUrl } from './getUrl';
+export type {
+  TApiRouteDataRequirements,
+  TClientRouteDataRequirements,
+} from './getUrl';
 
 //-----------------------Datas-----------------------
 export {
