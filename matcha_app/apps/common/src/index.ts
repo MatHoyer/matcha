@@ -39,6 +39,35 @@ export {
   sessionSchemas,
   signupSchemas,
 } from './schemas/auth.schema';
-export { userSchema } from './schemas/database/user.schema';
+export {
+  blockSchema,
+  genderSchema,
+  imageSchema,
+  likeSchema,
+  locationSchema,
+  messageSchema,
+  notificationSchema,
+  orientationSchema,
+  reportSchema,
+  tagSchema,
+  userSchema,
+  userTagSchema,
+  viewSchema,
+} from './schemas/database.schema';
+export type {
+  TBlock,
+  TGender,
+  TImage,
+  TLike,
+  TLocation,
+  TMessage,
+  TNotification,
+  TOrientation,
+  TReport,
+  TTag,
+  TUser,
+  TUserTag,
+  TView,
+} from './schemas/database.schema';
 export { errorSchema } from './schemas/error.schema';
 export type { TErrorSchema } from './schemas/error.schema';

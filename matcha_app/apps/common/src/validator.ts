@@ -140,7 +140,7 @@ class ZodDate extends ZodType<Date> {
 
 // Enum schema
 class ZodEnum<T extends string> extends ZodType<T> {
-  private values: readonly T[];
+  public values: readonly T[];
 
   constructor(values: readonly T[]) {
     super();
@@ -186,7 +186,7 @@ class ZodObject<T extends { [key: string]: any }> extends ZodType<T> {
 
 // Array schema
 class ZodArray<T> extends ZodType<T[]> {
-  private itemType: ZodType<T>;
+  public itemType: ZodType<T>;
 
   constructor(itemType: ZodType<T>) {
     super();

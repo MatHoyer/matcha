@@ -1,16 +1,16 @@
-import { GENDERS, ORIENTATIONS } from '../datas';
 import { z } from '../validator';
+import { userSchema } from './database.schema';
 
 export const signupSchemas = {
-  requirements: z.object({
-    name: z.string(),
-    lastName: z.string(),
-    email: z.string().email(),
-    password: z.string(),
-    age: z.number(),
-    gender: z.enum(GENDERS),
-    preference: z.enum(ORIENTATIONS),
-  }),
+  requirements: userSchema.pick([
+    'name',
+    'lastName',
+    'email',
+    'password',
+    'age',
+    'gender',
+    'preference',
+  ]),
   response: z.object({
     message: z.string(),
   }),
@@ -34,14 +34,14 @@ export const logoutSchemas = {
 
 export const sessionSchemas = {
   response: z.object({
-    user: z.object({
-      id: z.number(),
-      name: z.string(),
-      lastName: z.string(),
-      email: z.string().email(),
-      age: z.number(),
-      gender: z.enum(GENDERS),
-      preference: z.enum(ORIENTATIONS),
-    }),
+    user: userSchema.pick([
+      'id',
+      'name',
+      'lastName',
+      'email',
+      'age',
+      'gender',
+      'preference',
+    ]),
   }),
 };
