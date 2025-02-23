@@ -27,3 +27,13 @@ export {
 
 //-----------------------Socket-----------------------
 export { SOCKETS_EVENTS } from './sockets';
+
+//-----------------------Schemas-----------------------
+export {
+  loginSchemas,
+  logoutSchemas,
+  sessionSchemas,
+  signupSchemas,
+} from './schemas/auth.schema';
+export { errorSchema } from './schemas/error.schema';
+export type { TErrorSchema } from './schemas/error.schema';

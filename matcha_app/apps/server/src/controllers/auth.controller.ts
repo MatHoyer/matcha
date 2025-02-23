@@ -1,15 +1,23 @@
-import { AUTH_COOKIE_NAME, wait } from '@matcha/common';
+import {
+  AUTH_COOKIE_NAME,
+  Infer,
+  loginSchemas,
+  sessionSchemas,
+  signupSchemas,
+  TErrorSchema,
+  wait,
+} from '@matcha/common';
 import type { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import db from '../database/Database.js';
 import type { Gender, Orientation } from '../database/query/type.js';
 import { env } from '../env.js';
-import type { TLoginSchema, TSignupSchema } from '../schemas/auth.schema.js';
 import { hashPassword } from '../services/auth.service.js';
 
 export const signup = async (req: Request, res: Response) => {
-  const { password, gender, preference, ...userData } =
-    req.body as TSignupSchema;
+  const { password, gender, preference, ...userData } = req.body as Infer<
+    typeof signupSchemas.requirements
+  >;
   const hashedPassword = hashPassword(password, env.AUTH_SECRET);
 
   let user = await db.user.findFirst({
@@ -18,7 +26,7 @@ export const signup = async (req: Request, res: Response) => {
     },
   });
   if (user) {
-    res.status(409).json({ message: 'User already exists' });
+    res.status(409).json({ message: 'User already exists' } as TErrorSchema);
     return;
   }
 
@@ -30,9 +38,8 @@ export const signup = async (req: Request, res: Response) => {
       ...userData,
     },
   });
-  // remove cringe check after good prisma update
   if (!user) {
-    res.status(500).json({ message: 'Error creating user' });
+    res.status(500).json({ message: 'Error creating user' } as TErrorSchema);
     return;
   }
 
@@ -52,11 +59,13 @@ export const signup = async (req: Request, res: Response) => {
     })
     .json({
       message: 'Signed in',
-    });
+    } as Infer<typeof signupSchemas.response>);
 };
 
 export const login = async (req: Request, res: Response) => {
-  const { email, password } = req.body as TLoginSchema;
+  const { email, password } = req.body as Infer<
+    typeof loginSchemas.requirements
+  >;
   const hashedPassword = hashPassword(password, env.AUTH_SECRET);
   await wait(2000);
 
@@ -68,7 +77,7 @@ export const login = async (req: Request, res: Response) => {
   });
   // remove cringe check after good prisma update
   if (!user) {
-    res.status(401).json({ message: 'Invalid credentials' });
+    res.status(401).json({ message: 'Invalid credentials' } as TErrorSchema);
     return;
   }
 
@@ -88,7 +97,7 @@ export const login = async (req: Request, res: Response) => {
     })
     .json({
       message: 'Logged in',
-    });
+    } as Infer<typeof loginSchemas.response>);
 };
 
 export const logout = async (req: Request, res: Response) => {
@@ -102,20 +111,20 @@ export const logout = async (req: Request, res: Response) => {
     })
     .json({
       message: 'Logged out',
-    });
+    } as Infer<typeof loginSchemas.response>);
 };
 
 export const session = async (req: Request, res: Response) => {
   const token = req.cookies[AUTH_COOKIE_NAME] as string;
   if (!token) {
-    res.status(401).json({ message: 'Unauthorized' });
+    res.status(401).json({ message: 'Unauthorized' } as TErrorSchema);
     return;
   }
 
   try {
     const user = jwt.verify(token, env.JWT_SECRET);
-    res.status(200).json({ user });
+    res.status(200).json({ user } as Infer<typeof sessionSchemas.response>);
   } catch (error) {
-    res.status(401).json({ message: 'Unauthorized' });
+    res.status(401).json({ message: 'Unauthorized' } as TErrorSchema);
   }
 };

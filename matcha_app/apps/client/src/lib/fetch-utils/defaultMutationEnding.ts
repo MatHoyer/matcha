@@ -1,27 +1,18 @@
+import { Infer, ZodType } from '@matcha/common';
 import { AxiosResponse } from 'axios';
 import { toast } from 'sonner';
 
-export const isActionSuccessful = <T, D>(res?: AxiosResponse<T, D>) => {
-  if (res && res.status === 200) {
-    return true;
-  }
-
-  return false;
-};
-
-export const defaultMutationEnding = async <T, D>(data: {
-  res?: AxiosResponse<T, D>;
+export const defaultMutationEnding = async <T extends ZodType<D>, D>(data: {
+  // eslint-disable-next-line
+  res?: AxiosResponse<any, any>;
   successMessage?: string;
-  errorMessage?: string;
-  cb?: (data: T) => void | Promise<void>;
+  cb?: (data: Infer<T>) => void | Promise<void>;
+  responseSchema: T;
 }) => {
-  const { cb, res, successMessage, errorMessage } = data;
+  const { cb, res, successMessage, responseSchema } = data;
 
-  if (!isActionSuccessful(res)) {
-    console.log('Error: ', res);
-    if (errorMessage) {
-      toast.error(errorMessage);
-    }
+  const responseData = responseSchema.safeParse(res?.data);
+  if (!responseData.success) {
     return;
   }
 
@@ -30,8 +21,8 @@ export const defaultMutationEnding = async <T, D>(data: {
   }
 
   if (cb) {
-    await cb(res?.data || ({} as T));
+    await cb(responseData.data as Infer<T>);
   }
 
-  return res;
+  return responseData.data as Infer<T>;
 };

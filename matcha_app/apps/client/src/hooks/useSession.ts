@@ -1,5 +1,5 @@
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
-import { getUrl } from '@matcha/common';
+import { getUrl, sessionSchemas } from '@matcha/common';
 import { useEffect, useState } from 'react';
 
 export type User = {
@@ -24,13 +24,14 @@ export const useSession = () => {
     const fetchSession = async () => {
       try {
         await axiosFetch({
-          method: 'get',
+          method: 'GET',
           url: getUrl('api-auth', {
             type: 'session',
           }),
           config: {
             withCredentials: true,
           },
+          schemas: sessionSchemas,
           handleEnding: {
             cb: (data) => {
               setUser(data.user);

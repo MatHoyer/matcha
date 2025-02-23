@@ -157,7 +157,7 @@ class ZodEnum<T extends string> extends ZodType<T> {
 
 // Object schema
 class ZodObject<T extends { [key: string]: any }> extends ZodType<T> {
-  private shape: { [K in keyof T]: ZodType<T[K]> };
+  public shape: { [K in keyof T]: ZodType<T[K]> };
 
   constructor(shape: { [K in keyof T]: ZodType<T[K]> }) {
     super();
