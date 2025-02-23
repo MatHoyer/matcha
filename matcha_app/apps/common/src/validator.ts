@@ -175,6 +175,13 @@ class ZodObject<T extends { [key: string]: any }> extends ZodType<T> {
     }
     return result;
   }
+  pick<K extends keyof T>(keys: K[]): ZodObject<Pick<T, K>> {
+    const pickedShape: { [K in keyof T]: ZodType<T[K]> } = {} as any;
+    for (const key of keys) {
+      pickedShape[key] = this.shape[key];
+    }
+    return new ZodObject(pickedShape);
+  }
 }
 
 // Array schema

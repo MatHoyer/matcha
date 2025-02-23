@@ -32,8 +32,7 @@ export const axiosFetch = async <
   handleEnding?: {
     successMessage?: string;
     errorMessage?: string;
-    // eslint-disable-next-line
-    cb?: (data: any) => void;
+    cb?: (data: Infer<T>) => void;
   };
 }): Promise<{
   ok: boolean;

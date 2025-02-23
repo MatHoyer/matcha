@@ -39,5 +39,6 @@ export {
   sessionSchemas,
   signupSchemas,
 } from './schemas/auth.schema';
+export { userSchema } from './schemas/database/user.schema';
 export { errorSchema } from './schemas/error.schema';
 export type { TErrorSchema } from './schemas/error.schema';
