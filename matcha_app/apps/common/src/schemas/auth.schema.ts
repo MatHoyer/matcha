@@ -17,10 +17,7 @@ export const signupSchemas = {
 };
 
 export const loginSchemas = {
-  requirements: z.object({
-    email: z.string().email(),
-    password: z.string(),
-  }),
+  requirements: userSchema.pick(['email', 'password']),
   response: z.object({
     message: z.string(),
   }),

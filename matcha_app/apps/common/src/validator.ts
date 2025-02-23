@@ -52,6 +52,18 @@ export abstract class ZodType<T> {
       }
     })();
   }
+
+  nullable() {
+    const self = this;
+    return new (class extends ZodType<T | null> {
+      parse(data: unknown): T | null {
+        if (data === null) {
+          return null;
+        }
+        return self.parse(data);
+      }
+    })();
+  }
 }
 
 // String schema
@@ -138,6 +150,16 @@ class ZodDate extends ZodType<Date> {
   }
 }
 
+// Null schema
+class ZodNull extends ZodType<null> {
+  parse(data: unknown): null {
+    if (data !== null) {
+      throw new Error(`Expected null, but received ${typeof data}`);
+    }
+    return null;
+  }
+}
+
 // Enum schema
 class ZodEnum<T extends string> extends ZodType<T> {
   public values: readonly T[];
@@ -201,20 +223,56 @@ class ZodArray<T> extends ZodType<T[]> {
   }
 }
 
+// Union schema
+class ZodUnion<T extends ZodType<any>[]> extends ZodType<Infer<T[number]>> {
+  private schemas: T;
+
+  constructor(schemas: T) {
+    super();
+    this.schemas = schemas;
+  }
+
+  parse(data: unknown): Infer<T[number]> {
+    let lastError: unknown;
+    for (const schema of this.schemas) {
+      try {
+        return schema.parse(data); // returns the type from the matching schema
+      } catch (error) {
+        lastError = error;
+      }
+    }
+    throw new Error(`Invalid value. Could not match any of the union types.`);
+  }
+}
+
 // A utility object to create schemas easily
 export const z = {
   string: () => new ZodString(),
   number: () => new ZodNumber(),
   boolean: () => new ZodBoolean(),
   date: () => new ZodDate(),
+  null: () => new ZodNull(),
   enum: <T extends readonly string[]>(values: T) =>
     new ZodEnum<T[number]>(values),
   object: <T extends { [key: string]: any }>(shape: {
     [K in keyof T]: ZodType<T[K]>;
   }) => new ZodObject<T>(shape),
   array: <T>(itemType: ZodType<T>) => new ZodArray(itemType),
+  union: <T extends ZodType<any>[]>(schemas: T): ZodUnion<T> =>
+    new ZodUnion(schemas),
 };
 
+type OptionalKeys<T> = {
+  [K in keyof T]-?: undefined extends T[K] ? K : never;
+}[keyof T];
+
+type MakeOptional<T> = Omit<T, OptionalKeys<T>> &
+  Partial<Pick<T, OptionalKeys<T>>>;
+
+type Flatten<T> = { [K in keyof T]: T[K] };
+
 export type Infer<S extends ZodType<any>> = S extends ZodType<infer T>
-  ? T
+  ? T extends object
+    ? Flatten<MakeOptional<T>>
+    : T
   : never;

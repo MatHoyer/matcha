@@ -5,12 +5,13 @@ import {
   sessionSchemas,
   signupSchemas,
   TErrorSchema,
+  TGender,
+  TOrientation,
   wait,
 } from '@matcha/common';
 import type { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import db from '../database/Database.js';
-import type { Gender, Orientation } from '../database/query/type.js';
 import { env } from '../env.js';
 import { hashPassword } from '../services/auth.service.js';
 
@@ -32,8 +33,8 @@ export const signup = async (req: Request, res: Response) => {
 
   user = await db.user.create({
     data: {
-      gender: gender as Gender,
-      preference: preference as Orientation,
+      gender: gender as TGender,
+      preference: preference as TOrientation,
       password: hashedPassword,
       ...userData,
     },
