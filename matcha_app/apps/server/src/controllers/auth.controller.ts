@@ -120,24 +120,3 @@ export const session = async (req: Request, res: Response) => {
     res.status(401).json({ message: 'Unauthorized' });
   }
 };
-
-export const getUsers = async (req: Request, res: Response) => {
-  try {
-    const users = await db.user.findMany({
-      select: {
-        id: true,
-        name: true,
-        email: true,
-        age: true,
-        gender: true,
-        preference: true,
-        lastTimeOnline: true,
-      }
-    });    
-    res.status(200).json(users);
-  }  
-  catch (error) {
-    console.error("Error fetching users:", error);
-    res.status(500).json({ message: "Internal Server Error" });    
-  }
-}

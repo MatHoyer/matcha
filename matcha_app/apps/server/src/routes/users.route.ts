@@ -1,10 +1,8 @@
 import { Router } from 'express';
-import {
-    getUsers,
-} from '../controllers/auth.controller.js';
+import { getUsers } from '../controllers/users.controller';
 
-const authRouter = Router();
+const usersRouter = Router();
 
-authRouter.get('/getUsers', getUsers);
+usersRouter.get('/getUsers', getUsers);
 
-export default authRouter;
+export default usersRouter;

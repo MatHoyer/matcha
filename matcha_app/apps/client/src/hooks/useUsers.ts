@@ -19,9 +19,10 @@ export type User = {
         try {
           await axiosFetch({
             method: "get",
-            url: getUrl("api-users", {
-              type: "getUsers",
-            }),
+            // url: getUrl("api-users", {
+            //   type: "getUsers",
+            // }),
+            url: 'http://localhost:3000/api/users',
             config: {
               withCredentials: true,
             },
@@ -38,6 +39,9 @@ export type User = {
   
       fetchUsers();
     }, []);
-  
+    useEffect(() => {
+        console.log("users : ", users);
+    }
+    , [users]);
     return { users, loading };
   };

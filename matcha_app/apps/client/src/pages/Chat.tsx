@@ -152,7 +152,9 @@ const Chat: React.FC = () => {
         {/* List of users online */}
         <ul className="mt-2 text-gray-300">
           <li className="font-semibold">Users:</li>
-          {/* Fetch and map users here */}
+          {users.map((user) => (
+            <li key={user.id}>{JSON.stringify(user)}</li>
+          ))}
         </ul>
       </form>
     </div>
