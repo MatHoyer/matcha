@@ -6,7 +6,7 @@ export type TClientRouteDataRequirements = {
   };
   'client-home': undefined;
   'client-research': {
-    type: 'forYou' | 'targetedSearch';
+    type: 'forYou' | 'advancedSearch';
   };
   'client-notifications': undefined;
   'client-account': undefined;

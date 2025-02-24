@@ -54,7 +54,7 @@ export const Pages = () => {
         <Route path="/" element={<Home />} />
         <Route path="/chat" element={<Chat />} />
         <Route
-          path={getUrl('client-research', { type: 'targetedSearch' })}
+          path={getUrl('client-research', { type: 'advancedSearch' })}
           element={<TargetedSearch />}
         />
       </Route>

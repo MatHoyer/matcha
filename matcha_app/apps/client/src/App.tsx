@@ -55,9 +55,9 @@ const App = () => {
                     },
                     {
                       icon: Crosshair,
-                      title: 'Targeted search',
+                      title: 'Advanced search',
                       url: getUrl('client-research', {
-                        type: 'targetedSearch',
+                        type: 'advancedSearch',
                       }),
                     },
                   ],
