@@ -19,9 +19,6 @@ import { env } from '../env';
 //     ROOM_MESSAGE: 'ROOM_MESSAGE',
 //   },
 // };
-
-const events = SOCKETS_EVENTS;
-
 interface User {
   id: string;
   username: string;
@@ -53,8 +50,7 @@ export const socketHandler = (io: Server) => {
   //   }
   // });
 
-
-  io.on('connection', (socket: Socket) => {
+  io.on(SOCKETS_EVENTS.connection, (socket: Socket) => {
     console.log('User connected : ', socket.id);
 
     const cookies = parse(socket.handshake.headers.cookie || '');
@@ -93,9 +89,10 @@ export const socketHandler = (io: Server) => {
       return;
     }
 
+    const nbUsers = connectedUsers.size;
+    console.log('nbUsers :', nbUsers); 
+    io.emit('clients-total', nbUsers);
 
-    io.emit('clients-total', connectedUsers.size);
-    // console.log('-> client total :', clientsTotal);
 
     socket.on('message', (data) => {
       // console.log(data);
