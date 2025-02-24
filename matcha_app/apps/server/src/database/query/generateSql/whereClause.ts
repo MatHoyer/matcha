@@ -2,6 +2,7 @@ import type { WhereClause } from '../type.js';
 
 type TReturnType = {
   whereClause: string;
+  // eslint-disable-next-line
   values: any[];
 };
 
@@ -12,6 +13,7 @@ export const generateWhereClauseSql = <T>(
 ): TReturnType => {
   if (!where) return { whereClause: '', values: [] };
   const sql: string[] = [];
+  // eslint-disable-next-line
   const values: any[] = [];
   let indexCounter = index || 1;
   for (const [key, value] of Object.entries(where)) {

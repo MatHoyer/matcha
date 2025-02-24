@@ -14,7 +14,7 @@ import PasswordInput from '@/components/ui/password-input';
 import Selector from '@/components/ui/selector';
 import { Typography } from '@/components/ui/typography';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
-import { GENDERS, getUrl, ORIENTATIONS } from '@matcha/common';
+import { GENDERS, getUrl, ORIENTATIONS, signupSchemas } from '@matcha/common';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { useForm } from 'react-hook-form';
@@ -47,21 +47,22 @@ const SignupPage: React.FC = () => {
 
   const mutation = useMutation({
     mutationFn: async (data: TForm) => {
+      const parsedData = signupSchemas.requirements.safeParse(data);
+      if (!parsedData.success) {
+        throw new Error('Invalid data');
+      }
+
       return await axiosFetch({
-        method: 'post',
+        method: 'POST',
         url: getUrl('api-auth', { type: 'signup' }),
-        data,
-        config: {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          withCredentials: true,
-        },
+        data: parsedData.data,
+        schemas: signupSchemas,
         handleEnding: {
           successMessage: 'Signup successful',
           errorMessage: 'Signup failed',
           cb: () => {
             navigate('/');
+            window.location.reload();
           },
         },
       });

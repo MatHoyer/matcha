@@ -15,7 +15,7 @@ CREATE TABLE "User" (
   "gender" "Gender" NOT NULL,
   "preference" "Orientation" NOT NULL,
   "biography" VARCHAR(1000),
-  "lastTimeOnline" TIMESTAMP
+  "lastTimeOnline" DATE NOT NULL DEFAULT CURRENT_DATE
 );
 
 DROP TABLE IF EXISTS "Tag" CASCADE;
@@ -39,7 +39,7 @@ CREATE TABLE "Message" (
   "userId" INT NOT NULL,
   "receiverId" INT NOT NULL,
   "message" VARCHAR(1000) NOT NULL,
-  "date" TIMESTAMP NOT NULL,
+  "date" DATE NOT NULL DEFAULT CURRENT_DATE,
   FOREIGN KEY ("userId") REFERENCES "User" ("id")  ON DELETE CASCADE,
   FOREIGN KEY ("receiverId") REFERENCES "User" ("id")  ON DELETE CASCADE
 );
@@ -68,7 +68,8 @@ CREATE TABLE "Notification" (
   "id" SERIAL PRIMARY KEY,
   "userId" INT NOT NULL,
   "message" VARCHAR(1000) NOT NULL,
-  "date" TIMESTAMP NOT NULL,
+  "date" DATE NOT NULL DEFAULT CURRENT_DATE,
+  "read" BOOLEAN NOT NULL DEFAULT FALSE,
   FOREIGN KEY ("userId") REFERENCES "User" ("id")  ON DELETE CASCADE
 );
 
@@ -87,7 +88,7 @@ CREATE TABLE "Location" (
   "userId" INT NOT NULL,
   "latitude" FLOAT NOT NULL,
   "longitude" FLOAT NOT NULL,
-  "date" TIMESTAMP NOT NULL,
+  "date" DATE NOT NULL DEFAULT CURRENT_DATE,
   FOREIGN KEY ("userId") REFERENCES "User" ("id")  ON DELETE CASCADE
 );
 
@@ -96,7 +97,7 @@ CREATE TABLE "View" (
   "id" SERIAL PRIMARY KEY,
   "userId" INT NOT NULL,
   "viewerId" INT NOT NULL,
-  "date" TIMESTAMP NOT NULL,
+  "date" DATE NOT NULL DEFAULT CURRENT_DATE,
   FOREIGN KEY ("userId") REFERENCES "User" ("id")  ON DELETE CASCADE,
   FOREIGN KEY ("viewerId") REFERENCES "User" ("id")  ON DELETE CASCADE
 );

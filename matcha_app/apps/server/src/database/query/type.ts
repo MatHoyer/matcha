@@ -1,107 +1,25 @@
-export enum Gender {
-  Male = 'Male',
-  Female = 'Female',
-}
-
-export enum Orientation {
-  Heterosexual = 'Heterosexual',
-  Bisexual = 'Bisexual',
-  Homosexual = 'Homosexual',
-}
-
-export type Tag = {
-  id: number;
-  name: string;
-};
-
-export type UserTag = {
-  id: number;
-  userId: number;
-  tagId: number;
-};
-
-export type Message = {
-  id: number;
-  senderId: number;
-  receiverId: number;
-  content: string;
-  date: Date;
-};
-
-export type Report = {
-  id: number;
-  userId: number;
-  reportedId: number;
-  reason: string;
-  date: Date;
-};
-
-export type Like = {
-  id: number;
-  userId: number;
-  likedId: number;
-  date: Date;
-};
-
-export type Notification = {
-  id: number;
-  userId: number;
-  content: string;
-  date: Date;
-};
-
-export type Block = {
-  id: number;
-  userId: number;
-  blockedId: number;
-  date: Date;
-};
-
-export type Location = {
-  id: number;
-  userId: number;
-  latitude: number;
-  longitude: number;
-  date: Date;
-};
-
-export type View = {
-  id: number;
-  userId: number;
-  viewedId: number;
-  date: Date;
-};
-
-export type Image = {
-  id: number;
-  userId: number;
-  url: string;
-  isProfile: boolean;
-};
-
-export type User = {
-  id: number;
-  name: string;
-  lastName: string;
-  email: string;
-  age: number;
-  password: string;
-  gender: Gender;
-  preference: Orientation;
-  biography?: string;
-  lastTimeOnline?: Date;
-};
+import {
+  TBlock,
+  TImage,
+  TLike,
+  TLocation,
+  TMessage,
+  TNotification,
+  TReport,
+  TUserTag,
+  TView,
+} from '@matcha/common';
 
 export type UserIncludes = {
-  userTag?: UserTag;
-  message?: Message;
-  report?: Report;
-  like?: Like;
-  notification?: Notification;
-  block?: Block;
-  location?: Location;
-  view?: View;
-  image?: Image;
+  userTag?: TUserTag;
+  message?: TMessage;
+  report?: TReport;
+  like?: TLike;
+  notification?: TNotification;
+  block?: TBlock;
+  location?: TLocation;
+  view?: TView;
+  image?: TImage;
 };
 
 export const tableAlias: Record<string, string> = {
@@ -201,7 +119,9 @@ export type OrderBy<T> = {
 };
 
 export type WhereClause<T> = {
-  [P in keyof T]?: T[P] | { $gt?: T[P]; $lt?: T[P]; $gte?: T[P]; $lte?: T[P]; $not?: T[P] };
+  [P in keyof T]?:
+    | T[P]
+    | { $gt?: T[P]; $lt?: T[P]; $gte?: T[P]; $lte?: T[P]; $not?: T[P] };
 };
 
 export type CommonOptions<T, I> = {

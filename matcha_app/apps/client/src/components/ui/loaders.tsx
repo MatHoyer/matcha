@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils';
 import { Loader2 } from 'lucide-react';
 import { motion } from 'motion/react';
 import { ComponentProps } from 'react';
-import { Button, ButtonProps } from './button';
+import { Button } from './button';
 
 export const AppLoader: React.FC<ComponentProps<typeof Loader2>> = ({
   className,
@@ -16,7 +16,7 @@ export const LoadingButton = ({
   children,
   className,
   ...props
-}: ButtonProps & {
+}: ComponentProps<typeof Button> & {
   loading?: boolean;
   success?: string;
 }) => {

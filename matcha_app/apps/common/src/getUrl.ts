@@ -1,17 +1,19 @@
 import { getServerUrl } from './getServer';
 
-type TRouteDataRequirements = {
-  // --------------------- Client Routes ----------------
+export type TClientRouteDataRequirements = {
   'client-auth': {
     type: 'signup' | 'login';
   };
   'client-home': undefined;
-
-  // --------------------- API Routes ---------------------
+};
+export type TApiRouteDataRequirements = {
   'api-auth': {
     type: 'signup' | 'login' | 'logout' | 'session' | undefined;
   };
 };
+
+type TRouteDataRequirements = TClientRouteDataRequirements &
+  TApiRouteDataRequirements;
 
 type TRoute = keyof TRouteDataRequirements;
 

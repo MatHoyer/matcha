@@ -1,8 +1,9 @@
+import { TUser } from '@matcha/common';
 import pg from 'pg';
-import type { User, UserIncludes } from '../query/type.js';
+import type { UserIncludes } from '../query/type.js';
 import GenericRepository from './GenericRepository.js';
 
-class UserRepository extends GenericRepository<User, UserIncludes> {
+class UserRepository extends GenericRepository<TUser, UserIncludes> {
   constructor(pool: pg.Pool) {
     super('user', pool);
   }

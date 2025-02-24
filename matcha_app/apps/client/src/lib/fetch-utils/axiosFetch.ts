@@ -1,24 +1,43 @@
+import { Infer, TErrorSchema, ZodType } from '@matcha/common';
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
+import { toast } from 'sonner';
 import { defaultMutationEnding } from './defaultMutationEnding';
 
-export const axiosFetch = async ({
+export const axiosFetch = async <
+  T extends ZodType<D>,
+  D,
+  R extends ZodType<DD>,
+  DD
+>({
   method,
   url,
-  data = null,
-  config = {},
+  data,
+  config = {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    withCredentials: true,
+  },
+  schemas,
   handleEnding,
 }: {
-  method: 'get' | 'post' | 'put' | 'delete';
+  method: 'GET' | 'POST' | 'PUT' | 'DELETE';
   url: string;
-  data?: unknown;
-  config: AxiosRequestConfig;
+  data?: Infer<R>;
+  config?: AxiosRequestConfig;
+  schemas: {
+    requirements?: R;
+    response: T;
+  };
   handleEnding?: {
     successMessage?: string;
     errorMessage?: string;
-    // eslint-disable-next-line
-    cb?: (data: any) => void;
+    cb?: (data: Infer<T>) => void;
   };
-}) => {
+}): Promise<{
+  ok: boolean;
+  data: TErrorSchema | Infer<T>;
+}> => {
   try {
     const response = await axios({
       method,
@@ -27,19 +46,34 @@ export const axiosFetch = async ({
       ...config,
     });
 
-    return await defaultMutationEnding({
-      res: response,
-      ...handleEnding,
-    });
-  } catch (error) {
-    console.error(error);
-    if (axios.isAxiosError(error)) {
-      const axiosError = error as AxiosError;
-      await defaultMutationEnding({
-        res: axiosError.response,
+    return {
+      ok: true,
+      data: (await defaultMutationEnding({
+        res: response,
         ...handleEnding,
-      });
+        responseSchema: schemas.response,
+      })) as Infer<T>,
+    };
+  } catch (error) {
+    // console.error(error);
+    if (axios.isAxiosError(error)) {
+      const axiosError = error as AxiosError<TErrorSchema>;
+      if (handleEnding?.errorMessage) {
+        toast.error(axiosError.response?.data.message || 'An error occurred');
+      }
+      return {
+        ok: false,
+        data: axiosError.response?.data as TErrorSchema,
+      };
     }
-    return error;
+    if (handleEnding?.errorMessage) {
+      toast.error(handleEnding?.errorMessage || 'An error occurred');
+    }
+    return {
+      ok: false,
+      data: {
+        message: handleEnding?.errorMessage || 'An error occurred',
+      } as TErrorSchema,
+    };
   }
 };

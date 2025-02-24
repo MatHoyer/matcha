@@ -12,7 +12,7 @@ import { LoadingButton } from '@/components/ui/loaders';
 import PasswordInput from '@/components/ui/password-input';
 import { Typography } from '@/components/ui/typography';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
-import { getUrl } from '@matcha/common';
+import { getUrl, loginSchemas } from '@matcha/common';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { useForm } from 'react-hook-form';
@@ -36,20 +36,16 @@ const LoginPage: React.FC = () => {
   const mutation = useMutation({
     mutationFn: async (data: TForm) => {
       return await axiosFetch({
-        method: 'post',
+        method: 'POST',
         url: getUrl('api-auth', { type: 'login' }),
         data,
-        config: {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          withCredentials: true,
-        },
+        schemas: loginSchemas,
         handleEnding: {
           successMessage: 'Login successful',
           errorMessage: 'Login failed',
           cb: () => {
             navigate('/');
+            window.location.reload();
           },
         },
       });

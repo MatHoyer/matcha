@@ -24,6 +24,7 @@ class GenericRepository<T, I> {
     this.pool = pool;
   }
 
+  // eslint-disable-next-line
   async #query(queryString: string, values: Array<any>) {
     try {
       const { rows } = await this.pool.query(queryString, values);
