@@ -5,9 +5,10 @@ import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
 
 const Chat: React.FC = () => {
-
   const [clientsTotal, setClientsTotal] = useState<number>(0);
-  const [messages, setMessages] = useState<{ name: string; message: string; dateTime: Date; isOwnMessage: boolean }[]>([]);
+  const [messages, setMessages] = useState<
+    { name: string; message: string; dateTime: Date; isOwnMessage: boolean }[]
+  >([]);
   const [message, setMessage] = useState<string>('');
   const [feedback, setFeedback] = useState('');
 
@@ -16,12 +17,10 @@ const Chat: React.FC = () => {
   const { user } = useSession();
   const name = user?.name || 'anonymous';
 
-  
   const { users } = useUsers();
   console.log('users : ', users);
 
   useEffect(() => {
-
     console.log('This user : ', user?.name);
     socket.on('clients-total', (data: number) => {
       console.log('Received clients-total : ', data);
@@ -48,15 +47,12 @@ const Chat: React.FC = () => {
       socket.off('clients-total');
       socket.off('chat-message');
       socket.off('feedback');
-    };    
-    
-
-  }, [socket]);
+    };
+  }, [user?.name]);
 
   useEffect(() => {
     scrollToBottom();
   }, [messages, feedback]);
-
 
   const sendMessage = (e: React.FormEvent) => {
     e.preventDefault();
@@ -91,12 +87,8 @@ const Chat: React.FC = () => {
 
   return (
     <div className="max-w-lg mx-auto p-4 bg-gray-900 text-white border border-gray-600 shadow-lg rounded-lg">
-      <h2 className="text-s font-semibold">
-        General chat room
-      </h2>
-      <h3 className="text-xs mb-2">
-        Total clients connected: {clientsTotal}
-      </h3>
+      <h2 className="text-s font-semibold">General chat room</h2>
+      <h3 className="text-xs mb-2">Total clients connected: {clientsTotal}</h3>
 
       <ul
         ref={messageContainerRef}
@@ -108,8 +100,8 @@ const Chat: React.FC = () => {
             key={index}
             className={`p-2 mb-2 rounded-md ${
               data.isOwnMessage
-                ? "bg-blue-600 text-white self-end"
-                : "bg-gray-700 text-gray-200"
+                ? 'bg-blue-600 text-white self-end'
+                : 'bg-gray-700 text-gray-200'
             }`}
           >
             <p className="text-sm">{data.message}</p>
@@ -138,7 +130,7 @@ const Chat: React.FC = () => {
             onChange={(e) => setMessage(e.target.value)}
             onFocus={() => handleFeedback(`${name} is typing...`)}
             onKeyPress={() => handleFeedback(`${name} is typing...`)}
-            onBlur={() => handleFeedback("")}
+            onBlur={() => handleFeedback('')}
             className="flex-1 p-2 bg-gray-700 text-white border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <button

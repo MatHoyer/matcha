@@ -24,9 +24,9 @@ interface User {
   username: string;
 }
 
-const rooms: Record<string, { name: string }> = {};
+// const rooms: Record<string, { name: string }> = {};
 const connectedUsers = new Map<string, User>();
-type TSocket = Socket & { user: User };
+// type TSocket = Socket & { user: User };
 
 export const socketHandler = (io: Server) => {
   // io.use((socket, next) => {
@@ -52,7 +52,6 @@ export const socketHandler = (io: Server) => {
 
   io.on(SOCKETS_EVENTS.connection, (socket: Socket) => {
     // console.log('User connected : ', socket.id);
-
     const cookies = parse(socket.handshake.headers.cookie || '');
     // console.log('cookies :', cookies);
     const token = cookies['auth-token'];
