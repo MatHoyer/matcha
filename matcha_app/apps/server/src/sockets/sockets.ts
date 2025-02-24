@@ -19,65 +19,78 @@ import { env } from '../env';
 //     ROOM_MESSAGE: 'ROOM_MESSAGE',
 //   },
 // };
-
-const events = SOCKETS_EVENTS;
-
 interface User {
   id: string;
   username: string;
 }
 
 const rooms: Record<string, { name: string }> = {};
-// const user = jwt.verify(token, env.JWT_SECRET);
 const connectedUsers = new Map<string, User>();
+type TSocket = Socket & { user: User };
 
 export const socketHandler = (io: Server) => {
-  let clientsTotal = 0;
+  // io.use((socket, next) => {
+  //   const cookies = parse(socket.handshake.headers.cookie || '');
+  //   console.log('cookies :', cookies);
+  //   const token = cookies['auth-token'];
+  //   if (!token) {
+  //     console.log('->No token provided, disconnecting');
+  //     socket.disconnect();
+  //     return;
+  //   }
+  //   try {
+  //     const decoded = jwt.verify(token, env.JWT_SECRET) as User;
+  //     console.log('->Decoded token :', decoded);
+  //     (socket as TSocket).user = decoded;
+  //     next();
+  //   } catch (error) {
+  //     console.error('->Error parsing token', error);
+  //     socket.disconnect();
+  //     return;
+  //   }
+  // });
 
-  io.on('connection', (socket: Socket) => {
-    console.log('User connected : ', socket.id);
+  io.on(SOCKETS_EVENTS.connection, (socket: Socket) => {
+    // console.log('User connected : ', socket.id);
 
     const cookies = parse(socket.handshake.headers.cookie || '');
-    console.log('cookies :', cookies);
+    // console.log('cookies :', cookies);
     const token = cookies['auth-token'];
-
-    // const token = socket.handshake.auth?.token;
     if (!token) {
-      console.log('No token provided, disconnecting');
+      // console.log('No token provided, disconnecting');
       socket.disconnect();
       return;
     }
 
     try {
       const userPayload = jwt.verify(token, env.JWT_SECRET) as User;
-      console.log('user id :', userPayload.id);
+      // console.log('user id :', userPayload.id);
       const userExists = Array.from(connectedUsers.values()).some(
         (user) => user.id === userPayload.id
       );
-      console.log('userExists :', userExists);
+      // console.log('userExists :', userExists);
       if (userExists == false) {
-        console.log('New user connected !, :');
+        // console.log('New user connected !');
         connectedUsers.set(socket.id, {
           id: userPayload.id,
           username: userPayload.username,
         });
-        clientsTotal++;
       } else {
-        console.log('user already connected !');
+        // console.log('user already connected !');
       }
-      io.emit('clients-total', clientsTotal);
+      io.emit('clients-total', connectedUsers.size);
       io.emit('connected-users', Array.from(connectedUsers.values()));
-      console.log('-> client total :', clientsTotal);
-      console.log('-> user online :', Array.from(connectedUsers.values()));
+      // console.log('-> client total :', connectedUsers.size);
+      // console.log('-> user online :', Array.from(connectedUsers.values()));
     } catch (error) {
       console.error('Error parsing token', error);
       socket.disconnect();
       return;
     }
 
-    // clientsTotal++;
-    // io.emit('clients-total', clientsTotal);
-    // console.log('-> client total :', clientsTotal);
+    const nbUsers = connectedUsers.size;
+    // console.log('nbUsers :', nbUsers);
+    io.emit('clients-total', nbUsers);
 
     socket.on('message', (data) => {
       // console.log(data);
@@ -89,10 +102,9 @@ export const socketHandler = (io: Server) => {
     });
 
     socket.on('disconnect', () => {
-      console.log('Socket disconnected', socket.id);
+      // console.log('Socket disconnected', socket.id);
       // socketsConnected.delete(socket.id);
-      // clientsTotal--;
-      io.emit('clients-total', clientsTotal);
+      // io.emit('clients-total', clientsTotal);
     });
   });
 };

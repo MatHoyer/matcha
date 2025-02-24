@@ -2,10 +2,10 @@ import { getUrl } from '@matcha/common';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
-import path from 'path';
 import { Server } from 'socket.io';
 import { env, envSchema } from './env.js';
 import { default as authRouter } from './routes/auth.route.js';
+import usersRouter from './routes/users.route.js';
 import { socketHandler } from './sockets/sockets.js';
 
 try {
@@ -31,6 +31,7 @@ app.get('/api/health', (_req, res) => {
   res.send('OK');
 });
 app.use(getUrl('api-auth'), authRouter);
+app.use(getUrl('api-users'), usersRouter);
 
 app.use(express.static(path.join(__dirname, '../../../public/dist')));
 app.get('*', (_req, res) => {
@@ -48,4 +49,5 @@ const io = new Server(server, {
     credentials: true,
   },
 });
+
 socketHandler(io);

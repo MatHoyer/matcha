@@ -10,6 +10,9 @@ export type TApiRouteDataRequirements = {
   'api-auth': {
     type: 'signup' | 'login' | 'logout' | 'session' | undefined;
   };
+  'api-users': {
+    type: 'getUsers' | undefined;
+  };
 };
 
 type TRouteDataRequirements = TClientRouteDataRequirements &
@@ -28,6 +31,7 @@ const routes: {
   'client-home': () => '/',
 
   'api-auth': ({ type }) => (type ? `/api/auth/${type}` : '/api/auth'),
+  'api-users': ({ type }) => (type ? `/api/users/${type}` : '/api/users'),
 };
 
 type TUrlParams =
