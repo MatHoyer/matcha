@@ -51,38 +51,37 @@ export const socketHandler = (io: Server) => {
   // });
 
   io.on(SOCKETS_EVENTS.connection, (socket: Socket) => {
-    console.log('User connected : ', socket.id);
+    // console.log('User connected : ', socket.id);
 
     const cookies = parse(socket.handshake.headers.cookie || '');
-    console.log('cookies :', cookies);
+    // console.log('cookies :', cookies);
     const token = cookies['auth-token'];
     if (!token) {
-      console.log('No token provided, disconnecting');
+      // console.log('No token provided, disconnecting');
       socket.disconnect();
       return;
     }
 
     try {
       const userPayload = jwt.verify(token, env.JWT_SECRET) as User;
-      console.log('user id :', userPayload.id);
+      // console.log('user id :', userPayload.id);
       const userExists = Array.from(connectedUsers.values()).some(
         (user) => user.id === userPayload.id
       );
-      console.log('userExists :', userExists);
+      // console.log('userExists :', userExists);
       if (userExists == false) {
-        console.log('New user connected !');
+        // console.log('New user connected !');
         connectedUsers.set(socket.id, {
           id: userPayload.id,
           username: userPayload.username,
         });
-
       } else {
-        console.log('user already connected !');
+        // console.log('user already connected !');
       }
       io.emit('clients-total', connectedUsers.size);
       io.emit('connected-users', Array.from(connectedUsers.values()));
-      console.log('-> client total :', connectedUsers.size);
-      console.log('-> user online :', Array.from(connectedUsers.values()));
+      // console.log('-> client total :', connectedUsers.size);
+      // console.log('-> user online :', Array.from(connectedUsers.values()));
     } catch (error) {
       console.error('Error parsing token', error);
       socket.disconnect();
@@ -90,9 +89,8 @@ export const socketHandler = (io: Server) => {
     }
 
     const nbUsers = connectedUsers.size;
-    console.log('nbUsers :', nbUsers); 
+    // console.log('nbUsers :', nbUsers);
     io.emit('clients-total', nbUsers);
-
 
     socket.on('message', (data) => {
       // console.log(data);
@@ -100,14 +98,12 @@ export const socketHandler = (io: Server) => {
     });
 
     socket.on('feedback', (data) => {
-      
       socket.broadcast.emit('feedback', data);
     });
 
     socket.on('disconnect', () => {
-      console.log('Socket disconnected', socket.id);
+      // console.log('Socket disconnected', socket.id);
       // socketsConnected.delete(socket.id);
-
       // io.emit('clients-total', clientsTotal);
     });
   });
