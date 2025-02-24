@@ -93,6 +93,11 @@ export const socketHandler = (io: Server) => {
 
     socket.on('message', (data) => {
       // console.log(data);
+      // const schema = z.object({
+      //   message: z.string(),
+      // });
+      // const parsedData = schema.parse(data);
+
       socket.broadcast.emit('chat-message', data);
     });
 
