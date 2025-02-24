@@ -14,7 +14,6 @@ import jwt from 'jsonwebtoken';
 import db from '../database/Database.js';
 import { env } from '../env.js';
 import { hashPassword } from '../services/auth.service.js';
- 
 
 export const signup = async (req: Request, res: Response) => {
   const { password, gender, preference, ...userData } = req.body as Infer<
