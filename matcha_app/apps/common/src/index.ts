@@ -71,3 +71,4 @@ export type {
 } from './schemas/database.schema';
 export { errorSchema } from './schemas/error.schema';
 export type { TErrorSchema } from './schemas/error.schema';
+export { getUserSchema } from './schemas/users.schema';
