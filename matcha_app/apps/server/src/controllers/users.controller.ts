@@ -5,7 +5,7 @@ import db from '../database/Database';
 export const getUsers = async (_req: Request, res: Response) => {
   try {
     const users = await db.user.findMany({
-      take: 1,
+      
     });
     res.status(200).json({ users } as Infer<typeof getUserSchema.response>);
   } catch (error) {

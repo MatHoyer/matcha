@@ -3,7 +3,7 @@ import { getUrl, getUserSchema, TUser } from '@matcha/common';
 import { useEffect, useState } from 'react';
 
 export const useUsers = () => {
-  const [users, setUsers] = useState<Omit<TUser, 'password'>[]>([]);
+  const [users, setUsers] = useState<Pick<TUser, 'id' | 'name' | 'lastName'>[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

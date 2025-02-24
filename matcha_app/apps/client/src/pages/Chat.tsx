@@ -18,6 +18,7 @@ const Chat: React.FC = () => {
   const name = user?.name || 'anonymous';
 
   const { users } = useUsers();
+  const [selectedUser, setSelectedUser] = useState<{ id: number; name: string; lastName: string } | null>(null);
   console.log('users : ', users);
 
   useEffect(() => {
@@ -85,6 +86,11 @@ const Chat: React.FC = () => {
     }
   };
 
+  const handleUserClick = (user: { id: string; name: string }) => {
+    // setSelectedUser(user);
+    socket.emit('create-room', user.id);
+  };
+
   return (
     <div className="max-w-lg mx-auto p-4 bg-gray-900 text-white border border-gray-600 shadow-lg rounded-lg">
       <h2 className="text-s font-semibold">General chat room</h2>
@@ -140,12 +146,16 @@ const Chat: React.FC = () => {
             Send
           </button>
         </div>
-
-        {/* List of users online */}
-        <ul className="mt-2 text-gray-300">
-          <li className="font-semibold">Users:</li>
+        <h2 className="text-lg font-semibold mb-2">Users</h2>
+        <ul>
           {users.map((user) => (
-            <li key={user.id}>{JSON.stringify(user)}</li>
+            <li
+              key={user.id}
+              className="p-2 hover:bg-gray-700 rounded cursor-pointer"
+              // onClick={() => handleUserClick(user)}
+            >
+              {user.name} {user.lastName}
+            </li>
           ))}
         </ul>
       </form>

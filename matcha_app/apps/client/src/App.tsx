@@ -1,5 +1,5 @@
 import { getUrl } from '@matcha/common';
-import { ChevronsUpDown, Home, MessageCircleHeart } from 'lucide-react';
+import { ChevronsUpDown, Home, MessageCircle, MessageCircleHeart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Logo } from './components/images/Logo';
 import { NavItemDropdown, NavItems } from './components/sidebar/NavComp';
@@ -14,10 +14,12 @@ import {
 import { Typography } from './components/ui/typography';
 import { useSession } from './hooks/useSession';
 import { Pages } from './pages/Pages';
+import { useUsers } from './hooks/useUsers';
 
 const App = () => {
   const session = useSession();
   const navigate = useNavigate();
+  const { users } = useUsers();
 
   return (
     <NavigationWrapper
@@ -38,12 +40,12 @@ const App = () => {
               />
               <NavItemDropdown
                 item={{
-                  title: 'Dropdown',
-                  icon: Home,
-                  items: [
-                    { title: 'Item 1', url: '/item-1' },
-                    { title: 'Item 2', url: '/item-2' },
-                  ],
+                  title: 'Chat',
+                  icon: MessageCircleHeart,
+                  items: users.map((user) => ({
+                    title: `${user.name} ${user.lastName}`,
+                    url: `/chat/${user.id}`,
+                  })),
                 }}
               />
             </SidebarMenu>
