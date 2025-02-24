@@ -45,7 +45,6 @@ const LoginPage: React.FC = () => {
           errorMessage: 'Login failed',
           cb: () => {
             navigate('/');
-            window.location.reload();
           },
         },
       });
@@ -53,13 +52,16 @@ const LoginPage: React.FC = () => {
   });
 
   const onSubmit = form.handleSubmit(async (data) => {
-    const res = await mutation.mutateAsync(data);
-    if (axios.isAxiosError(res)) {
-      form.setError('root', {
-        type: 'manual',
-        message: res.response?.data.message,
-      });
-    }
+    mutation.mutate(data, {
+      onError: (error) => {
+        if (axios.isAxiosError(error)) {
+          form.setError('root', {
+            type: 'manual',
+            message: error.response?.data.message,
+          });
+        }
+      },
+    });
   });
 
   return (

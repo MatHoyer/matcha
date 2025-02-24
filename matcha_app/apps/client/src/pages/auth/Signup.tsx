@@ -62,7 +62,6 @@ const SignupPage: React.FC = () => {
           errorMessage: 'Signup failed',
           cb: () => {
             navigate('/');
-            window.location.reload();
           },
         },
       });
