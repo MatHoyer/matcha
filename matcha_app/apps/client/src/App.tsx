@@ -1,5 +1,10 @@
 import { getUrl } from '@matcha/common';
-import { ChevronsUpDown, Home, MessageCircle, MessageCircleHeart } from 'lucide-react';
+import {
+  ChevronsUpDown,
+  Home,
+  MessageCircle,
+  MessageCircleHeart,
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Logo } from './components/images/Logo';
 import { NavItemDropdown, NavItems } from './components/sidebar/NavComp';
@@ -15,11 +20,47 @@ import { Typography } from './components/ui/typography';
 import { useSession } from './hooks/useSession';
 import { Pages } from './pages/Pages';
 import { useUsers } from './hooks/useUsers';
+import { TUser, TUserWithNames } from '@matcha/common';
+import { useState } from 'react';
+import { socket } from '@/lib/socket';
+import { Chat } from './pages/Chat';
 
 const App = () => {
   const session = useSession();
   const navigate = useNavigate();
   const { users } = useUsers();
+  const usersAllButAuthUser = users.filter(
+    (user: TUserWithNames) => user.id !== session.user?.id
+  );
+
+  const [openChats, setOpenChats] = useState<any[]>([]);
+
+  const handleChatClick = async (otherUser: TUser) => {
+    console.log('handleChatClick : ', otherUser);
+    const chatRoom = await createOrGetRoom(otherUser.id);
+    console.log('chatRoom : ', chatRoom);
+    setOpenChats((prev: any) => {
+      if (!prev.some((chat: any) => chat.id === otherUser.id)) {
+        return [...prev, { ...otherUser, roomId: chatRoom.id }];
+      }
+      return prev;
+    });
+  };
+
+  const createOrGetRoom = (otherUserId: number): Promise<{ id: string }> => {
+    return new Promise((resolve) => {
+      const user = session.user;
+      const userId = user?.id as number;
+      socket.emit(
+        'create-room',
+        userId,
+        otherUserId,
+        (room: { id: string }) => {
+          resolve(room);
+        }
+      );
+    });
+  };
 
   return (
     <NavigationWrapper
@@ -42,9 +83,10 @@ const App = () => {
                 item={{
                   title: 'Chat',
                   icon: MessageCircleHeart,
-                  items: users.map((user) => ({
-                    title: `${user.name} ${user.lastName}`,
-                    url: `/chat/${user.id}`,
+                  items: usersAllButAuthUser.map((otherUser) => ({
+                    title: `${otherUser.name} ${otherUser.lastName}`,
+                    url: `#`,
+                    onClick: () => handleChatClick(otherUser as TUser),
                   })),
                 }}
               />
@@ -79,6 +121,9 @@ const App = () => {
       }
     >
       <Pages />
+      {openChats.map((chat) => (
+        <Chat roomId={chat.roomId} recipientName={chat.name} />
+      ))}
     </NavigationWrapper>
   );
 };

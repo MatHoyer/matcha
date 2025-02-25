@@ -19,6 +19,7 @@ export const userSchema = z.object({
   biography: z.string().optional(),
 });
 export type TUser = Infer<typeof userSchema>;
+export type TUserWithNames = Pick<TUser, 'id' | 'name' | 'lastName'>;
 
 export const tagSchema = z.object({
   id: z.number(),
