@@ -170,7 +170,7 @@ const SignupPage: React.FC = () => {
                 <FormItem>
                   <FormLabel>Age</FormLabel>
                   <FormControl>
-                    <NumberInput {...field} scale={0} step={1} />
+                    <NumberInput {...field} scale={0} step={1} min={0} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

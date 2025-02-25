@@ -79,7 +79,7 @@ export abstract class ZodType<T> {
 class ZodString extends ZodType<string> {
   parse(data: unknown): string {
     if (typeof data !== 'string') {
-      throw new Error('Expected string: ' + data);
+      throw new Error('Expected string, got ' + data);
     }
     return data;
   }
@@ -115,7 +115,7 @@ class ZodString extends ZodType<string> {
 class ZodNumber extends ZodType<number> {
   parse(data: unknown): number {
     if (typeof data !== 'number') {
-      throw new Error('Expected number: ' + data);
+      throw new Error('Expected number, got ' + data);
     }
     return data;
   }
@@ -143,7 +143,7 @@ class ZodNumber extends ZodType<number> {
 class ZodBoolean extends ZodType<boolean> {
   parse(data: unknown): boolean {
     if (typeof data !== 'boolean') {
-      throw new Error('Expected boolean: ' + data);
+      throw new Error('Expected boolean, got ' + data);
     }
     return data;
   }
@@ -153,7 +153,7 @@ class ZodBoolean extends ZodType<boolean> {
 class ZodDate extends ZodType<Date> {
   parse(data: unknown): Date {
     if (!(data instanceof Date)) {
-      throw new Error('Expected date: ' + data);
+      throw new Error('Expected date, got ' + data);
     }
     return data;
   }
@@ -180,7 +180,9 @@ class ZodEnum<T extends string> extends ZodType<T> {
 
   parse(data: unknown): T {
     if (typeof data !== 'string' || !this.values.includes(data as T)) {
-      throw new Error(`Expected one of: ${this.values.join(', ')}: ${data}`);
+      throw new Error(
+        `Expected one of: ${this.values.join(', ')}, got ${data}`
+      );
     }
     return data as T;
   }
@@ -197,7 +199,7 @@ class ZodObject<T extends { [key: string]: any }> extends ZodType<T> {
 
   parse(data: unknown): T {
     if (typeof data !== 'object' || data === null) {
-      throw new Error('Expected object: ' + data);
+      throw new Error('Expected object, got ' + data);
     }
     const result: any = {};
     const errors = [] as TErrorSchema['fields'];
@@ -245,7 +247,7 @@ class ZodArray<T> extends ZodType<T[]> {
 
   parse(data: unknown): T[] {
     if (!Array.isArray(data)) {
-      throw new Error('Expected array: ' + data);
+      throw new Error('Expected array, got ' + data);
     }
     return data.map((item) => this.itemType.parse(item));
   }
