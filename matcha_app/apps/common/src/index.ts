@@ -72,3 +72,6 @@ export type {
 export { errorSchema } from './schemas/error.schema';
 export type { TErrorSchema } from './schemas/error.schema';
 export { getUserSchema } from './schemas/users.schema';
+
+//-----------------------Errors-----------------------
+export { SchemaError } from './errors/schema.error';

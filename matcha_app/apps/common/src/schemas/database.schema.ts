@@ -13,7 +13,7 @@ export const userSchema = z.object({
   lastName: z.string(),
   email: z.string().email(),
   password: z.string(),
-  age: z.number(),
+  age: z.number().min(18),
   gender: genderSchema,
   preference: orientationSchema,
   biography: z.string().optional(),

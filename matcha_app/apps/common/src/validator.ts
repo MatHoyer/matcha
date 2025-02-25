@@ -1,5 +1,8 @@
 // A minimal custom clone of Zod
 
+import { SchemaError } from './errors/schema.error';
+import { TErrorSchema } from './schemas/error.schema';
+
 // Base schema type
 export abstract class ZodType<T> {
   /**
@@ -14,12 +17,18 @@ export abstract class ZodType<T> {
    */
   safeParse(
     data: unknown
-  ): { success: true; data: T } | { success: false; error: unknown } {
+  ): { success: true; data: T } | { success: false; error: SchemaError } {
     try {
       const parsed = this.parse(data);
       return { success: true, data: parsed };
     } catch (error) {
-      return { success: false, error };
+      if (error instanceof SchemaError) {
+        return { success: false, error };
+      }
+      return {
+        success: false,
+        error: new SchemaError({ message: 'unknown', fields: [] }),
+      };
     }
   }
 
@@ -191,9 +200,28 @@ class ZodObject<T extends { [key: string]: any }> extends ZodType<T> {
       throw new Error('Expected object: ' + data);
     }
     const result: any = {};
+    const errors = [] as TErrorSchema['fields'];
+
     for (const key in this.shape) {
       const validator = this.shape[key];
-      result[key] = validator.parse((data as any)[key]);
+      try {
+        result[key] = validator.parse((data as any)[key]);
+      } catch (error) {
+        if (error instanceof Error) {
+          errors.push({ field: key, message: error.message });
+        } else {
+          throw new SchemaError({
+            message: 'Unknown error',
+            fields: [],
+          });
+        }
+      }
+    }
+    if (errors.length > 0) {
+      throw new SchemaError({
+        message: 'Invalid object',
+        fields: errors,
+      });
     }
     return result;
   }

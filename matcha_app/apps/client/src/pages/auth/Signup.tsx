@@ -13,11 +13,16 @@ import NumberInput from '@/components/ui/NumberField';
 import PasswordInput from '@/components/ui/password-input';
 import Selector from '@/components/ui/selector';
 import { Typography } from '@/components/ui/typography';
+import { useZodForm } from '@/hooks/useZodForm';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
-import { GENDERS, getUrl, ORIENTATIONS, signupSchemas } from '@matcha/common';
+import {
+  GENDERS,
+  getUrl,
+  Infer,
+  ORIENTATIONS,
+  signupSchemas,
+} from '@matcha/common';
 import { useMutation } from '@tanstack/react-query';
-import axios from 'axios';
-import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
 type TForm = {
@@ -33,7 +38,8 @@ type TForm = {
 const SignupPage: React.FC = () => {
   const navigate = useNavigate();
 
-  const form = useForm<TForm>({
+  const form = useZodForm<TForm>({
+    schema: signupSchemas.requirements,
     defaultValues: {
       name: '',
       lastName: '',
@@ -46,16 +52,11 @@ const SignupPage: React.FC = () => {
   });
 
   const mutation = useMutation({
-    mutationFn: async (data: TForm) => {
-      const parsedData = signupSchemas.requirements.safeParse(data);
-      if (!parsedData.success) {
-        throw new Error('Invalid data');
-      }
-
+    mutationFn: async (data: Infer<typeof signupSchemas.requirements>) => {
       return await axiosFetch({
         method: 'POST',
         url: getUrl('api-auth', { type: 'signup' }),
-        data: parsedData.data,
+        data: data,
         schemas: signupSchemas,
         handleEnding: {
           successMessage: 'Signup successful',
@@ -68,14 +69,8 @@ const SignupPage: React.FC = () => {
     },
   });
 
-  const onSubmit = form.handleSubmit(async (data) => {
-    const res = await mutation.mutateAsync(data);
-    if (axios.isAxiosError(res)) {
-      form.setError('root', {
-        type: 'manual',
-        message: res.response?.data.message,
-      });
-    }
+  const onSubmit = form.handleSubmit((data) => {
+    mutation.mutate(data as Infer<typeof signupSchemas.requirements>);
   });
 
   return (
