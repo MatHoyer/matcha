@@ -18,6 +18,7 @@ export const axiosFetch = async <
     withCredentials: true,
   },
   schemas,
+  form,
   handleEnding,
 }: {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -28,6 +29,8 @@ export const axiosFetch = async <
     requirements?: R;
     response: T;
   };
+  // eslint-disable-next-line
+  form?: any;
   handleEnding?: {
     successMessage?: string;
     errorMessage?: string;
@@ -49,7 +52,15 @@ export const axiosFetch = async <
     })) as Infer<T>;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
-      console.error('Server Error:', error.response.data);
+      if (form && form.setError) {
+        for (const field of error.response.data.fields) {
+          console.log('field', field);
+          form.setError(field.field, {
+            type: 'manual',
+            message: field.message,
+          });
+        }
+      }
     }
     throw error;
   }

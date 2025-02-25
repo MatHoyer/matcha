@@ -39,6 +39,12 @@ export {
   sessionSchemas,
   signupSchemas,
 } from './schemas/auth.schema';
+export type {
+  TLoginSchemas,
+  TLogoutSchemas,
+  TSessionSchemas,
+  TSignupSchemas,
+} from './schemas/auth.schema';
 export {
   blockSchema,
   genderSchema,

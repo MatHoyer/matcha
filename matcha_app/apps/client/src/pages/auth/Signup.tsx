@@ -58,6 +58,7 @@ const SignupPage: React.FC = () => {
         url: getUrl('api-auth', { type: 'signup' }),
         data: data,
         schemas: signupSchemas,
+        form,
         handleEnding: {
           successMessage: 'Signup successful',
           errorMessage: 'Signup failed',

@@ -11,11 +11,11 @@ import { Input } from '@/components/ui/input';
 import { LoadingButton } from '@/components/ui/loaders';
 import PasswordInput from '@/components/ui/password-input';
 import { Typography } from '@/components/ui/typography';
+import { useZodForm } from '@/hooks/useZodForm';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import { getUrl, loginSchemas } from '@matcha/common';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
 type TForm = {
@@ -26,7 +26,8 @@ type TForm = {
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
 
-  const form = useForm<TForm>({
+  const form = useZodForm<TForm>({
+    schema: loginSchemas.requirements,
     defaultValues: {
       email: '',
       password: '',
