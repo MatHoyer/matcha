@@ -41,6 +41,7 @@ const LoginPage: React.FC = () => {
         url: getUrl('api-auth', { type: 'login' }),
         data,
         schemas: loginSchemas,
+        form,
         handleEnding: {
           successMessage: 'Login successful',
           errorMessage: 'Login failed',
