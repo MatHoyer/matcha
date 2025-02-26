@@ -24,6 +24,7 @@ import { TUser, TUserWithNames } from '@matcha/common';
 import { useState } from 'react';
 import { socket } from '@/lib/socket';
 import { Chat } from './pages/Chat';
+import { SOCKETS_EVENTS } from '@matcha/common';
 
 const App = () => {
   const session = useSession();
@@ -36,9 +37,8 @@ const App = () => {
   const [openChats, setOpenChats] = useState<any[]>([]);
 
   const handleChatClick = async (otherUser: TUser) => {
-    console.log('handleChatClick : ', otherUser);
     const chatRoom = await createOrGetRoom(otherUser.id);
-    console.log('chatRoom : ', chatRoom);
+
     setOpenChats((prev: any) => {
       if (!prev.some((chat: any) => chat.id === otherUser.id)) {
         return [...prev, { ...otherUser, roomId: chatRoom.id }];
@@ -52,7 +52,7 @@ const App = () => {
       const user = session.user;
       const userId = user?.id as number;
       socket.emit(
-        'create-room',
+        SOCKETS_EVENTS.CLIENT.CREATE_ROOM,
         userId,
         otherUserId,
         (room: { id: string }) => {
@@ -122,7 +122,7 @@ const App = () => {
     >
       <Pages />
       {openChats.map((chat) => (
-        <Chat roomId={chat.roomId} recipientName={chat.name} />
+        <Chat key={chat.id} roomId={chat.id} recipientName={chat.name} />
       ))}
     </NavigationWrapper>
   );

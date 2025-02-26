@@ -1,6 +1,6 @@
 export const SOCKETS_EVENTS = {
-  connection: 'connection',
-  disconnect: 'disconnect',
+  CONNECTION: 'CONNECTION',
+  DISCONNECTION: 'DISCONNECTION',
   clientsTotal: 'clients-total',
   CLIENT: {
     CREATE_ROOM: 'CREATE_ROOM',

@@ -6,21 +6,6 @@ import { env } from '../env';
 import { nanoid } from 'nanoid';
 import { TUser } from '@matcha/common';
 
-// const EVENTS = {
-//   connection: 'connection',
-//   disconnect: 'disconnect',
-//   clientsTotal: 'clients-total',
-//   CLIENT: {
-//     CREATE_ROOM: 'CREATE_ROOM',
-//     SEND_ROOM_MESSAGE: 'SEND_ROOM_MESSAGE',
-//     JOIN_ROOM: 'JOIN_ROOM',
-//   },
-//   SERVER: {
-//     ROOMS: 'ROOMS',
-//     JOINED_ROOM: 'JOINED_ROOM',
-//     ROOM_MESSAGE: 'ROOM_MESSAGE',
-//   },
-// };
 interface User {
   id: string;
   username: string;
@@ -30,7 +15,7 @@ const connectedUsers = new Map<string, User>();
 const rooms: Record<string, Set<string>> = {};
 
 export const socketHandler = (io: Server) => {
-  io.on(SOCKETS_EVENTS.connection, (socket: Socket) => {
+  io.on('connection', (socket: Socket) => {
     const cookies = parse(socket.handshake.headers.cookie || '');
     const token = cookies['auth-token'];
     if (!token) {
@@ -48,37 +33,26 @@ export const socketHandler = (io: Server) => {
           id: userPayload.id,
           username: userPayload.username,
         });
+        console.log('connectedUsers', connectedUsers);
       }
-      io.emit('clients-total', connectedUsers.size);
-      io.emit('connected-users', Array.from(connectedUsers.values()));
     } catch (error) {
       console.error('Error parsing token', error);
       socket.disconnect();
       return;
     }
 
-    const nbUsers = connectedUsers.size;
-    io.emit('clients-total', nbUsers);
-
-    // socket.on('message', (data) => {
-    //   // const schema = z.object({
-    //   //   message: z.string(),
-    //   // });
-    //   // const parsedData = schema.parse(data);
-    //   socket.broadcast.emit('private-message', data);
-    // });
-
     socket.on('feedback', (data) => {
       socket.broadcast.emit('feedback', data);
     });
 
     socket.on(
-      'create-room',
+      SOCKETS_EVENTS.CLIENT.CREATE_ROOM,
       (
         userId: number,
         otherUserId: number,
         callback: (roomId: string) => void
       ) => {
+        console.log('userId', userId);
         const sortedUserIds = [userId, otherUserId].sort();
         let roomId = `chat-${sortedUserIds[0]}-${sortedUserIds[1]}`;
         if (!rooms[roomId]) {
@@ -86,15 +60,25 @@ export const socketHandler = (io: Server) => {
         }
         rooms[roomId].add(socket.id);
         socket.join(roomId);
+        console.log('rooms', rooms);
         callback(roomId);
       }
     );
 
-    socket.on('send-message', (roomId: string, message: string) => {
-      io.to(roomId).emit('room-message', { message, sender: socket.id });
-    });
+    socket.on(
+      SOCKETS_EVENTS.CLIENT.SEND_ROOM_MESSAGE,
+      (roomId: string, message: string, username: string) => {
+        const date = new Date();
 
-    socket.on('disconnect', () => {
+        socket.to(roomId).emit(SOCKETS_EVENTS.SERVER.ROOM_MESSAGE, {
+          message,
+          username,
+          time: `${date.getHours()}:${date.getMinutes()}`,
+        });
+      }
+    );
+
+    socket.on(SOCKETS_EVENTS.DISCONNECTION, () => {
       for (const roomId of Object.keys(rooms)) {
         rooms[roomId].delete(socket.id);
         if (rooms[roomId].size === 0) {
@@ -105,3 +89,11 @@ export const socketHandler = (io: Server) => {
     });
   });
 };
+
+// socket.on('message', (data) => {
+//   // const schema = z.object({
+//   //   message: z.string(),
+//   // });
+//   // const parsedData = schema.parse(data);
+//   socket.broadcast.emit('private-message', data);
+// });
