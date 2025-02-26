@@ -3,68 +3,68 @@ import { useUsers } from '@/hooks/useUsers';
 import { socket } from '@/lib/socket';
 import moment from 'moment';
 import React, { useEffect, useRef, useState } from 'react';
+import { SOCKETS_EVENTS } from '@matcha/common';
 
-const Chat: React.FC = () => {
-  const [clientsTotal, setClientsTotal] = useState<number>(0);
+interface PrivateChatProps {
+  roomId: string;
+  recipientName: string;
+}
+
+export const Chat: React.FC<PrivateChatProps> = ({ roomId, recipientName }) => {
   const [messages, setMessages] = useState<
     { name: string; message: string; dateTime: Date; isOwnMessage: boolean }[]
   >([]);
   const [message, setMessage] = useState<string>('');
   const [feedback, setFeedback] = useState('');
-
   const messageContainerRef = useRef<HTMLUListElement>(null);
-
   const { user } = useSession();
   const name = user?.name || 'anonymous';
+  const data = {
+    roomId,
+    name,
+    message,
+    dateTime: new Date(),
+  };
+  // useEffect(() => {
+  //   socket.on(
+  //     SOCKETS_EVENTS.SERVER.ROOM_MESSAGE,
+  //     (data: {
+  //       roomId: string;
+  //       name: string;
+  //       message: string;
+  //       dateTime: Date;
+  //     }) => {
+  //       if (data.roomId === roomId) {
+  //         // Listen for messages only from this room
+  //         setMessages((prevMessages) => [
+  //           ...prevMessages,
+  //           { ...data, isOwnMessage: false },
+  //         ]);
+  //       }
+  //     }
+  //   );
 
-  const { users } = useUsers();
-  console.log('users : ', users);
+  //   socket.on('feedback', (data: { feedback: string }) => {
+  //     setFeedback(data.feedback);
+  //   });
 
-  useEffect(() => {
-    console.log('This user : ', user?.name);
-    socket.on('clients-total', (data: number) => {
-      console.log('Received clients-total : ', data);
-      setClientsTotal(data);
-    });
-
-    socket.on(
-      'chat-message',
-      (data: { name: string; message: string; dateTime: Date }) => {
-        console.log('Received message : ', data);
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          { ...data, isOwnMessage: false },
-        ]);
-      }
-    );
-
-    socket.on('feedback', (data: { feedback: string }) => {
-      console.log('Feedback ! ');
-      setFeedback(data.feedback);
-    });
-
-    return () => {
-      socket.off('clients-total');
-      socket.off('chat-message');
-      socket.off('feedback');
-    };
-  }, [user?.name]);
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, feedback]);
+  //   return () => {
+  //     socket.off('clients-total');
+  //     socket.off('room-message');
+  //     socket.off('feedback');
+  //   };
+  // }, [roomId]);
 
   const sendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (message.trim() === '') return;
 
-    const data = {
-      name,
+    // socket.emit('send-message', data);
+    socket.emit(SOCKETS_EVENTS.CLIENT.SEND_ROOM_MESSAGE, {
+      roomId,
       message,
-      dateTime: new Date(),
-    };
-
-    socket.emit('message', data);
+      name,
+    });
     setMessages((prevMessages) => [
       ...prevMessages,
       { ...data, isOwnMessage: true },
@@ -76,20 +76,9 @@ const Chat: React.FC = () => {
     socket.emit('feedback', { feedback: feedbackMessage });
   };
 
-  const scrollToBottom = () => {
-    if (messageContainerRef.current) {
-      messageContainerRef.current.scrollTo(
-        0,
-        messageContainerRef.current.scrollHeight
-      );
-    }
-  };
-
   return (
-    <div className="max-w-lg mx-auto p-4 bg-gray-900 text-white border border-gray-600 shadow-lg rounded-lg">
-      <h2 className="text-s font-semibold">General chat room</h2>
-      <h3 className="text-xs mb-2">Total clients connected: {clientsTotal}</h3>
-
+    <div className="max-w-lg mx-auto p-4 text-white border border-gray-600 shadow-lg rounded-lg">
+      <h2 className="text-xs mb-2 font-semibold">Chat with {recipientName}</h2>
       <ul
         ref={messageContainerRef}
         id="message-container"
@@ -120,7 +109,7 @@ const Chat: React.FC = () => {
         onSubmit={sendMessage}
         className="mt-4 flex flex-col gap-2"
       >
-        <p>{name} :</p>
+        <h2 className="text-xs mb-2 font-semibold">{name} :</h2>
         <div className="flex items-center gap-2">
           <input
             id="message-input"
@@ -140,17 +129,7 @@ const Chat: React.FC = () => {
             Send
           </button>
         </div>
-
-        {/* List of users online */}
-        <ul className="mt-2 text-gray-300">
-          <li className="font-semibold">Users:</li>
-          {users.map((user) => (
-            <li key={user.id}>{JSON.stringify(user)}</li>
-          ))}
-        </ul>
       </form>
     </div>
   );
 };
-
-export default Chat;

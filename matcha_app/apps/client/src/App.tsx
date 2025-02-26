@@ -1,12 +1,7 @@
-import { getUrl } from '@matcha/common';
-import {
-  ChevronsUpDown,
-  Crosshair,
-  Heart,
-  Home,
-  MessageCircleHeart,
-  Search,
-} from 'lucide-react';
+import { socket } from '@/lib/socket';
+import { getUrl, SOCKETS_EVENTS, TUser, TUserWithNames } from '@matcha/common';
+import { ChevronsUpDown, Home, MessageCircleHeart } from 'lucide-react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Logo } from './components/images/Logo';
 import { NavItemDropdown, NavItems } from './components/sidebar/NavComp';
@@ -20,11 +15,45 @@ import {
 } from './components/ui/sidebar';
 import { Typography } from './components/ui/typography';
 import { useSession } from './hooks/useSession';
+import { useUsers } from './hooks/useUsers';
+import { Chat } from './pages/Chat';
 import { Pages } from './pages/Pages';
 
 const App = () => {
   const session = useSession();
   const navigate = useNavigate();
+  const { users } = useUsers();
+  const usersAllButAuthUser = users.filter(
+    (user: TUserWithNames) => user.id !== session.user?.id
+  );
+
+  const [openChats, setOpenChats] = useState<any[]>([]);
+
+  const handleChatClick = async (otherUser: TUser) => {
+    const chatRoom = await createOrGetRoom(otherUser.id);
+
+    setOpenChats((prev: any) => {
+      if (!prev.some((chat: any) => chat.id === otherUser.id)) {
+        return [...prev, { ...otherUser, roomId: chatRoom.id }];
+      }
+      return prev;
+    });
+  };
+
+  const createOrGetRoom = (otherUserId: number): Promise<{ id: string }> => {
+    return new Promise((resolve) => {
+      const user = session.user;
+      const userId = user?.id as number;
+      socket.emit(
+        SOCKETS_EVENTS.CLIENT.CREATE_ROOM,
+        userId,
+        otherUserId,
+        (room: { id: string }) => {
+          resolve(room);
+        }
+      );
+    });
+  };
 
   return (
     <NavigationWrapper
@@ -45,21 +74,11 @@ const App = () => {
               />
               <NavItemDropdown
                 item={{
-                  title: 'Search',
-                  icon: Search,
+                  title: 'Dropdown',
+                  icon: Home,
                   items: [
-                    {
-                      icon: Heart,
-                      title: 'For you',
-                      url: getUrl('client-research', { type: 'forYou' }),
-                    },
-                    {
-                      icon: Crosshair,
-                      title: 'Advanced search',
-                      url: getUrl('client-research', {
-                        type: 'advancedSearch',
-                      }),
-                    },
+                    { title: 'Item 1', url: '/item-1' },
+                    { title: 'Item 2', url: '/item-2' },
                   ],
                 }}
               />
@@ -94,6 +113,9 @@ const App = () => {
       }
     >
       <Pages />
+      {openChats.map((chat) => (
+        <Chat key={chat.id} roomId={chat.id} recipientName={chat.name} />
+      ))}
     </NavigationWrapper>
   );
 };

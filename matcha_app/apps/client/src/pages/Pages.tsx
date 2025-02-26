@@ -3,7 +3,7 @@ import { getUrl } from '@matcha/common';
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
 import LoginPage from './auth/Login';
 import SignupPage from './auth/Signup';
-import Chat from './Chat';
+// import Chat from './Chat';
 import { Home } from './Home';
 import { NotFound } from './NotFound';
 import { TargetedSearch } from './research/TargetedSearch';

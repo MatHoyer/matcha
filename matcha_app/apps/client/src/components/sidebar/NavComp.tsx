@@ -31,6 +31,7 @@ type TSubItem = {
   title: string;
   url: string;
   can?: boolean;
+  onClick?: () => void;
 };
 
 export const NavItem: React.FC<{
@@ -94,7 +95,13 @@ export const NavItemDropdown: React.FC<{
                     className={cn(isActive && 'bg-accent/50')}
                   >
                     <div
-                      onClick={() => navigate(subItem.url)}
+                      onClick={() => {
+                        if (subItem.onClick) {
+                          subItem.onClick();
+                        } else {
+                          navigate(subItem.url);
+                        }
+                      }}
                       className="flex items-center cursor-pointer"
                     >
                       {!!subItem?.icon && <subItem.icon />}

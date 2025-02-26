@@ -72,6 +72,7 @@ export type {
   TReport,
   TTag,
   TUser,
+  TUserWithNames,
   TUserTag,
   TView,
 } from './schemas/database.schema';
