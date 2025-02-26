@@ -1,7 +1,7 @@
 // A minimal custom clone of Zod
 
 import { SchemaError } from '../errors/schema.error';
-import { TErrorSchema } from '../schemas/error.schema';
+import { TErrorSchema } from '../schemas/api/error.schema';
 
 // Base schema type
 export abstract class ZodType<T> {
@@ -76,7 +76,7 @@ export abstract class ZodType<T> {
 }
 
 // String schema
-class ZodString extends ZodType<string> {
+export class ZodString extends ZodType<string> {
   parse(data: unknown): string {
     if (typeof data !== 'string') {
       throw new Error('Expected string, got ' + data);
@@ -112,7 +112,7 @@ class ZodString extends ZodType<string> {
 }
 
 // Number schema
-class ZodNumber extends ZodType<number> {
+export class ZodNumber extends ZodType<number> {
   parse(data: unknown): number {
     if (typeof data !== 'number') {
       throw new Error('Expected number, got ' + data);
@@ -140,7 +140,7 @@ class ZodNumber extends ZodType<number> {
 }
 
 // Boolean schema
-class ZodBoolean extends ZodType<boolean> {
+export class ZodBoolean extends ZodType<boolean> {
   parse(data: unknown): boolean {
     if (typeof data !== 'boolean') {
       throw new Error('Expected boolean, got ' + data);
@@ -150,7 +150,7 @@ class ZodBoolean extends ZodType<boolean> {
 }
 
 // Date schema
-class ZodDate extends ZodType<Date> {
+export class ZodDate extends ZodType<Date> {
   parse(data: unknown): Date {
     if (!(data instanceof Date)) {
       throw new Error('Expected date, got ' + data);
@@ -160,7 +160,7 @@ class ZodDate extends ZodType<Date> {
 }
 
 // Null schema
-class ZodNull extends ZodType<null> {
+export class ZodNull extends ZodType<null> {
   parse(data: unknown): null {
     if (data !== null) {
       throw new Error(`Expected null, but received ${typeof data}`);
@@ -170,7 +170,7 @@ class ZodNull extends ZodType<null> {
 }
 
 // Enum schema
-class ZodEnum<T extends string> extends ZodType<T> {
+export class ZodEnum<T extends string> extends ZodType<T> {
   public values: readonly T[];
 
   constructor(values: readonly T[]) {
@@ -189,7 +189,7 @@ class ZodEnum<T extends string> extends ZodType<T> {
 }
 
 // Object schema
-class ZodObject<T extends { [key: string]: any }> extends ZodType<T> {
+export class ZodObject<T extends { [key: string]: any }> extends ZodType<T> {
   public shape: { [K in keyof T]: ZodType<T[K]> };
 
   constructor(shape: { [K in keyof T]: ZodType<T[K]> }) {
@@ -237,7 +237,7 @@ class ZodObject<T extends { [key: string]: any }> extends ZodType<T> {
 }
 
 // Array schema
-class ZodArray<T> extends ZodType<T[]> {
+export class ZodArray<T> extends ZodType<T[]> {
   public itemType: ZodType<T>;
 
   constructor(itemType: ZodType<T>) {
@@ -254,7 +254,9 @@ class ZodArray<T> extends ZodType<T[]> {
 }
 
 // Union schema
-class ZodUnion<T extends ZodType<any>[]> extends ZodType<Infer<T[number]>> {
+export class ZodUnion<T extends ZodType<any>[]> extends ZodType<
+  Infer<T[number]>
+> {
   public schemas: T;
 
   constructor(schemas: T) {

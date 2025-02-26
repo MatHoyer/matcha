@@ -1,7 +1,7 @@
 import { getUserSchema, Infer } from '@matcha/common';
 import type { Request, Response } from 'express';
 import db from '../database/Database';
-import { defaultResponse } from '../routes/defaultResponse';
+import { defaultResponse } from '../utils/defaultResponse';
 
 export const getUsers = async (_req: Request, res: Response) => {
   try {

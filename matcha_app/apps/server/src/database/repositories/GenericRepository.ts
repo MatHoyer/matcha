@@ -97,9 +97,9 @@ class GenericRepository<T, I> {
     return (await this.#find({ ...options, take: 1 })) as T | null;
   }
 
-  async findMany(options: CommonOptions<T, I>) {
+  async findMany(options: CommonOptions<T, I>): Promise<T[]> {
     const res = await this.#find(options);
-    return Array.isArray(res) ? res : [res];
+    return res ? (Array.isArray(res) ? res : [res]) : [];
   }
 
   async create(content: { data: Omit<T, 'id'> }): Promise<T | null> {

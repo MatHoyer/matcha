@@ -6,7 +6,7 @@ import {
   session,
   signup,
 } from '../controllers/auth.controller.js';
-import { bodyParser } from './bodyParser.js';
+import { bodyParser } from '../middlewares/bodyParser.middleware.js';
 
 const authRouter = Router();
 

@@ -1,5 +1,6 @@
-import { TErrorSchema, ZodType } from '@matcha/common';
+import { ZodType } from '@matcha/common';
 import type { NextFunction, Request, Response } from 'express';
+import { defaultResponse } from '../utils/defaultResponse';
 
 export const bodyParser =
   <T>(schema: ZodType<T>) =>
@@ -9,6 +10,10 @@ export const bodyParser =
       next();
     } catch (error) {
       console.error(`Error at ${req.url}:`, error);
-      res.status(500).json({ message: 'Bad body' } as TErrorSchema);
+      return defaultResponse({
+        res,
+        status: 500,
+        json: { message: 'Bad body' },
+      });
     }
   };

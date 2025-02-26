@@ -1,4 +1,4 @@
-import { Infer, z } from '../validator/validator';
+import { Infer, z } from '../../validator/validator';
 
 export const errorSchema = z.object({
   fields: z.array(

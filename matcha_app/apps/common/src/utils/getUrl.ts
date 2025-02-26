@@ -15,6 +15,9 @@ export type TApiRouteDataRequirements = {
   'api-auth': {
     type: 'signup' | 'login' | 'logout' | 'session' | undefined;
   };
+  'api-tags': {
+    id?: number;
+  };
   'api-users': {
     type: 'getUsers' | undefined;
   };
@@ -39,6 +42,7 @@ const routes: {
   'client-account': () => '/account',
 
   'api-auth': ({ type }) => (type ? `/api/auth/${type}` : '/api/auth'),
+  'api-tags': ({ id }) => (id ? `/api/tags/${id}` : '/api/tags'),
   'api-users': ({ type }) => (type ? `/api/users/${type}` : '/api/users'),
 };
 

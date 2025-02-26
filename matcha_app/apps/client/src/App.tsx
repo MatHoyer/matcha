@@ -107,7 +107,7 @@ const App = () => {
                   title: 'Chat',
                   icon: MessageCircleHeart,
                   items: usersAllButAuthUser.map((otherUser) => ({
-                    title: `${otherUser.name} ${otherUser.lastName}`,
+                    title: `${otherUser.name} ${otherUser.lastName} ${otherUser.id}`,
                     url: '',
                     onClick: () => handleChatClick(otherUser as TUser),
                   })),
