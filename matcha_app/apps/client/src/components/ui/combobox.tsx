@@ -16,13 +16,27 @@ import {
   CommandList,
 } from './command';
 
-export const Combobox: React.FC<{
+//eslint-disable-next-line
+type ComboboxProps<T extends any[] | any> = {
   name: string;
-  list: { value: string; label: string }[];
-  value: string;
-  onChange: (value: string) => void;
+  list: {
+    //eslint-disable-next-line
+    value: T extends any[] ? T[number] | null : T | null;
+    label: string;
+  }[];
+  value: T | null;
+  onChange: (value: T | null) => void;
   modal?: boolean;
-}> = ({ name, list, value, onChange, modal }) => {
+};
+
+// eslint-disable-next-line
+export const Combobox = <T extends any>({
+  name,
+  list,
+  value,
+  onChange,
+  modal,
+}: ComboboxProps<T>) => {
   const [open, setOpen] = useState(false);
 
   return (
@@ -51,7 +65,9 @@ export const Combobox: React.FC<{
                   key={element.value}
                   value={element.value}
                   onSelect={(currentValue) => {
-                    onChange(currentValue === value ? '' : currentValue);
+                    onChange(
+                      currentValue === value ? null : (currentValue as T)
+                    );
                     setOpen(false);
                   }}
                   className="cursor-pointer"
@@ -73,13 +89,14 @@ export const Combobox: React.FC<{
   );
 };
 
-export const MultiCombobox: React.FC<{
-  name: string;
-  list: { value: string; label: string }[];
-  value: string[];
-  onChange: (value: string[]) => void;
-  modal?: boolean;
-}> = ({ name, list, value, onChange, modal }) => {
+// eslint-disable-next-line
+export const MultiCombobox = <T extends any[]>({
+  name,
+  list,
+  value,
+  onChange,
+  modal,
+}: ComboboxProps<T>) => {
   const [open, setOpen] = useState(false);
 
   return (
@@ -92,7 +109,7 @@ export const MultiCombobox: React.FC<{
           className="w-[200px] flex justify-between"
         >
           <p className="w-[calc(100%-20px)] truncate text-start">
-            {value.length > 0
+            {value && value.length > 0
               ? value
                   .map(
                     (v) => list.find((element) => element.value === v)?.label
@@ -114,10 +131,18 @@ export const MultiCombobox: React.FC<{
                   key={element.value}
                   value={element.value}
                   onSelect={(currentValue) => {
-                    if (value.includes(currentValue)) {
-                      onChange(value.filter((v) => v !== currentValue));
+                    if (value && value.includes(currentValue)) {
+                      onChange(
+                        value.filter(
+                          (v) => v !== (currentValue as T[number])
+                        ) as T
+                      );
                     } else {
-                      onChange([...value, currentValue]);
+                      onChange(
+                        value
+                          ? ([...value, currentValue as T[number]] as T)
+                          : ([currentValue as T[number]] as T)
+                      );
                     }
                   }}
                   className="cursor-pointer"
@@ -126,7 +151,7 @@ export const MultiCombobox: React.FC<{
                   <Check
                     className={cn(
                       'ml-auto',
-                      value.some((v) => v === element.value)
+                      value && value.some((v) => v === element.value)
                         ? 'opacity-100'
                         : 'opacity-0'
                     )}

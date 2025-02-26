@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { MultiCombobox } from './combobox';
 
 const TagCombobox: React.FC = () => {
-  const [tags, setTags] = useState<string[]>([]);
+  const [tags, setTags] = useState<string[] | null>(null);
   const query = useQuery({
     queryKey: ['tags'],
     queryFn: async () => {
