@@ -23,7 +23,8 @@ export const defaultResponse = (data: {
     status = 500;
   }
   if (!cookie) {
-    return res.status(status).json(json);
+    res.status(status).json(json);
+    return;
   }
   res.status(status).cookie(cookie.name, cookie.val, cookie.options).json(json);
 };

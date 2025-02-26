@@ -1,4 +1,4 @@
-import { Infer, z } from '../validator';
+import { Infer, z } from '../validator/validator';
 import { userSchema } from './database.schema';
 
 export const signupSchemas = {

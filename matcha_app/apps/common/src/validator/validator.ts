@@ -1,7 +1,7 @@
 // A minimal custom clone of Zod
 
-import { SchemaError } from './errors/schema.error';
-import { TErrorSchema } from './schemas/error.schema';
+import { SchemaError } from '../errors/schema.error';
+import { TErrorSchema } from '../schemas/error.schema';
 
 // Base schema type
 export abstract class ZodType<T> {

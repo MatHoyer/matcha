@@ -1,5 +1,5 @@
-import { GENDERS, ORIENTATIONS } from '../datas';
-import { Infer, z } from '../validator';
+import { GENDERS, ORIENTATIONS } from '../utils/datas';
+import { Infer, z } from '../validator/validator';
 
 export const genderSchema = z.enum(GENDERS);
 export type TGender = Infer<typeof genderSchema>;

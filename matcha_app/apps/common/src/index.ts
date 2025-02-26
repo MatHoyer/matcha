@@ -1,14 +1,14 @@
 // -----------------------Validator-----------------------
-export { z, ZodType } from './validator';
-export type { Infer } from './validator';
+export { z, ZodType } from './validator/validator';
+export type { Infer } from './validator/validator';
 
 //-----------------------Get URL-----------------------
-export { getServerUrl } from './getServer';
-export { getUrl } from './getUrl';
+export { getServerUrl } from './utils/getServer';
+export { getUrl } from './utils/getUrl';
 export type {
   TApiRouteDataRequirements,
   TClientRouteDataRequirements,
-} from './getUrl';
+} from './utils/getUrl';
 
 //-----------------------Datas-----------------------
 export {
@@ -18,7 +18,7 @@ export {
   GENDERS,
   ORIENTATIONS,
   THOUSAND_SEPARATOR,
-} from './datas';
+} from './utils/datas';
 
 //-----------------------Utils-----------------------
 export {
@@ -27,10 +27,10 @@ export {
   removeDuplicate,
   typedEntries,
   wait,
-} from './utils';
+} from './utils/utils';
 
 //-----------------------Socket-----------------------
-export { SOCKETS_EVENTS } from './sockets';
+export { SOCKETS_EVENTS } from './sockets/sockets';
 
 //-----------------------Schemas-----------------------
 export {

@@ -1,4 +1,4 @@
-import { z } from '../validator';
+import { z } from '../validator/validator';
 import { userSchema } from './database.schema';
 
 export const getUserSchema = {

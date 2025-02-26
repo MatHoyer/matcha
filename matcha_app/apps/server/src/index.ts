@@ -34,21 +34,21 @@ app.get('/api/health', (_req, res) => {
 app.use(getUrl('api-auth'), authRouter);
 app.use(getUrl('api-users'), usersRouter);
 
-app.use(express.static(path.join(__dirname, '../../../public/dist')));
-app.get('*', (_req, res) => {
-  res.sendFile(path.join(__dirname, '../../../public/dist/index.html'));
-});
+if (env.NODE_ENV === 'PROD') {
+  app.use(express.static(path.join(__dirname, '../../../public/dist')));
+  app.get('*', (_req, res) => {
+    res.sendFile(path.join(__dirname, '../../../public/dist/index.html'));
+  });
+}
 
 const server = app.listen(env.SERVER_PORT, () => {
   console.log(`Server started at http://localhost:${env.SERVER_PORT}`);
 });
 
-// add for chat ---------------------
 const io = new Server(server, {
   cors: {
     origin: `http://localhost:${env.CLIENT_PORT}`,
     credentials: true,
   },
 });
-
 socketHandler(io);
