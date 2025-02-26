@@ -7,7 +7,7 @@ import { socket } from '@/lib/socket';
 import { SOCKETS_EVENTS } from '@matcha/common';
 import { Minus, X } from 'lucide-react';
 import moment from 'moment';
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 
 interface PrivateChatProps {
   roomId: string;
@@ -38,44 +38,43 @@ export const Chat: React.FC<PrivateChatProps> = ({
     message,
     dateTime: new Date(),
   };
-  // useEffect(() => {
-  //   socket.on(
-  //     SOCKETS_EVENTS.SERVER.ROOM_MESSAGE,
-  //     (data: {
-  //       roomId: string;
-  //       name: string;
-  //       message: string;
-  //       dateTime: Date;
-  //     }) => {
-  //       if (data.roomId === roomId) {
-  //         // Listen for messages only from this room
-  //         setMessages((prevMessages) => [
-  //           ...prevMessages,
-  //           { ...data, isOwnMessage: false },
-  //         ]);
-  //       }
-  //     }
-  //   );
 
-  //   socket.on('feedback', (data: { feedback: string }) => {
-  //     setFeedback(data.feedback);
-  //   });
-
-  //   return () => {
-  //     socket.off('clients-total');
-  //     socket.off('room-message');
-  //     socket.off('feedback');
-  //   };
-  // }, [roomId]);
+  useEffect(() => {
+    socket.on(
+      SOCKETS_EVENTS.SERVER.ROOM_MESSAGE,
+      ({ message, userName, time }) => {
+        console.log('message received !');
+        console.log('message :', message);
+        console.log('userName :', userName);
+        console.log('time :', time);
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          {
+            name: userName,
+            message: message,
+            dateTime: new Date(),
+            isOwnMessage: userName === name,
+          },
+        ]);
+      }
+    );
+    return () => {
+      socket.off(SOCKETS_EVENTS.SERVER.ROOM_MESSAGE);
+    };
+  }, [name]);
 
   const sendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    if (message.trim() === '') return;
+    console.log('sendMessage !');
+    console.log('roomId :', roomId);
+    console.log('message :', message);
+    console.log('name :', name);
+    const messageToSend = message;
+    if (messageToSend.trim() === '') return;
 
-    // socket.emit('send-message', data);
     socket.emit(SOCKETS_EVENTS.CLIENT.SEND_ROOM_MESSAGE, {
       roomId,
-      message,
+      message: messageToSend,
       name,
     });
     setMessages((prevMessages) => [
@@ -144,7 +143,7 @@ export const Chat: React.FC<PrivateChatProps> = ({
                 // className="flex-1 p-2 bg-gray-700 text-white border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <Button
-                type="submit"
+                onClick={sendMessage}
                 // className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
               >
                 Send

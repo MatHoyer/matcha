@@ -12,7 +12,7 @@ interface User {
 }
 
 const connectedUsers = new Map<string, User>();
-const rooms: Record<string, Set<string>> = {};
+const rooms: Record<string, { id: string }> = {};
 
 export const socketHandler = (io: Server) => {
   io.on('connection', (socket: Socket) => {
@@ -45,48 +45,50 @@ export const socketHandler = (io: Server) => {
       socket.broadcast.emit('feedback', data);
     });
 
-    socket.on(
-      SOCKETS_EVENTS.CLIENT.CREATE_ROOM,
-      (
-        userId: number,
-        otherUserId: number,
-        callback: (roomId: string) => void
-      ) => {
-        console.log('userId', userId);
-        const sortedUserIds = [userId, otherUserId].sort();
-        let roomId = `chat-${sortedUserIds[0]}-${sortedUserIds[1]}`;
-        if (!rooms[roomId]) {
-          rooms[roomId] = new Set<string>();
-        }
-        rooms[roomId].add(socket.id);
+    socket.on(SOCKETS_EVENTS.CLIENT.CREATE_ROOM, ({ roomName }) => {
+      console.log('roomId : ', roomName);
+
+      if (!rooms[roomName]) {
+        const roomId = nanoid();
+        rooms[roomName] = {
+          id: roomId,
+        };
         socket.join(roomId);
-        console.log('rooms', rooms);
-        callback(roomId);
+        console.log('1 .rooms just joined ! : ', roomId);
+      } else {
+        const roomId = rooms[roomName].id;
+        socket.join(roomId);
+        console.log('2 .rooms just joined ! : ', roomId);
       }
-    );
+    });
 
     socket.on(
       SOCKETS_EVENTS.CLIENT.SEND_ROOM_MESSAGE,
-      (roomId: string, message: string, username: string) => {
+      (room, message: string, userName: string) => {
         const date = new Date();
-
+        const roomId = rooms[room.roomId].id;
+        console.log('roomId : ', roomId);
+        console.log('mesage about to be send');
+        console.log('message : ', message);
+        console.log('userName : ', userName);
+        // console.log('date : ', date);
         socket.to(roomId).emit(SOCKETS_EVENTS.SERVER.ROOM_MESSAGE, {
           message,
-          username,
+          userName,
           time: `${date.getHours()}:${date.getMinutes()}`,
         });
       }
     );
 
-    socket.on(SOCKETS_EVENTS.DISCONNECTION, () => {
-      for (const roomId of Object.keys(rooms)) {
-        rooms[roomId].delete(socket.id);
-        if (rooms[roomId].size === 0) {
-          delete rooms[roomId];
-        }
-      }
-      connectedUsers.delete(socket.id);
-    });
+    // socket.on(SOCKETS_EVENTS.DISCONNECTION, () => {
+    //   for (const roomId of Object.keys(rooms)) {
+    //     rooms[roomId].delete(socket.id);
+    //     if (rooms[roomId].size === 0) {
+    //       delete rooms[roomId];
+    //     }
+    //   }
+    //   connectedUsers.delete(socket.id);
+    // });
   });
 };
 
