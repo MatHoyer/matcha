@@ -5,19 +5,23 @@ import { Typography } from '@/components/ui/typography';
 import { useSession } from '@/hooks/useSession';
 import { socket } from '@/lib/socket';
 import { SOCKETS_EVENTS } from '@matcha/common';
-import { X } from 'lucide-react';
+import { Minus, X } from 'lucide-react';
 import moment from 'moment';
 import React, { useRef, useState } from 'react';
 
 interface PrivateChatProps {
   roomId: string;
+  status: 'full' | 'collapse';
   otherUserName: string;
+  toggleChat: () => void;
   closeChat: () => void;
 }
 
 export const Chat: React.FC<PrivateChatProps> = ({
   roomId,
+  status,
   otherUserName,
+  toggleChat,
   closeChat,
 }) => {
   const [messages, setMessages] = useState<
@@ -86,62 +90,69 @@ export const Chat: React.FC<PrivateChatProps> = ({
   };
 
   return (
-    <Card className="p-3">
+    <Card className="p-3 w-80 h-fit">
       <div className="flex items-center justify-between">
         <Typography variant="small">Chat with {otherUserName}</Typography>
-        <X className="cursor-pointer" onClick={() => closeChat()} />
-      </div>
-      <ul
-        ref={messageContainerRef}
-        id="message-container"
-        className="h-60 overflow-y-auto bg-gray-800 rounded-lg p-3 shadow-inner"
-      >
-        {messages.map((data, index) => (
-          <li
-            key={index}
-            className={`p-2 mb-2 rounded-md ${
-              data.isOwnMessage
-                ? 'bg-blue-600 text-white self-end'
-                : 'bg-gray-700 text-gray-200'
-            }`}
-          >
-            <p className="text-sm">{data.message}</p>
-            <span className="text-xs block text-gray-400">
-              {data.name} • {moment(data.dateTime).fromNow()}
-            </span>
-          </li>
-        ))}
-        {feedback && (
-          <li className="text-sm italic text-gray-400">{feedback}</li>
-        )}
-      </ul>
-
-      <form
-        id="message-form"
-        onSubmit={sendMessage}
-        className="mt-4 flex flex-col gap-2"
-      >
-        <h2 className="text-xs mb-2 font-semibold">{name} :</h2>
         <div className="flex items-center gap-2">
-          <Input
-            id="message-input"
-            type="text"
-            placeholder="Type a message..."
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            onFocus={() => handleFeedback(`${name} is typing...`)}
-            onKeyPress={() => handleFeedback(`${name} is typing...`)}
-            onBlur={() => handleFeedback('')}
-            // className="flex-1 p-2 bg-gray-700 text-white border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <Button
-            type="submit"
-            // className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-          >
-            Send
-          </Button>
+          <Minus className="cursor-pointer" onClick={() => toggleChat()} />
+          <X className="cursor-pointer" onClick={() => closeChat()} />
         </div>
-      </form>
+      </div>
+      {status === 'full' && (
+        <>
+          <ul
+            ref={messageContainerRef}
+            id="message-container"
+            className="h-60 overflow-y-auto bg-gray-800 rounded-lg p-3 shadow-inner"
+          >
+            {messages.map((data, index) => (
+              <li
+                key={index}
+                className={`p-2 mb-2 rounded-md ${
+                  data.isOwnMessage
+                    ? 'bg-blue-600 text-white self-end'
+                    : 'bg-gray-700 text-gray-200'
+                }`}
+              >
+                <p className="text-sm">{data.message}</p>
+                <span className="text-xs block text-gray-400">
+                  {data.name} • {moment(data.dateTime).fromNow()}
+                </span>
+              </li>
+            ))}
+            {feedback && (
+              <li className="text-sm italic text-gray-400">{feedback}</li>
+            )}
+          </ul>
+
+          <form
+            id="message-form"
+            onSubmit={sendMessage}
+            className="mt-4 flex flex-col gap-2"
+          >
+            <h2 className="text-xs mb-2 font-semibold">{name} :</h2>
+            <div className="flex items-center gap-2">
+              <Input
+                id="message-input"
+                type="text"
+                placeholder="Type a message..."
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onFocus={() => handleFeedback(`${name} is typing...`)}
+                onKeyPress={() => handleFeedback(`${name} is typing...`)}
+                onBlur={() => handleFeedback('')}
+                // className="flex-1 p-2 bg-gray-700 text-white border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <Button
+                type="submit"
+                // className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              >
+                Send
+              </Button>
+            </div>
+          </form>
+        </>
+      )}
     </Card>
   );
 };

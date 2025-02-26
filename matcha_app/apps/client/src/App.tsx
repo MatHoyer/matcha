@@ -33,7 +33,7 @@ const App = () => {
     (user: TUserWithNames) => user.id !== session.user?.id
   );
   const [openedChats, setOpenChats] = useState<
-    { id: string; otherUser: TUser }[]
+    { id: string; otherUser: TUser; status: 'full' | 'collapse' }[]
   >([]);
 
   const handleChatClick = (otherUser: TUser) => {
@@ -60,7 +60,7 @@ const App = () => {
 
     setOpenChats((prev) => {
       if (!prev.some((chat) => chat.id === chatRoom.id)) {
-        return [...prev, { otherUser, id: chatRoom.id }];
+        return [...prev, { otherUser, id: chatRoom.id, status: 'full' }];
       }
       return prev;
     });
