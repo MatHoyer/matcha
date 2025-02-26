@@ -4,7 +4,7 @@ import {
   LayoutDescription,
   LayoutHeader,
   LayoutTitle,
-} from '@/components/Layout';
+} from '@/components/pagination/Layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Typography } from '@/components/ui/typography';
 import { useSession } from '@/hooks/useSession';

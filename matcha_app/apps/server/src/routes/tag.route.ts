@@ -9,8 +9,8 @@ const tagRouter = Router();
 tagRouter.get('/', isLogged, getTags);
 tagRouter.post(
   '/',
-  bodyParser(createTagSchemas.requirements),
   isLogged,
+  bodyParser(createTagSchemas.requirements),
   createTag
 );
 
