@@ -1,5 +1,4 @@
-import { socket } from '@/lib/socket';
-import { getUrl, SOCKETS_EVENTS, TUser, TUserWithNames } from '@matcha/common';
+import { getUrl, TUser, TUserWithNames } from '@matcha/common';
 import {
   ChevronsUpDown,
   Crosshair,
@@ -10,6 +9,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { ChatContainer } from './components/ChatContainer';
 import { Logo } from './components/images/Logo';
 import { NavItemDropdown, NavItems } from './components/sidebar/NavComp';
 import { NavigationWrapper } from './components/sidebar/NavigationWrapper';
@@ -23,7 +23,6 @@ import {
 import { Typography } from './components/ui/typography';
 import { useSession } from './hooks/useSession';
 import { useUsers } from './hooks/useUsers';
-import { Chat } from './pages/Chat';
 import { Pages } from './pages/Pages';
 
 const App = () => {
@@ -33,32 +32,37 @@ const App = () => {
   const usersAllButAuthUser = users.filter(
     (user: TUserWithNames) => user.id !== session.user?.id
   );
+  const [openedChats, setOpenChats] = useState<
+    { id: string; otherUser: TUser }[]
+  >([]);
 
-  const [openChats, setOpenChats] = useState<any[]>([]);
+  const handleChatClick = (otherUser: TUser) => {
+    // const createOrGetRoom = (
+    //   otherUserId: number
+    // ): Promise<{ id: string }> => {
+    //   return new Promise((resolve) => {
+    //     const user = session.user;
+    //     const userId = user?.id as number;
+    //     socket.emit(
+    //       SOCKETS_EVENTS.CLIENT.CREATE_ROOM,
+    //       userId,
+    //       otherUserId,
+    //       (room: { id: string }) => {
+    //         resolve(room);
+    //       }
+    //     );
+    //   });
+    // };
 
-  const handleChatClick = async (otherUser: TUser) => {
-    const chatRoom = await createOrGetRoom(otherUser.id);
+    // const chatRoom = await createOrGetRoom(otherUser.id);
+    const chatRoomId = `chat-${session.user!.id}-${otherUser.id}`;
+    const chatRoom = { id: chatRoomId };
 
-    setOpenChats((prev: any) => {
-      if (!prev.some((chat: any) => chat.id === otherUser.id)) {
-        return [...prev, { ...otherUser, roomId: chatRoom.id }];
+    setOpenChats((prev) => {
+      if (!prev.some((chat) => chat.id === chatRoom.id)) {
+        return [...prev, { otherUser, id: chatRoom.id }];
       }
       return prev;
-    });
-  };
-
-  const createOrGetRoom = (otherUserId: number): Promise<{ id: string }> => {
-    return new Promise((resolve) => {
-      const user = session.user;
-      const userId = user?.id as number;
-      socket.emit(
-        SOCKETS_EVENTS.CLIENT.CREATE_ROOM,
-        userId,
-        otherUserId,
-        (room: { id: string }) => {
-          resolve(room);
-        }
-      );
     });
   };
 
@@ -104,7 +108,7 @@ const App = () => {
                   icon: MessageCircleHeart,
                   items: usersAllButAuthUser.map((otherUser) => ({
                     title: `${otherUser.name} ${otherUser.lastName}`,
-                    url: `#`,
+                    url: '',
                     onClick: () => handleChatClick(otherUser as TUser),
                   })),
                 }}
@@ -140,9 +144,7 @@ const App = () => {
       }
     >
       <Pages />
-      {openChats.map((chat) => (
-        <Chat key={chat.id} roomId={chat.id} recipientName={chat.name} />
-      ))}
+      <ChatContainer openedChats={openedChats} setOpenChats={setOpenChats} />
     </NavigationWrapper>
   );
 };

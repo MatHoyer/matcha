@@ -1,16 +1,25 @@
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Typography } from '@/components/ui/typography';
 import { useSession } from '@/hooks/useSession';
-import { useUsers } from '@/hooks/useUsers';
 import { socket } from '@/lib/socket';
-import moment from 'moment';
-import React, { useEffect, useRef, useState } from 'react';
 import { SOCKETS_EVENTS } from '@matcha/common';
+import { X } from 'lucide-react';
+import moment from 'moment';
+import React, { useRef, useState } from 'react';
 
 interface PrivateChatProps {
   roomId: string;
-  recipientName: string;
+  otherUserName: string;
+  closeChat: () => void;
 }
 
-export const Chat: React.FC<PrivateChatProps> = ({ roomId, recipientName }) => {
+export const Chat: React.FC<PrivateChatProps> = ({
+  roomId,
+  otherUserName,
+  closeChat,
+}) => {
   const [messages, setMessages] = useState<
     { name: string; message: string; dateTime: Date; isOwnMessage: boolean }[]
   >([]);
@@ -77,8 +86,11 @@ export const Chat: React.FC<PrivateChatProps> = ({ roomId, recipientName }) => {
   };
 
   return (
-    <div className="max-w-lg mx-auto p-4 text-white border border-gray-600 shadow-lg rounded-lg">
-      <h2 className="text-xs mb-2 font-semibold">Chat with {recipientName}</h2>
+    <Card className="p-3">
+      <div className="flex items-center justify-between">
+        <Typography variant="small">Chat with {otherUserName}</Typography>
+        <X className="cursor-pointer" onClick={() => closeChat()} />
+      </div>
       <ul
         ref={messageContainerRef}
         id="message-container"
@@ -111,7 +123,7 @@ export const Chat: React.FC<PrivateChatProps> = ({ roomId, recipientName }) => {
       >
         <h2 className="text-xs mb-2 font-semibold">{name} :</h2>
         <div className="flex items-center gap-2">
-          <input
+          <Input
             id="message-input"
             type="text"
             placeholder="Type a message..."
@@ -120,16 +132,16 @@ export const Chat: React.FC<PrivateChatProps> = ({ roomId, recipientName }) => {
             onFocus={() => handleFeedback(`${name} is typing...`)}
             onKeyPress={() => handleFeedback(`${name} is typing...`)}
             onBlur={() => handleFeedback('')}
-            className="flex-1 p-2 bg-gray-700 text-white border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            // className="flex-1 p-2 bg-gray-700 text-white border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-          <button
+          <Button
             type="submit"
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            // className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
           >
             Send
-          </button>
+          </Button>
         </div>
       </form>
-    </div>
+    </Card>
   );
 };
