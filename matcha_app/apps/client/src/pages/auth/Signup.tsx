@@ -90,9 +90,6 @@ const SignupPage: React.FC = () => {
           >
             <FormField
               control={form.control}
-              {...form.register('name', {
-                required: 'Name is required',
-              })}
               name="name"
               render={({ field }) => (
                 <FormItem>
@@ -106,9 +103,6 @@ const SignupPage: React.FC = () => {
             />
             <FormField
               control={form.control}
-              {...form.register('lastName', {
-                required: 'Lastname is required',
-              })}
               name="lastName"
               render={({ field }) => (
                 <FormItem>
@@ -126,9 +120,6 @@ const SignupPage: React.FC = () => {
             />
             <FormField
               control={form.control}
-              {...form.register('email', {
-                required: 'Email is required',
-              })}
               name="email"
               render={({ field }) => (
                 <FormItem>
@@ -147,9 +138,6 @@ const SignupPage: React.FC = () => {
             />
             <FormField
               control={form.control}
-              {...form.register('password', {
-                required: 'Password is required',
-              })}
               name="password"
               render={({ field }) => (
                 <FormItem>
@@ -163,9 +151,6 @@ const SignupPage: React.FC = () => {
             />
             <FormField
               control={form.control}
-              {...form.register('age', {
-                required: 'Age is required',
-              })}
               name="age"
               render={({ field }) => (
                 <FormItem>
@@ -179,9 +164,6 @@ const SignupPage: React.FC = () => {
             />
             <FormField
               control={form.control}
-              {...form.register('gender', {
-                required: 'Gender is required',
-              })}
               name="gender"
               render={({ field }) => (
                 <FormItem>
@@ -199,9 +181,6 @@ const SignupPage: React.FC = () => {
             />
             <FormField
               control={form.control}
-              {...form.register('preference', {
-                required: 'Orientation is required',
-              })}
               name="preference"
               render={({ field }) => (
                 <FormItem>

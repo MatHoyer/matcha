@@ -1,6 +1,13 @@
 import { socket } from '@/lib/socket';
 import { getUrl, SOCKETS_EVENTS, TUser, TUserWithNames } from '@matcha/common';
-import { ChevronsUpDown, Home, MessageCircleHeart } from 'lucide-react';
+import {
+  ChevronsUpDown,
+  Crosshair,
+  Heart,
+  Home,
+  MessageCircleHeart,
+  Search,
+} from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Logo } from './components/images/Logo';
@@ -69,17 +76,37 @@ const App = () => {
               <NavItems
                 items={[
                   { title: 'Home', icon: Home, url: getUrl('client-home') },
-                  { title: 'Chat', icon: MessageCircleHeart, url: '/chat' },
                 ]}
               />
               <NavItemDropdown
                 item={{
-                  title: 'Dropdown',
-                  icon: Home,
+                  title: 'Search',
+                  icon: Search,
                   items: [
-                    { title: 'Item 1', url: '/item-1' },
-                    { title: 'Item 2', url: '/item-2' },
+                    {
+                      icon: Heart,
+                      title: 'For you',
+                      url: getUrl('client-research', { type: 'forYou' }),
+                    },
+                    {
+                      icon: Crosshair,
+                      title: 'Advanced search',
+                      url: getUrl('client-research', {
+                        type: 'advancedSearch',
+                      }),
+                    },
                   ],
+                }}
+              />
+              <NavItemDropdown
+                item={{
+                  title: 'Chat',
+                  icon: MessageCircleHeart,
+                  items: usersAllButAuthUser.map((otherUser) => ({
+                    title: `${otherUser.name} ${otherUser.lastName}`,
+                    url: `#`,
+                    onClick: () => handleChatClick(otherUser as TUser),
+                  })),
                 }}
               />
             </SidebarMenu>

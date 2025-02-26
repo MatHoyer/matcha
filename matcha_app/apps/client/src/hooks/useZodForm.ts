@@ -38,28 +38,5 @@ export const useZodForm = <T extends FieldValues>({
     mode: 'onBlur',
   });
 
-  // const values = useWatch({ control: form.control });
-
-  // useEffect(() => {
-  //   for (const field of Object.keys(values)) {
-  //     form.clearErrors(field as FieldPath<T>);
-  //   }
-  //   const data = schema.safeParse(values);
-  //   if (!data.success) {
-  //     console.log('error', data.error);
-  //     for (const field of data.error.fields) {
-  //       const fieldName = field.field as FieldPath<T>;
-  //       console.log(fieldName, form.getFieldState(fieldName));
-  //       if (form.getFieldState(fieldName).isDirty) {
-  //         form.setError(fieldName, {
-  //           type: 'manual',
-  //           message: field.message,
-  //         });
-  //       }
-  //     }
-  //   }
-  //   console.log(values);
-  // }, [values, form.formState.isSubmitted, schema, form]);
-
   return form;
 };
