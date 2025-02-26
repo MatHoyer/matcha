@@ -7,11 +7,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { BadgeCheck } from 'lucide-react';
+import { getUrl } from '@matcha/common';
+import { Bell, FileUser } from 'lucide-react';
 import { PropsWithChildren } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { LogoutButton } from '../LogoutButton';
 
 const UserDropdown: React.FC<PropsWithChildren> = ({ children }) => {
+  const navigate = useNavigate();
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
@@ -21,9 +25,19 @@ const UserDropdown: React.FC<PropsWithChildren> = ({ children }) => {
         sideOffset={4}
       >
         <DropdownMenuGroup>
-          <DropdownMenuItem className="cursor-pointer">
-            <BadgeCheck />
-            Account
+          <DropdownMenuItem
+            className="cursor-pointer"
+            onClick={() => navigate(getUrl('client-notifications'))}
+          >
+            <Bell />
+            Notifications
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            className="cursor-pointer"
+            onClick={() => navigate(getUrl('client-account'))}
+          >
+            <FileUser />
+            My account
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />

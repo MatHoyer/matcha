@@ -13,7 +13,7 @@ export const defaultMutationEnding = async <T extends ZodType<D>, D>(data: {
 
   const responseData = responseSchema.safeParse(res?.data);
   if (!responseData.success) {
-    return;
+    return null;
   }
 
   if (successMessage) {

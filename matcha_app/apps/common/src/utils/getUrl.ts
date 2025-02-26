@@ -5,6 +5,11 @@ export type TClientRouteDataRequirements = {
     type: 'signup' | 'login';
   };
   'client-home': undefined;
+  'client-research': {
+    type: 'forYou' | 'advancedSearch';
+  };
+  'client-notifications': undefined;
+  'client-account': undefined;
 };
 export type TApiRouteDataRequirements = {
   'api-auth': {
@@ -29,6 +34,9 @@ const routes: {
 } = {
   'client-auth': ({ type }) => `/auth/${type}`,
   'client-home': () => '/',
+  'client-research': ({ type }) => `/research/${type}`,
+  'client-notifications': () => '/notifications',
+  'client-account': () => '/account',
 
   'api-auth': ({ type }) => (type ? `/api/auth/${type}` : '/api/auth'),
   'api-users': ({ type }) => (type ? `/api/users/${type}` : '/api/users'),

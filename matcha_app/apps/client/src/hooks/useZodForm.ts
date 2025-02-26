@@ -1,0 +1,65 @@
+import { ZodType } from '@matcha/common';
+import { FieldValues, Resolver, useForm, UseFormProps } from 'react-hook-form';
+
+type UseZodFormProps<T extends FieldValues> = Exclude<
+  UseFormProps<T>,
+  'resolver'
+> & {
+  schema: ZodType<T>;
+};
+
+const zodResolver =
+  <T extends FieldValues>(schema: ZodType<T>): Resolver<T> =>
+  (values) => {
+    const parsed = schema.safeParse(values);
+    if (parsed.success) {
+      return { errors: {}, values: parsed.data };
+    }
+
+    return {
+      errors: parsed.error.fields.reduce(
+        (acc, fieldError) => ({
+          ...acc,
+          [fieldError.field]: { message: fieldError.message },
+        }),
+        {} as FieldValues
+      ),
+      values: {},
+    };
+  };
+
+export const useZodForm = <T extends FieldValues>({
+  schema,
+  ...formProps
+}: UseZodFormProps<T>) => {
+  const form = useForm<T>({
+    ...formProps,
+    resolver: zodResolver(schema),
+    mode: 'onBlur',
+  });
+
+  // const values = useWatch({ control: form.control });
+
+  // useEffect(() => {
+  //   for (const field of Object.keys(values)) {
+  //     form.clearErrors(field as FieldPath<T>);
+  //   }
+  //   const data = schema.safeParse(values);
+  //   if (!data.success) {
+  //     console.log('error', data.error);
+  //     for (const field of data.error.fields) {
+  //       const fieldName = field.field as FieldPath<T>;
+  //       console.log(fieldName, form.getFieldState(fieldName));
+  //       if (form.getFieldState(fieldName).isDirty) {
+  //         form.setError(fieldName, {
+  //           type: 'manual',
+  //           message: field.message,
+  //         });
+  //       }
+  //     }
+  //   }
+  //   console.log(values);
+  // }, [values, form.formState.isSubmitted, schema, form]);
+
+  return form;
+};

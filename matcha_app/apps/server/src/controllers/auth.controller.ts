@@ -4,7 +4,6 @@ import {
   loginSchemas,
   sessionSchemas,
   signupSchemas,
-  TErrorSchema,
   TGender,
   TOrientation,
   wait,
@@ -13,8 +12,8 @@ import type { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import db from '../database/Database.js';
 import { env } from '../env.js';
+import { defaultResponse } from '../routes/defaultResponse.js';
 import { hashPassword } from '../services/auth.service.js';
- 
 
 export const signup = async (req: Request, res: Response) => {
   const { password, gender, preference, ...userData } = req.body as Infer<
@@ -28,8 +27,14 @@ export const signup = async (req: Request, res: Response) => {
     },
   });
   if (user) {
-    res.status(409).json({ message: 'User already exists' } as TErrorSchema);
-    return;
+    return defaultResponse({
+      res,
+      status: 409,
+      json: {
+        message: 'User already exists',
+        fields: [{ field: 'email', message: 'User already exists' }],
+      },
+    });
   }
 
   user = await db.user.create({
@@ -41,8 +46,13 @@ export const signup = async (req: Request, res: Response) => {
     },
   });
   if (!user) {
-    res.status(500).json({ message: 'Error creating user' } as TErrorSchema);
-    return;
+    return defaultResponse({
+      res,
+      status: 500,
+      json: {
+        message: 'Error creating user',
+      },
+    });
   }
 
   const { password: _, ...userWithoutPassword } = user;
@@ -51,17 +61,23 @@ export const signup = async (req: Request, res: Response) => {
     expiresIn: 30 * 24 * 60 * 60,
   });
 
-  res
-    .status(200)
-    .cookie(AUTH_COOKIE_NAME, token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-    })
-    .json({
+  return defaultResponse({
+    res,
+    status: 200,
+    cookie: {
+      name: AUTH_COOKIE_NAME,
+      val: token,
+      options: {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'strict',
+        maxAge: 30 * 24 * 60 * 60 * 1000,
+      },
+    },
+    json: {
       message: 'Signed in',
-    } as Infer<typeof signupSchemas.response>);
+    },
+  });
 };
 
 export const login = async (req: Request, res: Response) => {
@@ -77,10 +93,14 @@ export const login = async (req: Request, res: Response) => {
       password: hashedPassword,
     },
   });
-  // remove cringe check after good prisma update
   if (!user) {
-    res.status(401).json({ message: 'Invalid credentials' } as TErrorSchema);
-    return;
+    return defaultResponse({
+      res,
+      status: 401,
+      json: {
+        message: 'Invalid credentials',
+      },
+    });
   }
 
   const { password: _, ...userWithoutPassword } = user;
@@ -89,44 +109,67 @@ export const login = async (req: Request, res: Response) => {
     expiresIn: 30 * 24 * 60 * 60,
   });
 
-  res
-    .status(200)
-    .cookie(AUTH_COOKIE_NAME, token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-    })
-    .json({
+  return defaultResponse({
+    res,
+    status: 200,
+    cookie: {
+      name: AUTH_COOKIE_NAME,
+      val: token,
+      options: {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'strict',
+        maxAge: 30 * 24 * 60 * 60 * 1000,
+      },
+    },
+    json: {
       message: 'Logged in',
-    } as Infer<typeof loginSchemas.response>);
+    },
+  });
 };
 
 export const logout = async (_req: Request, res: Response) => {
-  res
-    .status(200)
-    .cookie(AUTH_COOKIE_NAME, '', {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'strict',
-      maxAge: 0,
-    })
-    .json({
+  return defaultResponse({
+    res,
+    status: 200,
+    cookie: {
+      name: AUTH_COOKIE_NAME,
+      val: '',
+      options: {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'strict',
+        maxAge: 0,
+      },
+    },
+    json: {
       message: 'Logged out',
-    } as Infer<typeof loginSchemas.response>);
+    },
+  });
 };
 
 export const session = async (req: Request, res: Response) => {
   const token = req.cookies[AUTH_COOKIE_NAME] as string;
   if (!token) {
-    res.status(401).json({ message: 'Unauthorized' } as TErrorSchema);
-    return;
+    return defaultResponse({
+      res,
+      status: 401,
+      json: {
+        message: 'Unauthorized',
+      },
+    });
   }
 
   try {
     const user = jwt.verify(token, env.JWT_SECRET);
     res.status(200).json({ user } as Infer<typeof sessionSchemas.response>);
   } catch (_error) {
-    res.status(401).json({ message: 'Unauthorized' } as TErrorSchema);
+    return defaultResponse({
+      res,
+      status: 401,
+      json: {
+        message: 'Unauthorized',
+      },
+    });
   }
 };

@@ -1,6 +1,5 @@
-import { Infer, TErrorSchema, ZodType } from '@matcha/common';
-import axios, { AxiosError, AxiosRequestConfig } from 'axios';
-import { toast } from 'sonner';
+import { Infer, ZodType } from '@matcha/common';
+import axios, { AxiosRequestConfig } from 'axios';
 import { defaultMutationEnding } from './defaultMutationEnding';
 
 export const axiosFetch = async <
@@ -19,6 +18,7 @@ export const axiosFetch = async <
     withCredentials: true,
   },
   schemas,
+  form,
   handleEnding,
 }: {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE';
@@ -29,15 +29,14 @@ export const axiosFetch = async <
     requirements?: R;
     response: T;
   };
+  // eslint-disable-next-line
+  form?: any;
   handleEnding?: {
     successMessage?: string;
     errorMessage?: string;
     cb?: (data: Infer<T>) => void;
   };
-}): Promise<{
-  ok: boolean;
-  data: TErrorSchema | Infer<T>;
-}> => {
+}): Promise<Infer<T>> => {
   try {
     const response = await axios({
       method,
@@ -46,34 +45,23 @@ export const axiosFetch = async <
       ...config,
     });
 
-    return {
-      ok: true,
-      data: (await defaultMutationEnding({
-        res: response,
-        ...handleEnding,
-        responseSchema: schemas.response,
-      })) as Infer<T>,
-    };
+    return (await defaultMutationEnding({
+      res: response,
+      ...handleEnding,
+      responseSchema: schemas.response,
+    })) as Infer<T>;
   } catch (error) {
-    // console.error(error);
-    if (axios.isAxiosError(error)) {
-      const axiosError = error as AxiosError<TErrorSchema>;
-      if (handleEnding?.errorMessage) {
-        toast.error(axiosError.response?.data.message || 'An error occurred');
+    if (axios.isAxiosError(error) && error.response) {
+      if (form && form.setError) {
+        for (const field of error.response.data.fields) {
+          console.log('field', field);
+          form.setError(field.field, {
+            type: 'manual',
+            message: field.message,
+          });
+        }
       }
-      return {
-        ok: false,
-        data: axiosError.response?.data as TErrorSchema,
-      };
     }
-    if (handleEnding?.errorMessage) {
-      toast.error(handleEnding?.errorMessage || 'An error occurred');
-    }
-    return {
-      ok: false,
-      data: {
-        message: handleEnding?.errorMessage || 'An error occurred',
-      } as TErrorSchema,
-    };
+    throw error;
   }
 };

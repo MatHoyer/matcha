@@ -6,6 +6,7 @@ import SignupPage from './auth/Signup';
 import Chat from './Chat';
 import { Home } from './Home';
 import { NotFound } from './NotFound';
+import { TargetedSearch } from './research/TargetedSearch';
 
 const AuthRoute = () => {
   const { user, loading } = useSession();
@@ -52,6 +53,10 @@ export const Pages = () => {
       <Route element={<PrivateRoute />}>
         <Route path="/" element={<Home />} />
         <Route path="/chat" element={<Chat />} />
+        <Route
+          path={getUrl('client-research', { type: 'advancedSearch' })}
+          element={<TargetedSearch />}
+        />
       </Route>
     </Routes>
   );

@@ -1,5 +1,12 @@
 import { getUrl } from '@matcha/common';
-import { ChevronsUpDown, Home, MessageCircleHeart } from 'lucide-react';
+import {
+  ChevronsUpDown,
+  Crosshair,
+  Heart,
+  Home,
+  MessageCircleHeart,
+  Search,
+} from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Logo } from './components/images/Logo';
 import { NavItemDropdown, NavItems } from './components/sidebar/NavComp';
@@ -38,11 +45,21 @@ const App = () => {
               />
               <NavItemDropdown
                 item={{
-                  title: 'Dropdown',
-                  icon: Home,
+                  title: 'Search',
+                  icon: Search,
                   items: [
-                    { title: 'Item 1', url: '/item-1' },
-                    { title: 'Item 2', url: '/item-2' },
+                    {
+                      icon: Heart,
+                      title: 'For you',
+                      url: getUrl('client-research', { type: 'forYou' }),
+                    },
+                    {
+                      icon: Crosshair,
+                      title: 'Advanced search',
+                      url: getUrl('client-research', {
+                        type: 'advancedSearch',
+                      }),
+                    },
                   ],
                 }}
               />

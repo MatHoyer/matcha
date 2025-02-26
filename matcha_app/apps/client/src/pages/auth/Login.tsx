@@ -11,11 +11,11 @@ import { Input } from '@/components/ui/input';
 import { LoadingButton } from '@/components/ui/loaders';
 import PasswordInput from '@/components/ui/password-input';
 import { Typography } from '@/components/ui/typography';
+import { useZodForm } from '@/hooks/useZodForm';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import { getUrl, loginSchemas } from '@matcha/common';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
 type TForm = {
@@ -26,7 +26,8 @@ type TForm = {
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
 
-  const form = useForm<TForm>({
+  const form = useZodForm<TForm>({
+    schema: loginSchemas.requirements,
     defaultValues: {
       email: '',
       password: '',
@@ -40,12 +41,12 @@ const LoginPage: React.FC = () => {
         url: getUrl('api-auth', { type: 'login' }),
         data,
         schemas: loginSchemas,
+        form,
         handleEnding: {
           successMessage: 'Login successful',
           errorMessage: 'Login failed',
           cb: () => {
             navigate('/');
-            window.location.reload();
           },
         },
       });
@@ -53,13 +54,16 @@ const LoginPage: React.FC = () => {
   });
 
   const onSubmit = form.handleSubmit(async (data) => {
-    const res = await mutation.mutateAsync(data);
-    if (axios.isAxiosError(res)) {
-      form.setError('root', {
-        type: 'manual',
-        message: res.response?.data.message,
-      });
-    }
+    mutation.mutate(data, {
+      onError: (error) => {
+        if (axios.isAxiosError(error)) {
+          form.setError('root', {
+            type: 'manual',
+            message: error.response?.data.message,
+          });
+        }
+      },
+    });
   });
 
   return (

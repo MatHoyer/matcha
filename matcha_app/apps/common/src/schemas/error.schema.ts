@@ -1,14 +1,12 @@
-import { Infer, z } from '../validator';
+import { Infer, z } from '../validator/validator';
 
 export const errorSchema = z.object({
-  fields: z
-    .array(
-      z.object({
-        field: z.string(),
-        message: z.string(),
-      })
-    )
-    .optional(),
+  fields: z.array(
+    z.object({
+      field: z.string(),
+      message: z.string(),
+    })
+  ),
   message: z.string(),
 });
 export type TErrorSchema = Infer<typeof errorSchema>;
