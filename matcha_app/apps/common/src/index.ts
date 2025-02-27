@@ -56,6 +56,8 @@ export type {
 } from './schemas/api/auth.schema';
 export { errorSchema } from './schemas/api/error.schema';
 export type { TErrorSchema } from './schemas/api/error.schema';
+export { getGlobalLocationsSchemas } from './schemas/api/globalLocations.schema';
+export type { TGlobalLocationsSchemas } from './schemas/api/globalLocations.schema';
 export { targetedSearchSchema } from './schemas/api/search.schema';
 export type { TTargetedSearchSchema } from './schemas/api/search.schema';
 export { createTagSchemas, getTagsSchemas } from './schemas/api/tags.schema';

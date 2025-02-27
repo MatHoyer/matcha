@@ -1,12 +1,13 @@
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import { getTagsSchemas, getUrl } from '@matcha/common';
 import { useQuery } from '@tanstack/react-query';
-import { MultiCombobox } from './combobox';
+import { MultiCombobox } from '../ui/combobox';
 
 const MultiTagCombobox: React.FC<{
   value: string[] | null;
   onChange: (value: string[] | null) => void;
-}> = ({ value, onChange }) => {
+  modal?: boolean;
+}> = ({ value, onChange, modal }) => {
   const query = useQuery({
     queryKey: ['tags'],
     queryFn: async () => {
@@ -31,6 +32,7 @@ const MultiTagCombobox: React.FC<{
       }
       value={value}
       onChange={onChange}
+      modal={modal}
     />
   );
 };

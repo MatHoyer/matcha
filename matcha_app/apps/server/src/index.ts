@@ -6,6 +6,7 @@ import path from 'path';
 import { Server } from 'socket.io';
 import { env, envSchema } from './env.js';
 import { default as authRouter } from './routes/auth.route.js';
+import globalLocationRouter from './routes/globalLocation.route.js';
 import tagRouter from './routes/tag.route.js';
 import usersRouter from './routes/users.route.js';
 import { socketHandler } from './sockets/sockets.js';
@@ -34,6 +35,7 @@ app.get('/api/health', (_req, res) => {
 });
 app.use(getUrl('api-auth'), authRouter);
 app.use(getUrl('api-tags'), tagRouter);
+app.use(getUrl('api-globalLocations'), globalLocationRouter);
 app.use(getUrl('api-users'), usersRouter);
 
 if (env.NODE_ENV === 'PROD') {

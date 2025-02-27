@@ -18,6 +18,7 @@ export type TApiRouteDataRequirements = {
   'api-tags': {
     id?: number;
   };
+  'api-globalLocations': undefined;
   'api-users': {
     type: 'getUsers' | undefined;
   };
@@ -43,6 +44,7 @@ const routes: {
 
   'api-auth': ({ type }) => (type ? `/api/auth/${type}` : '/api/auth'),
   'api-tags': ({ id }) => (id ? `/api/tags/${id}` : '/api/tags'),
+  'api-globalLocations': () => '/api/globalLocations',
   'api-users': ({ type }) => (type ? `/api/users/${type}` : '/api/users'),
 };
 

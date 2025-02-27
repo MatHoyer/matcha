@@ -1,5 +1,6 @@
 import {
   blockSchema,
+  globalLocationSchema,
   imageSchema,
   likeSchema,
   messageSchema,
@@ -67,7 +68,8 @@ export const tableKeys: Record<string, Record<string, string>> = {
   like: transformSchema(likeSchema),
   notification: transformSchema(notificationSchema),
   block: transformSchema(blockSchema),
-  location: transformSchema(userLocationSchema),
+  globalLocation: transformSchema(globalLocationSchema),
+  userLocation: transformSchema(userLocationSchema),
   view: transformSchema(viewSchema),
   image: transformSchema(imageSchema),
 };

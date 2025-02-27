@@ -6,12 +6,13 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { default as MultiTagCombobox } from '@/components/ui/TagCombobox';
 import { openGlobalDialog } from '@/hooks/use-dialog';
 import { useSession } from '@/hooks/useSession';
 import { useZodForm } from '@/hooks/useZodForm';
 import { targetedSearchSchema } from '@matcha/common';
 import { Plus, Search } from 'lucide-react';
+import { default as GlobalLocationCombobox } from '../comboxes/GlobalLocation.combobox';
+import MultiTagCombobox from '../comboxes/Tag.combobox';
 import { Button } from '../ui/button';
 import { FameSlider } from '../ui/FameRating';
 import { Label } from '../ui/label';
@@ -118,13 +119,26 @@ export const AdvancedSearchForm: React.FC<TFormProps<TForm>> = ({
       />
       <FormField
         control={form.control}
+        name="location"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Location</FormLabel>
+            <FormControl>
+              <GlobalLocationCombobox {...field} modal={modal} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
         name="tags"
         render={({ field }) => (
           <FormItem>
             <FormLabel>Tags</FormLabel>
             <FormControl>
               <div className="flex gap-2">
-                <MultiTagCombobox {...field} />
+                <MultiTagCombobox {...field} modal={modal} />
                 <Button
                   onClick={() => {
                     openGlobalDialog('create-tag');
