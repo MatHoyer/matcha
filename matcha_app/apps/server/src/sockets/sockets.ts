@@ -46,27 +46,20 @@ export const socketHandler = (io: Server) => {
     });
 
     socket.on(SOCKETS_EVENTS.CLIENT.CREATE_ROOM, ({ roomName }) => {
-      console.log('roomId : ', roomName);
-
       if (!rooms[roomName]) {
-        const roomId = nanoid();
         rooms[roomName] = {
-          id: roomId,
+          id: roomName,
         };
-        socket.join(roomId);
-        console.log('1 .rooms just joined ! : ', roomId);
-      } else {
-        const roomId = rooms[roomName].id;
-        socket.join(roomId);
-        console.log('2 .rooms just joined ! : ', roomId);
       }
+      socket.join(rooms[roomName].id);
+      console.log('Room just joined ! : ', rooms[roomName].id);
     });
 
     socket.on(SOCKETS_EVENTS.CLIENT.SEND_ROOM_MESSAGE, (data) => {
-      const roomId = rooms[data.name].id;
+      console.log('Sending message to room : ', data.roomId);
       const message = data.messageToSend;
       const userName = data.name;
-      socket.to(roomId).emit(SOCKETS_EVENTS.SERVER.ROOM_MESSAGE, {
+      socket.to(data.roomId).emit(SOCKETS_EVENTS.SERVER.ROOM_MESSAGE, {
         message,
         userName,
       });

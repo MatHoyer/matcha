@@ -49,6 +49,8 @@ export const Chat: React.FC<PrivateChatProps> = ({
     }) => {
       console.log('message received !', message);
       console.log('userName :', userName);
+      console.log('data.roomId : ', data.roomId);
+      console.log('roomId :', roomId);
       // Add the message to the chat of the receiver
       setMessages((prevMessages) => [
         ...prevMessages,
