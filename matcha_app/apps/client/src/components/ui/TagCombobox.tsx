@@ -1,11 +1,12 @@
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import { getTagsSchemas, getUrl } from '@matcha/common';
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
 import { MultiCombobox } from './combobox';
 
-const TagCombobox: React.FC = () => {
-  const [tags, setTags] = useState<string[] | null>(null);
+const MultiTagCombobox: React.FC<{
+  value: string[] | null;
+  onChange: (value: string[] | null) => void;
+}> = ({ value, onChange }) => {
   const query = useQuery({
     queryKey: ['tags'],
     queryFn: async () => {
@@ -28,10 +29,10 @@ const TagCombobox: React.FC = () => {
           label: tag.name,
         })) || []
       }
-      value={tags}
-      onChange={setTags}
+      value={value}
+      onChange={onChange}
     />
   );
 };
 
-export default TagCombobox;
+export default MultiTagCombobox;

@@ -21,14 +21,14 @@ CREATE TABLE "User" (
 DROP TABLE IF EXISTS "Tag" CASCADE;
 CREATE TABLE "Tag" (
   "id" SERIAL PRIMARY KEY,
-  name VARCHAR(255) NOT NULL UNIQUE
+  "name" VARCHAR(255) NOT NULL UNIQUE
 );
 
 DROP TABLE IF EXISTS "UserTag";
 CREATE TABLE "UserTag" (
-  "id" SERIAL PRIMARY KEY,
   "userId" INT NOT NULL,
   "tagId" INT NOT NULL,
+  PRIMARY KEY ("userId", "tagId"),
   FOREIGN KEY ("userId") REFERENCES "User" ("id")  ON DELETE CASCADE,
   FOREIGN KEY ("tagId") REFERENCES "Tag" ("id")  ON DELETE CASCADE
 );
@@ -56,9 +56,9 @@ CREATE TABLE "Report" (
 
 DROP TABLE IF EXISTS "Like";
 CREATE TABLE "Like" (
-  "id" SERIAL PRIMARY KEY,
   "userId" INT NOT NULL,
   "likedId" INT NOT NULL,
+  PRIMARY KEY ("userId", "likedId"),
   FOREIGN KEY ("userId") REFERENCES "User" ("id")  ON DELETE CASCADE,
   FOREIGN KEY ("likedId") REFERENCES "User" ("id")  ON DELETE CASCADE
 );
@@ -75,9 +75,9 @@ CREATE TABLE "Notification" (
 
 DROP TABLE IF EXISTS "Block";
 CREATE TABLE "Block" (
-  "id" SERIAL PRIMARY KEY,
   "userId" INT NOT NULL,
   "blockedId" INT NOT NULL,
+  PRIMARY KEY ("userId", "blockedId"),
   FOREIGN KEY ("userId") REFERENCES "User" ("id")  ON DELETE CASCADE,
   FOREIGN KEY ("blockedId") REFERENCES "User" ("id")  ON DELETE CASCADE
 );

@@ -59,6 +59,8 @@ export type {
 } from './schemas/api/auth.schema';
 export { errorSchema } from './schemas/api/error.schema';
 export type { TErrorSchema } from './schemas/api/error.schema';
+export { targetedSearchSchema } from './schemas/api/search.schema';
+export type { TTargetedSearchSchema } from './schemas/api/search.schema';
 export { createTagSchemas, getTagsSchemas } from './schemas/api/tags.schema';
 export type { TCreateTagSchemas, TTagSchemas } from './schemas/api/tags.schema';
 export {

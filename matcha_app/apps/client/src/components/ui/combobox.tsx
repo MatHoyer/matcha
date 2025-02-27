@@ -106,7 +106,7 @@ export const MultiCombobox = <T extends any[]>({
           variant="outline"
           role="combobox"
           aria-expanded={open}
-          className="w-[200px] flex justify-between"
+          className="w-full flex justify-between"
         >
           <p className="w-[calc(100%-20px)] truncate text-start">
             {value && value.length > 0
@@ -147,7 +147,9 @@ export const MultiCombobox = <T extends any[]>({
                   }}
                   className="cursor-pointer"
                 >
-                  {element.label}
+                  <p className="w-[calc(100%-20px)] truncate text-start">
+                    {element.label}
+                  </p>
                   <Check
                     className={cn(
                       'ml-auto',

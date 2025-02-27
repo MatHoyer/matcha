@@ -28,7 +28,6 @@ export const tagSchema = z.object({
 export type TTag = Infer<typeof tagSchema>;
 
 export const userTagSchema = z.object({
-  id: z.number(),
   userId: userSchema.pick(['id']).shape.id,
   tagId: tagSchema.pick(['id']).shape.id,
 });
@@ -52,7 +51,6 @@ export const reportSchema = z.object({
 export type TReport = Infer<typeof reportSchema>;
 
 export const likeSchema = z.object({
-  id: z.number(),
   userId: userSchema.pick(['id']).shape.id,
   likedId: userSchema.pick(['id']).shape.id,
 });
@@ -68,7 +66,6 @@ export const notificationSchema = z.object({
 export type TNotification = Infer<typeof notificationSchema>;
 
 export const blockSchema = z.object({
-  id: z.number(),
   userId: userSchema.pick(['id']).shape.id,
   blockedId: userSchema.pick(['id']).shape.id,
 });

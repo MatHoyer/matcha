@@ -24,8 +24,6 @@ export const isLogged = async (
   try {
     const userToken = jwt.verify(token, env.JWT_SECRET) as TUser;
 
-    console.log(userToken.id);
-
     const user = await db.user.findFirst({
       where: {
         id: userToken.id,
