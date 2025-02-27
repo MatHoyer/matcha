@@ -12,7 +12,7 @@ export type TTagSchemas = {
 
 export const createTagSchemas = {
   requirements: z.object({
-    name: z.string(),
+    name: z.string().min(1),
   }),
   response: z.object({
     message: z.string(),
