@@ -6,10 +6,13 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { openGlobalDialog } from '@/hooks/use-dialog';
+import { closeGlobalDialog, openGlobalDialog } from '@/hooks/use-dialog';
 import { useSession } from '@/hooks/useSession';
 import { useZodForm } from '@/hooks/useZodForm';
-import { targetedSearchSchema } from '@matcha/common';
+import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
+import { defaultHandleSubmit } from '@/lib/fetch-utils/defaultHandleSubmit';
+import { getUrl, targetedSearchSchema } from '@matcha/common';
+import { useMutation } from '@tanstack/react-query';
 import { Plus, Search } from 'lucide-react';
 import { default as GlobalLocationCombobox } from '../comboxes/GlobalLocation.combobox';
 import MultiTagCombobox from '../comboxes/Tag.combobox';
@@ -50,9 +53,26 @@ export const AdvancedSearchForm: React.FC<TFormProps<TForm>> = ({
     },
   });
 
-  const onSubmit = () => {
-    console.log(form.getValues());
-  };
+  const mutation = useMutation({
+    mutationFn: async (data: TForm) => {
+      return await axiosFetch({
+        method: 'POST',
+        url: getUrl('api-search', { type: 'advancedSearch' }),
+        data,
+        schemas: targetedSearchSchema,
+        form,
+        handleEnding: {
+          errorMessage: 'Error searching',
+          successMessage: 'Search successful',
+          cb: () => {
+            if (modal) closeGlobalDialog();
+          },
+        },
+      });
+    },
+  });
+
+  const onSubmit = defaultHandleSubmit(form, mutation);
 
   return (
     <Form

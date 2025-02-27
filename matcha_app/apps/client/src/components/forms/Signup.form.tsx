@@ -13,6 +13,7 @@ import Selector from '@/components/ui/selector';
 import { closeGlobalDialog } from '@/hooks/use-dialog';
 import { useZodForm } from '@/hooks/useZodForm';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
+import { defaultHandleSubmit } from '@/lib/fetch-utils/defaultHandleSubmit';
 import {
   GENDERS,
   getUrl,
@@ -21,7 +22,6 @@ import {
   signupSchemas,
 } from '@matcha/common';
 import { useMutation } from '@tanstack/react-query';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { SubmitButtonForm } from './components/SubmitButton.form';
 import { TFormProps } from './types.form';
@@ -76,18 +76,7 @@ const SignupForm: React.FC<TFormProps<TForm>> = ({
     },
   });
 
-  const onSubmit = form.handleSubmit((data) => {
-    mutation.mutate(data as Infer<typeof signupSchemas.requirements>, {
-      onError: (error) => {
-        if (axios.isAxiosError(error)) {
-          form.setError('root', {
-            type: 'manual',
-            message: error.response?.data.message,
-          });
-        }
-      },
-    });
-  });
+  const onSubmit = defaultHandleSubmit(form, mutation);
 
   return (
     <Form

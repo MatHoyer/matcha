@@ -90,12 +90,12 @@ const App = () => {
                     {
                       icon: Heart,
                       title: 'For you',
-                      url: getUrl('client-research', { type: 'forYou' }),
+                      url: getUrl('client-search', { type: 'forYou' }),
                     },
                     {
                       icon: Crosshair,
                       title: 'Advanced search',
-                      url: getUrl('client-research', {
+                      url: getUrl('client-search', {
                         type: 'advancedSearch',
                       }),
                     },

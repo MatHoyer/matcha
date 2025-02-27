@@ -1,9 +1,9 @@
 import { closeGlobalDialog } from '@/hooks/use-dialog';
 import { useZodForm } from '@/hooks/useZodForm';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
+import { defaultHandleSubmit } from '@/lib/fetch-utils/defaultHandleSubmit';
 import { createTagSchemas, getUrl } from '@matcha/common';
 import { useMutation } from '@tanstack/react-query';
-import axios from 'axios';
 import {
   Form,
   FormControl,
@@ -51,18 +51,7 @@ export const CreateTagForm: React.FC<TFormProps<TForm>> = ({
     },
   });
 
-  const onSubmit = form.handleSubmit(async (data) => {
-    mutation.mutate(data, {
-      onError: (error) => {
-        if (axios.isAxiosError(error)) {
-          form.setError('root', {
-            type: 'manual',
-            message: error.response?.data.message,
-          });
-        }
-      },
-    });
-  });
+  const onSubmit = defaultHandleSubmit(form, mutation);
 
   return (
     <Form

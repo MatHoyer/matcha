@@ -7,7 +7,7 @@ export const targetedSearchSchema = {
       min: z.number(),
       max: z.number(),
     }),
-    fame: z.number(),
+    fame: z.number().min(1).max(5),
     location: z.string(),
     tags: z.array(z.string()),
   }),

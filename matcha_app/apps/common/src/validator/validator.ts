@@ -87,27 +87,30 @@ export class ZodString extends ZodType<string> {
     return this.refine(
       (data) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data),
       'Invalid email'
-    );
+    ) as ZodString;
   }
   min(minLength: number) {
     return this.refine(
       (data) => data.length >= minLength,
       `Must be at least ${minLength} characters long`
-    );
+    ) as ZodString;
   }
   max(maxLength: number) {
     return this.refine(
       (data) => data.length <= maxLength,
       `Must be at most ${maxLength} characters long`
-    );
+    ) as ZodString;
   }
   regex(regex: RegExp) {
-    return this.refine((data) => regex.test(data), 'Invalid input');
+    return this.refine(
+      (data) => regex.test(data),
+      'Invalid input'
+    ) as ZodString;
   }
   url() {
     return this.regex(
       /^(http:\/\/localhost:\d+\/|https?:\/\/[a-zA-Z0-9-]+\.[a-zA-Z]{2,})(\/.*)?$/
-    );
+    ) as ZodString;
   }
 }
 
@@ -120,22 +123,22 @@ export class ZodNumber extends ZodType<number> {
     return data;
   }
   positive() {
-    return this.refine((data) => data > 0, 'Must be positive');
+    return this.refine((data) => data > 0, 'Must be positive') as ZodNumber;
   }
   negative() {
-    return this.refine((data) => data < 0, 'Must be negative');
+    return this.refine((data) => data < 0, 'Must be negative') as ZodNumber;
   }
   min(minLength: number) {
     return this.refine(
       (data) => data >= minLength,
       `Must be at least ${minLength}`
-    );
+    ) as ZodNumber;
   }
   max(maxLength: number) {
     return this.refine(
       (data) => data <= maxLength,
       `Must be at most ${maxLength}`
-    );
+    ) as ZodNumber;
   }
 }
 

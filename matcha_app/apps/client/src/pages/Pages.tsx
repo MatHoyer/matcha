@@ -52,7 +52,7 @@ export const Pages = () => {
       <Route element={<PrivateRoute />}>
         <Route path="/" element={<Home />} />
         <Route
-          path={getUrl('client-research', { type: 'advancedSearch' })}
+          path={getUrl('client-search', { type: 'advancedSearch' })}
           element={<AdvancedSearch />}
         />
       </Route>
