@@ -82,12 +82,12 @@ CREATE TABLE "Block" (
   FOREIGN KEY ("blockedId") REFERENCES "User" ("id")  ON DELETE CASCADE
 );
 
-DROP TABLE IF EXISTS "GlobalLocation"
+DROP TABLE IF EXISTS "GlobalLocation";
 CREATE TABLE "GlobalLocation" (
   "id" SERIAL PRIMARY KEY,
   "name" VARCHAR(255) NOT NULL UNIQUE,
   "latitude" FLOAT NOT NULL,
-  "longitude" FLOAT NOT NULL,
+  "longitude" FLOAT NOT NULL
 );
 INSERT INTO "GlobalLocation" ("name", "latitude", "longitude") 
 VALUES ('Paris', 48.8566, 2.3522),
@@ -116,7 +116,6 @@ VALUES ('Paris', 48.8566, 2.3522),
 ('Athens', 37.9838, 23.7275),
 ('Istanbul', 41.0082, 28.9784),
 ('Cairo', 30.0444, 31.2357),
-('Cape Town', -33.9249, 18.4241),
 ('Nairobi', -1.2921, 36.8219),
 ('Mumbai', 19.0760, 72.8777),
 ('Bangkok', 13.7563, 100.5018),
@@ -124,7 +123,6 @@ VALUES ('Paris', 48.8566, 2.3522),
 ('Kuala Lumpur', 3.1390, 101.6869),
 ('Jakarta', -6.2088, 106.8456),
 ('Manila', 14.5995, 120.9842),
-('Sydney', -33.8688, 151.2093),
 ('Auckland', -36.8485, 174.7633),
 ('Vancouver', 49.2827, -123.1207),
 ('San Francisco', 37.7749, -122.4194),
