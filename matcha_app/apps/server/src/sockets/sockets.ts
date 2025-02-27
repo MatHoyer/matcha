@@ -62,23 +62,15 @@ export const socketHandler = (io: Server) => {
       }
     });
 
-    socket.on(
-      SOCKETS_EVENTS.CLIENT.SEND_ROOM_MESSAGE,
-      (room, message: string, userName: string) => {
-        const date = new Date();
-        const roomId = rooms[room.roomId].id;
-        console.log('roomId : ', roomId);
-        console.log('mesage about to be send');
-        console.log('message : ', message);
-        console.log('userName : ', userName);
-        // console.log('date : ', date);
-        socket.to(roomId).emit(SOCKETS_EVENTS.SERVER.ROOM_MESSAGE, {
-          message,
-          userName,
-          time: `${date.getHours()}:${date.getMinutes()}`,
-        });
-      }
-    );
+    socket.on(SOCKETS_EVENTS.CLIENT.SEND_ROOM_MESSAGE, (data) => {
+      const roomId = rooms[data.name].id;
+      const message = data.messageToSend;
+      const userName = data.name;
+      socket.to(roomId).emit(SOCKETS_EVENTS.SERVER.ROOM_MESSAGE, {
+        message,
+        userName,
+      });
+    });
 
     // socket.on(SOCKETS_EVENTS.DISCONNECTION, () => {
     //   for (const roomId of Object.keys(rooms)) {

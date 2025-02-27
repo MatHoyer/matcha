@@ -29,7 +29,6 @@ export const Chat: React.FC<PrivateChatProps> = ({
   >([]);
   const [message, setMessage] = useState<string>('');
   const [feedback, setFeedback] = useState('');
-  const messageContainerRef = useRef<HTMLUListElement>(null);
   const { user } = useSession();
   const name = user?.name || 'anonymous';
   const data = {
@@ -39,30 +38,37 @@ export const Chat: React.FC<PrivateChatProps> = ({
     dateTime: new Date(),
   };
 
+  // Receive message from the server
   useEffect(() => {
-    socket.on(
-      SOCKETS_EVENTS.SERVER.ROOM_MESSAGE,
-      ({ message, userName, time }) => {
-        console.log('message received !');
-        console.log('message :', message);
-        console.log('userName :', userName);
-        console.log('time :', time);
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          {
-            name: userName,
-            message: message,
-            dateTime: new Date(),
-            isOwnMessage: userName === name,
-          },
-        ]);
-      }
-    );
+    const messageHandler = ({
+      message,
+      userName,
+    }: {
+      message: string;
+      userName: string;
+    }) => {
+      console.log('message received !', message);
+      console.log('userName :', userName);
+      // Add the message to the chat of the receiver
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        {
+          name: userName,
+          message: message,
+          dateTime: new Date(),
+          isOwnMessage: userName === name,
+        },
+      ]);
+    };
+
+    socket.on(SOCKETS_EVENTS.SERVER.ROOM_MESSAGE, messageHandler);
+
     return () => {
-      socket.off(SOCKETS_EVENTS.SERVER.ROOM_MESSAGE);
+      socket.off(SOCKETS_EVENTS.SERVER.ROOM_MESSAGE, messageHandler);
     };
   }, [name]);
 
+  // Send message to the server
   const sendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('sendMessage !');
@@ -74,13 +80,15 @@ export const Chat: React.FC<PrivateChatProps> = ({
 
     socket.emit(SOCKETS_EVENTS.CLIENT.SEND_ROOM_MESSAGE, {
       roomId,
-      message: messageToSend,
+      messageToSend,
       name,
     });
+    // Add the message to the chat of the sender
     setMessages((prevMessages) => [
       ...prevMessages,
       { ...data, isOwnMessage: true },
     ]);
+    // Clear the input
     setMessage('');
   };
 
@@ -100,7 +108,6 @@ export const Chat: React.FC<PrivateChatProps> = ({
       {status === 'full' && (
         <>
           <ul
-            ref={messageContainerRef}
             id="message-container"
             className="h-60 overflow-y-auto bg-gray-800 rounded-lg p-3 shadow-inner"
           >
