@@ -13,6 +13,9 @@ import { useZodForm } from '@/hooks/useZodForm';
 import { targetedSearchSchema } from '@matcha/common';
 import { Plus, Search } from 'lucide-react';
 import { Button } from '../ui/button';
+import { FameSlider } from '../ui/FameRating';
+import { Label } from '../ui/label';
+import NumberInput from '../ui/NumberField';
 import { Typography } from '../ui/typography';
 import { SubmitButtonForm } from './components/SubmitButton.form';
 import { TFormProps } from './types.form';
@@ -56,6 +59,63 @@ export const AdvancedSearchForm: React.FC<TFormProps<TForm>> = ({
       onSubmit={() => onSubmit()}
       className="flex flex-col gap-2"
     >
+      <FormField
+        control={form.control}
+        name="ages"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Age</FormLabel>
+            <FormControl>
+              <div className="flex gap-2">
+                <div className="flex flex-col gap-2 w-full">
+                  <Label htmlFor="min-age">
+                    <Typography variant="muted">Minimum</Typography>
+                  </Label>
+                  <NumberInput
+                    id="min-age"
+                    min={18}
+                    scale={0}
+                    step={1}
+                    value={field.value.min}
+                    onChange={(value) =>
+                      field.onChange({ ...field.value, min: value })
+                    }
+                  />
+                </div>
+                <div className="flex flex-col gap-2 w-full">
+                  <Label htmlFor="max-age">
+                    <Typography variant="muted">Maximum</Typography>
+                  </Label>
+                  <NumberInput
+                    id="max-age"
+                    min={18}
+                    scale={0}
+                    step={1}
+                    value={field.value.max}
+                    onChange={(value) =>
+                      field.onChange({ ...field.value, max: value })
+                    }
+                  />
+                </div>
+              </div>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="fame"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Fame</FormLabel>
+            <FormControl>
+              <FameSlider {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
       <FormField
         control={form.control}
         name="tags"

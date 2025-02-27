@@ -2,7 +2,6 @@ import {
   blockSchema,
   imageSchema,
   likeSchema,
-  locationSchema,
   messageSchema,
   notificationSchema,
   reportSchema,
@@ -10,12 +9,13 @@ import {
   TBlock,
   TImage,
   TLike,
-  TLocation,
   TMessage,
   TNotification,
   TReport,
+  TUserLocation,
   TUserTag,
   TView,
+  userLocationSchema,
   userSchema,
   userTagSchema,
   viewSchema,
@@ -29,7 +29,7 @@ export type UserIncludes = {
   like?: TLike;
   notification?: TNotification;
   block?: TBlock;
-  location?: TLocation;
+  location?: TUserLocation;
   view?: TView;
   image?: TImage;
 };
@@ -67,7 +67,7 @@ export const tableKeys: Record<string, Record<string, string>> = {
   like: transformSchema(likeSchema),
   notification: transformSchema(notificationSchema),
   block: transformSchema(blockSchema),
-  location: transformSchema(locationSchema),
+  location: transformSchema(userLocationSchema),
   view: transformSchema(viewSchema),
   image: transformSchema(imageSchema),
 };
