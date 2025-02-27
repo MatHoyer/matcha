@@ -5,7 +5,7 @@ import LoginPage from './auth/Login';
 import SignupPage from './auth/Signup';
 import { Home } from './Home';
 import { NotFound } from './NotFound';
-import { TargetedSearch } from './research/TargetedSearch';
+import { AdvancedSearch } from './research/AdvancedSearch';
 
 const AuthRoute = () => {
   const { user, loading } = useSession();
@@ -53,7 +53,7 @@ export const Pages = () => {
         <Route path="/" element={<Home />} />
         <Route
           path={getUrl('client-research', { type: 'advancedSearch' })}
-          element={<TargetedSearch />}
+          element={<AdvancedSearch />}
         />
       </Route>
     </Routes>

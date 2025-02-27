@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import PasswordInput from '@/components/ui/password-input';
+import { closeGlobalDialog } from '@/hooks/use-dialog';
 import { useZodForm } from '@/hooks/useZodForm';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import { getUrl, loginSchemas } from '@matcha/common';
@@ -49,6 +50,7 @@ const LoginForm: React.FC<TFormProps<TForm>> = ({
           successMessage: 'Login successful',
           errorMessage: 'Login failed',
           cb: () => {
+            if (modal) closeGlobalDialog();
             navigate('/');
           },
         },
@@ -107,11 +109,9 @@ const LoginForm: React.FC<TFormProps<TForm>> = ({
         )}
       />
       <FormMessage>{form.formState.errors.root?.message}</FormMessage>
-      <SubmitButtonForm
-        modal={modal}
-        isLoading={mutation.isPending}
-        message="Login"
-      />
+      <SubmitButtonForm modal={modal} isLoading={mutation.isPending}>
+        Login
+      </SubmitButtonForm>
     </Form>
   );
 };

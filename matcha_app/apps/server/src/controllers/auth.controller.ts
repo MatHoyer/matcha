@@ -48,7 +48,7 @@ export const signup = async (req: Request, res: Response) => {
   if (!user) {
     return defaultResponse({
       res,
-      status: 500,
+      status: 400,
       json: {
         message: 'Error creating user',
       },

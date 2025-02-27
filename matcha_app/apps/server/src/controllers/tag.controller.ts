@@ -10,20 +10,35 @@ export const getTags = async (_req: Request, res: Response) => {
 };
 
 export const createTag = async (req: Request, res: Response) => {
-  const { tag } = req.body as Infer<typeof createTagSchemas.requirements>;
+  const { name } = req.body as Infer<typeof createTagSchemas.requirements>;
 
-  const newTag = await db.tag.create({
-    data: {
-      name: tag,
+  const existingTag = await db.tag.findFirst({
+    where: {
+      name,
     },
   });
-  if (!newTag) {
+  if (existingTag) {
     return defaultResponse({
       res,
       status: 409,
       json: {
         message: 'Existing tag',
         fields: [{ field: 'name', message: 'This tag already exist' }],
+      },
+    });
+  }
+
+  const newTag = await db.tag.create({
+    data: {
+      name,
+    },
+  });
+  if (!newTag) {
+    return defaultResponse({
+      res,
+      status: 400,
+      json: {
+        message: 'Error creating tag',
       },
     });
   }

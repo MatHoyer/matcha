@@ -14,15 +14,7 @@ export {
 } from './validator/validator';
 export type { Infer } from './validator/validator';
 
-//-----------------------Get URL-----------------------
-export { getServerUrl } from './utils/getServer';
-export { getUrl } from './utils/getUrl';
-export type {
-  TApiRouteDataRequirements,
-  TClientRouteDataRequirements,
-} from './utils/getUrl';
-
-//-----------------------Datas-----------------------
+//-----------------------Utils-----------------------
 export {
   AUTH_COOKIE_NAME,
   DECIMAL_SEPARATOR,
@@ -31,8 +23,13 @@ export {
   ORIENTATIONS,
   THOUSAND_SEPARATOR,
 } from './utils/datas';
-
-//-----------------------Utils-----------------------
+export { getDateAsString, getNearDate } from './utils/date';
+export { getServerUrl } from './utils/getServer';
+export { getUrl } from './utils/getUrl';
+export type {
+  TApiRouteDataRequirements,
+  TClientRouteDataRequirements,
+} from './utils/getUrl';
 export {
   capitalize,
   quoteUppercase,

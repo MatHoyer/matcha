@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import NumberInput from '@/components/ui/NumberField';
 import PasswordInput from '@/components/ui/password-input';
 import Selector from '@/components/ui/selector';
+import { closeGlobalDialog } from '@/hooks/use-dialog';
 import { useZodForm } from '@/hooks/useZodForm';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import {
@@ -20,6 +21,7 @@ import {
   signupSchemas,
 } from '@matcha/common';
 import { useMutation } from '@tanstack/react-query';
+import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { SubmitButtonForm } from './components/SubmitButton.form';
 import { TFormProps } from './types.form';
@@ -66,6 +68,7 @@ const SignupForm: React.FC<TFormProps<TForm>> = ({
           successMessage: 'Signup successful',
           errorMessage: 'Signup failed',
           cb: () => {
+            if (modal) closeGlobalDialog();
             navigate('/');
           },
         },
@@ -74,7 +77,16 @@ const SignupForm: React.FC<TFormProps<TForm>> = ({
   });
 
   const onSubmit = form.handleSubmit((data) => {
-    mutation.mutate(data as Infer<typeof signupSchemas.requirements>);
+    mutation.mutate(data as Infer<typeof signupSchemas.requirements>, {
+      onError: (error) => {
+        if (axios.isAxiosError(error)) {
+          form.setError('root', {
+            type: 'manual',
+            message: error.response?.data.message,
+          });
+        }
+      },
+    });
   });
 
   return (
@@ -193,11 +205,10 @@ const SignupForm: React.FC<TFormProps<TForm>> = ({
           </FormItem>
         )}
       />
-      <SubmitButtonForm
-        modal={modal}
-        isLoading={mutation.isPending}
-        message="Signup"
-      />
+      <FormMessage>{form.formState.errors.root?.message}</FormMessage>
+      <SubmitButtonForm modal={modal} isLoading={mutation.isPending}>
+        Signup
+      </SubmitButtonForm>
     </Form>
   );
 };

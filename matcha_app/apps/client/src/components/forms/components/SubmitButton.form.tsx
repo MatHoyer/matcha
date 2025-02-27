@@ -1,16 +1,18 @@
 import { SubmitButtonDialog } from '@/components/dialogs/components/SubmitButton.dialog';
 import { LoadingButton } from '@/components/ui/loaders';
+import { PropsWithChildren } from 'react';
 
-export const SubmitButtonForm: React.FC<{
-  modal?: boolean;
-  isLoading?: boolean;
-  message?: string;
-}> = ({ modal = false, isLoading = false, message = 'Submit' }) => {
+export const SubmitButtonForm: React.FC<
+  {
+    modal?: boolean;
+    isLoading?: boolean;
+  } & PropsWithChildren
+> = ({ modal = false, isLoading = false, children = 'Submit' }) => {
   return modal ? (
-    <SubmitButtonDialog isLoading={isLoading}>{message}</SubmitButtonDialog>
+    <SubmitButtonDialog isLoading={isLoading}>{children}</SubmitButtonDialog>
   ) : (
     <LoadingButton type="submit" loading={isLoading}>
-      {message}
+      {children}
     </LoadingButton>
   );
 };
