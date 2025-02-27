@@ -20,7 +20,7 @@ export const socketHandler = (io: Server) => {
       socket.disconnect();
       return;
     }
-    console.log(connectedUsers);
+    // console.log(connectedUsers);
 
     try {
       const userPayload = jwt.verify(token, env.JWT_SECRET) as TUser;
