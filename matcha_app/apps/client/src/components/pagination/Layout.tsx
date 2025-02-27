@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 import { ComponentPropsWithoutRef } from 'react';
-import { Typography } from './ui/typography';
+import { Typography } from '../ui/typography';
 
 export const Layout: React.FC<
   ComponentPropsWithoutRef<'div'> & { size?: 'sm' | 'default' | 'lg' }

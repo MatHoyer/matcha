@@ -11,7 +11,7 @@ import { getUrl } from '@matcha/common';
 import { Bell, FileUser } from 'lucide-react';
 import { PropsWithChildren } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogoutButton } from '../LogoutButton';
+import { LogoutButton } from '../ui/LogoutButton';
 
 const UserDropdown: React.FC<PropsWithChildren> = ({ children }) => {
   const navigate = useNavigate();

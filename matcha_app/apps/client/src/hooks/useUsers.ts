@@ -3,7 +3,9 @@ import { getUrl, getUserSchema, TUser } from '@matcha/common';
 import { useEffect, useState } from 'react';
 
 export const useUsers = () => {
-  const [users, setUsers] = useState<Pick<TUser, 'id' | 'name' | 'lastName'>[]>([]);
+  const [users, setUsers] = useState<Pick<TUser, 'id' | 'name' | 'lastName'>[]>(
+    []
+  );
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -31,8 +33,8 @@ export const useUsers = () => {
 
     fetchUsers();
   }, []);
-  useEffect(() => {
-    console.log('users : ', users);
-  }, [users]);
+  // useEffect(() => {
+  //   console.log('users : ', users);
+  // }, [users]);
   return { users, loading };
 };

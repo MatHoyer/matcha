@@ -1,16 +1,20 @@
 // -----------------------Validator-----------------------
-export { z, ZodType } from './validator/validator';
+export {
+  z,
+  ZodArray,
+  ZodBoolean,
+  ZodDate,
+  ZodEnum,
+  ZodNull,
+  ZodNumber,
+  ZodObject,
+  ZodString,
+  ZodType,
+  ZodUnion,
+} from './validator/validator';
 export type { Infer } from './validator/validator';
 
-//-----------------------Get URL-----------------------
-export { getServerUrl } from './utils/getServer';
-export { getUrl } from './utils/getUrl';
-export type {
-  TApiRouteDataRequirements,
-  TClientRouteDataRequirements,
-} from './utils/getUrl';
-
-//-----------------------Datas-----------------------
+//-----------------------Utils-----------------------
 export {
   AUTH_COOKIE_NAME,
   DECIMAL_SEPARATOR,
@@ -19,8 +23,13 @@ export {
   ORIENTATIONS,
   THOUSAND_SEPARATOR,
 } from './utils/datas';
-
-//-----------------------Utils-----------------------
+export { getDateAsString, getNearDate } from './utils/date';
+export { getServerUrl } from './utils/getServer';
+export { getUrl } from './utils/getUrl';
+export type {
+  TApiRouteDataRequirements,
+  TClientRouteDataRequirements,
+} from './utils/getUrl';
 export {
   capitalize,
   quoteUppercase,
@@ -38,24 +47,33 @@ export {
   logoutSchemas,
   sessionSchemas,
   signupSchemas,
-} from './schemas/auth.schema';
+} from './schemas/api/auth.schema';
 export type {
   TLoginSchemas,
   TLogoutSchemas,
   TSessionSchemas,
   TSignupSchemas,
-} from './schemas/auth.schema';
+} from './schemas/api/auth.schema';
+export { errorSchema } from './schemas/api/error.schema';
+export type { TErrorSchema } from './schemas/api/error.schema';
+export { getGlobalLocationsSchemas } from './schemas/api/globalLocations.schema';
+export type { TGlobalLocationsSchemas } from './schemas/api/globalLocations.schema';
+export { targetedSearchSchema } from './schemas/api/search.schema';
+export type { TTargetedSearchSchema } from './schemas/api/search.schema';
+export { createTagSchemas, getTagsSchemas } from './schemas/api/tags.schema';
+export type { TCreateTagSchemas, TTagSchemas } from './schemas/api/tags.schema';
 export {
   blockSchema,
   genderSchema,
+  globalLocationSchema,
   imageSchema,
   likeSchema,
-  locationSchema,
   messageSchema,
   notificationSchema,
   orientationSchema,
   reportSchema,
   tagSchema,
+  userLocationSchema,
   userSchema,
   userTagSchema,
   viewSchema,
@@ -63,21 +81,20 @@ export {
 export type {
   TBlock,
   TGender,
+  TGlobalLocation,
   TImage,
   TLike,
-  TLocation,
   TMessage,
   TNotification,
   TOrientation,
   TReport,
   TTag,
   TUser,
-  TUserWithNames,
+  TUserLocation,
   TUserTag,
+  TUserWithNames,
   TView,
 } from './schemas/database.schema';
-export { errorSchema } from './schemas/error.schema';
-export type { TErrorSchema } from './schemas/error.schema';
 export { getUserSchema } from './schemas/users.schema';
 
 //-----------------------Errors-----------------------

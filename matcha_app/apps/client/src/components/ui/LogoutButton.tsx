@@ -1,7 +1,7 @@
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import { getUrl, logoutSchemas } from '@matcha/common';
 import { useMutation } from '@tanstack/react-query';
-import { LoadingButton } from './ui/loaders';
+import { LoadingButton } from './loaders';
 
 export const LogoutButton = () => {
   const removeCookieMutation = useMutation({

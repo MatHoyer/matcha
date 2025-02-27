@@ -12,8 +12,8 @@ import type { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import db from '../database/Database.js';
 import { env } from '../env.js';
-import { defaultResponse } from '../routes/defaultResponse.js';
 import { hashPassword } from '../services/auth.service.js';
+import { defaultResponse } from '../utils/defaultResponse.js';
 
 export const signup = async (req: Request, res: Response) => {
   const { password, gender, preference, ...userData } = req.body as Infer<
@@ -48,7 +48,7 @@ export const signup = async (req: Request, res: Response) => {
   if (!user) {
     return defaultResponse({
       res,
-      status: 500,
+      status: 400,
       json: {
         message: 'Error creating user',
       },
@@ -63,7 +63,7 @@ export const signup = async (req: Request, res: Response) => {
 
   return defaultResponse({
     res,
-    status: 200,
+    status: 201,
     cookie: {
       name: AUTH_COOKIE_NAME,
       val: token,

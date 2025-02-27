@@ -28,7 +28,6 @@ export const tagSchema = z.object({
 export type TTag = Infer<typeof tagSchema>;
 
 export const userTagSchema = z.object({
-  id: z.number(),
   userId: userSchema.pick(['id']).shape.id,
   tagId: tagSchema.pick(['id']).shape.id,
 });
@@ -52,7 +51,6 @@ export const reportSchema = z.object({
 export type TReport = Infer<typeof reportSchema>;
 
 export const likeSchema = z.object({
-  id: z.number(),
   userId: userSchema.pick(['id']).shape.id,
   likedId: userSchema.pick(['id']).shape.id,
 });
@@ -68,20 +66,27 @@ export const notificationSchema = z.object({
 export type TNotification = Infer<typeof notificationSchema>;
 
 export const blockSchema = z.object({
-  id: z.number(),
   userId: userSchema.pick(['id']).shape.id,
   blockedId: userSchema.pick(['id']).shape.id,
 });
 export type TBlock = Infer<typeof blockSchema>;
 
-export const locationSchema = z.object({
+export const globalLocationSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  latitude: z.number(),
+  longitude: z.number(),
+});
+export type TGlobalLocation = Infer<typeof globalLocationSchema>;
+
+export const userLocationSchema = z.object({
   id: z.number(),
   userId: userSchema.pick(['id']).shape.id,
   latitude: z.number(),
   longitude: z.number(),
   date: z.date(),
 });
-export type TLocation = Infer<typeof locationSchema>;
+export type TUserLocation = Infer<typeof userLocationSchema>;
 
 export const viewSchema = z.object({
   id: z.number(),

@@ -1,9 +1,13 @@
 import pg from 'pg';
+import GlobalLocationRepository from './repositories/GlobalLocationRepository.js';
+import TagRepository from './repositories/TagRepository.js';
 import UserRepository from './repositories/UserRepository.js';
 
 class Database {
   pool: pg.Pool;
   user: UserRepository;
+  tag: TagRepository;
+  globalLocation: GlobalLocationRepository;
 
   constructor() {
     this.pool = new pg.Pool({
@@ -16,6 +20,8 @@ class Database {
 
     this.pool.connect();
     this.user = new UserRepository(this.pool);
+    this.tag = new TagRepository(this.pool);
+    this.globalLocation = new GlobalLocationRepository(this.pool);
   }
 }
 

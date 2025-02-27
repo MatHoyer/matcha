@@ -5,7 +5,7 @@ export type TClientRouteDataRequirements = {
     type: 'signup' | 'login';
   };
   'client-home': undefined;
-  'client-research': {
+  'client-search': {
     type: 'forYou' | 'advancedSearch';
   };
   'client-notifications': undefined;
@@ -14,6 +14,13 @@ export type TClientRouteDataRequirements = {
 export type TApiRouteDataRequirements = {
   'api-auth': {
     type: 'signup' | 'login' | 'logout' | 'session' | undefined;
+  };
+  'api-tags': {
+    id?: number;
+  };
+  'api-globalLocations': undefined;
+  'api-search': {
+    type: 'advancedSearch' | 'forYou';
   };
   'api-users': {
     type: 'getUsers' | undefined;
@@ -34,11 +41,14 @@ const routes: {
 } = {
   'client-auth': ({ type }) => `/auth/${type}`,
   'client-home': () => '/',
-  'client-research': ({ type }) => `/research/${type}`,
+  'client-search': ({ type }) => `/research/${type}`,
   'client-notifications': () => '/notifications',
   'client-account': () => '/account',
 
   'api-auth': ({ type }) => (type ? `/api/auth/${type}` : '/api/auth'),
+  'api-tags': ({ id }) => (id ? `/api/tags/${id}` : '/api/tags'),
+  'api-globalLocations': () => '/api/globalLocations',
+  'api-search': ({ type }) => (type ? `/api/search/${type}` : '/api/search'),
   'api-users': ({ type }) => (type ? `/api/users/${type}` : '/api/users'),
 };
 
