@@ -37,30 +37,19 @@ const App = () => {
   >([]);
 
   const handleChatClick = (otherUser: TUser) => {
-    // const createOrGetRoom = (
-    //   otherUserId: number
-    // ): Promise<{ id: string }> => {
-    //   return new Promise((resolve) => {
-    //     const user = session.user;
-    //     const userId = user?.id as number;
-    //     socket.emit(
-    //       SOCKETS_EVENTS.CLIENT.CREATE_ROOM,
-    //       userId,
-    //       otherUserId,
-    //       (room: { id: string }) => {
-    //         resolve(room);
-    //       }
-    //     );
-    //   });
+    // const createOrJoinRoom = (roomName: string) => {
+    //   socket.emit(SOCKETS_EVENTS.CLIENT.CREATE_ROOM, { roomName });
     // };
 
     // const chatRoom = await createOrGetRoom(otherUser.id);
-    const chatRoomId = `chat-${session.user!.id}-${otherUser.id}`;
-    const chatRoom = { id: chatRoomId };
+    const sortedUserIds = [session.user!.id, otherUser.id].sort();
+    const chatRoomName = `chat-${sortedUserIds[0]}-${sortedUserIds[1]}`;
+    // createOrJoinRoom(chatRoomName);
+    const windowRoom = { id: chatRoomName };
 
     setOpenChats((prev) => {
-      if (!prev.some((chat) => chat.id === chatRoom.id)) {
-        return [...prev, { otherUser, id: chatRoom.id, status: 'full' }];
+      if (!prev.some((chatWindow) => chatWindow.id === windowRoom.id)) {
+        return [...prev, { otherUser, id: windowRoom.id, status: 'full' }];
       }
       return prev;
     });

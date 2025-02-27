@@ -16,16 +16,16 @@ export const ChatContainer: React.FC<{
 }> = ({ openedChats, setOpenChats }) => {
   return (
     <div className="flex flex-row-reverse gap-2 absolute right-2 bottom-2 items-end">
-      {openedChats.map((chat) => (
+      {openedChats.map((chatWindow) => (
         <Chat
-          key={chat.id}
-          status={chat.status}
-          roomId={chat.id}
-          otherUserName={chat.otherUser.name}
+          key={chatWindow.id}
+          status={chatWindow.status}
+          otherUserId={chatWindow.otherUser.id}
+          otherUserName={chatWindow.otherUser.name}
           toggleChat={() => {
             setOpenChats((prevChats) =>
               prevChats.map((prevChat) => {
-                if (prevChat.id === chat.id) {
+                if (prevChat.id === chatWindow.id) {
                   return {
                     ...prevChat,
                     status: prevChat.status === 'full' ? 'collapse' : 'full',
@@ -37,7 +37,7 @@ export const ChatContainer: React.FC<{
           }}
           closeChat={() =>
             setOpenChats((prevChats) =>
-              prevChats.filter((prevChat) => prevChat.id !== chat.id)
+              prevChats.filter((prevChat) => prevChat.id !== chatWindow.id)
             )
           }
         />

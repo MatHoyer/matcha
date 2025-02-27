@@ -4,13 +4,12 @@ import { Input } from '@/components/ui/input';
 import { Typography } from '@/components/ui/typography';
 import { useSession } from '@/hooks/useSession';
 import { socket } from '@/lib/socket';
-import { SOCKETS_EVENTS } from '@matcha/common';
 import { Minus, X } from 'lucide-react';
 import moment from 'moment';
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface PrivateChatProps {
-  roomId: string;
+  otherUserId: number;
   status: 'full' | 'collapse';
   otherUserName: string;
   toggleChat: () => void;
@@ -18,7 +17,7 @@ interface PrivateChatProps {
 }
 
 export const Chat: React.FC<PrivateChatProps> = ({
-  roomId,
+  otherUserId,
   status,
   otherUserName,
   toggleChat,
@@ -29,59 +28,56 @@ export const Chat: React.FC<PrivateChatProps> = ({
   >([]);
   const [message, setMessage] = useState<string>('');
   const [feedback, setFeedback] = useState('');
-  const messageContainerRef = useRef<HTMLUListElement>(null);
   const { user } = useSession();
   const name = user?.name || 'anonymous';
   const data = {
-    roomId,
+    otherUserId,
     name,
     message,
     dateTime: new Date(),
   };
-  // useEffect(() => {
-  //   socket.on(
-  //     SOCKETS_EVENTS.SERVER.ROOM_MESSAGE,
-  //     (data: {
-  //       roomId: string;
-  //       name: string;
-  //       message: string;
-  //       dateTime: Date;
-  //     }) => {
-  //       if (data.roomId === roomId) {
-  //         // Listen for messages only from this room
-  //         setMessages((prevMessages) => [
-  //           ...prevMessages,
-  //           { ...data, isOwnMessage: false },
-  //         ]);
-  //       }
-  //     }
-  //   );
 
-  //   socket.on('feedback', (data: { feedback: string }) => {
-  //     setFeedback(data.feedback);
-  //   });
+  // Receive message from the server
+  useEffect(() => {
+    const messageHandler = ({ message }: { message: string }) => {
+      console.log('message received !', message);
+      // Add the message to the chat of the receiver
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        {
+          name: otherUserName,
+          message: message,
+          dateTime: new Date(),
+          isOwnMessage: false,
+        },
+      ]);
+    };
 
-  //   return () => {
-  //     socket.off('clients-total');
-  //     socket.off('room-message');
-  //     socket.off('feedback');
-  //   };
-  // }, [roomId]);
+    // socket.on(SOCKETS_EVENTS.SERVER.ROOM_MESSAGE, messageHandler);
+    socket.on(`pv-${user!.id}-${otherUserId}`, messageHandler);
 
+    return () => {
+      socket.off(`pv-${user!.id}-${otherUserId}`, messageHandler);
+    };
+  }, []);
+
+  // Send message to the server
   const sendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    if (message.trim() === '') return;
+    const messageToSend = message;
+    if (messageToSend.trim() === '') return;
 
-    // socket.emit('send-message', data);
-    socket.emit(SOCKETS_EVENTS.CLIENT.SEND_ROOM_MESSAGE, {
-      roomId,
-      message,
-      name,
+    socket.emit('send-message', {
+      userId: user!.id,
+      otherUserId,
+      messageToSend,
     });
+    // Add the message to the chat of the sender
     setMessages((prevMessages) => [
       ...prevMessages,
       { ...data, isOwnMessage: true },
     ]);
+    // Clear the input
     setMessage('');
   };
 
@@ -101,7 +97,6 @@ export const Chat: React.FC<PrivateChatProps> = ({
       {status === 'full' && (
         <>
           <ul
-            ref={messageContainerRef}
             id="message-container"
             className="h-60 overflow-y-auto bg-gray-800 rounded-lg p-3 shadow-inner"
           >
