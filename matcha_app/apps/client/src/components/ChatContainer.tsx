@@ -20,7 +20,7 @@ export const ChatContainer: React.FC<{
         <Chat
           key={chatWindow.id}
           status={chatWindow.status}
-          roomId={chatWindow.id}
+          otherUserId={chatWindow.otherUser.id}
           otherUserName={chatWindow.otherUser.name}
           toggleChat={() => {
             setOpenChats((prevChats) =>

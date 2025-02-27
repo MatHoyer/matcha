@@ -4,13 +4,12 @@ import { Input } from '@/components/ui/input';
 import { Typography } from '@/components/ui/typography';
 import { useSession } from '@/hooks/useSession';
 import { socket } from '@/lib/socket';
-import { SOCKETS_EVENTS } from '@matcha/common';
 import { Minus, X } from 'lucide-react';
 import moment from 'moment';
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface PrivateChatProps {
-  roomId: string;
+  otherUserId: number;
   status: 'full' | 'collapse';
   otherUserName: string;
   toggleChat: () => void;
@@ -18,7 +17,7 @@ interface PrivateChatProps {
 }
 
 export const Chat: React.FC<PrivateChatProps> = ({
-  roomId,
+  otherUserId,
   status,
   otherUserName,
   toggleChat,
@@ -32,7 +31,7 @@ export const Chat: React.FC<PrivateChatProps> = ({
   const { user } = useSession();
   const name = user?.name || 'anonymous';
   const data = {
-    roomId,
+    otherUserId,
     name,
     message,
     dateTime: new Date(),
@@ -40,50 +39,38 @@ export const Chat: React.FC<PrivateChatProps> = ({
 
   // Receive message from the server
   useEffect(() => {
-    const messageHandler = ({
-      message,
-      userName,
-    }: {
-      message: string;
-      userName: string;
-    }) => {
+    const messageHandler = ({ message }: { message: string }) => {
       console.log('message received !', message);
-      console.log('userName :', userName);
-      console.log('data.roomId : ', data.roomId);
-      console.log('roomId :', roomId);
       // Add the message to the chat of the receiver
       setMessages((prevMessages) => [
         ...prevMessages,
         {
-          name: userName,
+          name: otherUserName,
           message: message,
           dateTime: new Date(),
-          isOwnMessage: userName === name,
+          isOwnMessage: false,
         },
       ]);
     };
 
-    socket.on(SOCKETS_EVENTS.SERVER.ROOM_MESSAGE, messageHandler);
+    // socket.on(SOCKETS_EVENTS.SERVER.ROOM_MESSAGE, messageHandler);
+    socket.on(`pv-${user!.id}-${otherUserId}`, messageHandler);
 
     return () => {
-      socket.off(SOCKETS_EVENTS.SERVER.ROOM_MESSAGE, messageHandler);
+      socket.off(`pv-${user!.id}-${otherUserId}`, messageHandler);
     };
-  }, [name]);
+  }, []);
 
   // Send message to the server
   const sendMessage = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('sendMessage !');
-    console.log('roomId :', roomId);
-    console.log('message :', message);
-    console.log('name :', name);
     const messageToSend = message;
     if (messageToSend.trim() === '') return;
 
-    socket.emit(SOCKETS_EVENTS.CLIENT.SEND_ROOM_MESSAGE, {
-      roomId,
+    socket.emit('send-message', {
+      userId: user!.id,
+      otherUserId,
       messageToSend,
-      name,
     });
     // Add the message to the chat of the sender
     setMessages((prevMessages) => [
@@ -152,7 +139,7 @@ export const Chat: React.FC<PrivateChatProps> = ({
                 // className="flex-1 p-2 bg-gray-700 text-white border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
               <Button
-                onClick={sendMessage}
+                type="submit"
                 // className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
               >
                 Send

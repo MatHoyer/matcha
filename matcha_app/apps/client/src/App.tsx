@@ -24,8 +24,6 @@ import { Typography } from './components/ui/typography';
 import { useSession } from './hooks/useSession';
 import { useUsers } from './hooks/useUsers';
 import { Pages } from './pages/Pages';
-import { SOCKETS_EVENTS } from '@matcha/common';
-import { socket } from '@/lib/socket';
 
 const App = () => {
   const session = useSession();
@@ -39,14 +37,14 @@ const App = () => {
   >([]);
 
   const handleChatClick = (otherUser: TUser) => {
-    const createOrJoinRoom = (roomName: string) => {
-      socket.emit(SOCKETS_EVENTS.CLIENT.CREATE_ROOM, { roomName });
-    };
+    // const createOrJoinRoom = (roomName: string) => {
+    //   socket.emit(SOCKETS_EVENTS.CLIENT.CREATE_ROOM, { roomName });
+    // };
 
     // const chatRoom = await createOrGetRoom(otherUser.id);
     const sortedUserIds = [session.user!.id, otherUser.id].sort();
     const chatRoomName = `chat-${sortedUserIds[0]}-${sortedUserIds[1]}`;
-    createOrJoinRoom(chatRoomName);
+    // createOrJoinRoom(chatRoomName);
     const windowRoom = { id: chatRoomName };
 
     setOpenChats((prev) => {
