@@ -16,7 +16,7 @@ export const userSchema = z.object({
   age: z.number().min(18),
   gender: genderSchema,
   preference: orientationSchema,
-  biography: z.string().optional(),
+  biography: z.string().optional().nullable(),
 });
 export type TUser = Infer<typeof userSchema>;
 export type TUserWithNames = Pick<TUser, 'id' | 'name' | 'lastName'>;
@@ -79,12 +79,17 @@ export const globalLocationSchema = z.object({
 });
 export type TGlobalLocation = Infer<typeof globalLocationSchema>;
 
-export const userLocationSchema = z.object({
+export const locationSchema = z.object({
   id: z.number(),
-  userId: userSchema.pick(['id']).shape.id,
   latitude: z.number(),
   longitude: z.number(),
   date: z.date(),
+});
+export type TLocation = Infer<typeof locationSchema>;
+
+export const userLocationSchema = z.object({
+  userId: userSchema.pick(['id']).shape.id,
+  locationId: locationSchema.pick(['id']).shape.id,
 });
 export type TUserLocation = Infer<typeof userLocationSchema>;
 

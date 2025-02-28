@@ -21,3 +21,7 @@ export const typedEntries = <T extends object>(
 export const wait = (ms: number): Promise<void> => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
+
+export const containsUpperCase = (str: string): boolean => {
+  return /[A-Z]/.test(str);
+};

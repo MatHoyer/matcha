@@ -11,7 +11,7 @@ import { useSession } from '@/hooks/useSession';
 import { useZodForm } from '@/hooks/useZodForm';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import { defaultHandleSubmit } from '@/lib/fetch-utils/defaultHandleSubmit';
-import { getUrl, targetedSearchSchema } from '@matcha/common';
+import { advancedSearchSchema, getUrl } from '@matcha/common';
 import { useMutation } from '@tanstack/react-query';
 import { Plus, Search } from 'lucide-react';
 import { default as GlobalLocationCombobox } from '../comboxes/GlobalLocation.combobox';
@@ -40,13 +40,13 @@ export const AdvancedSearchForm: React.FC<TFormProps<TForm>> = ({
 }) => {
   const session = useSession();
   const form = useZodForm<TForm>({
-    schema: targetedSearchSchema.requirements,
+    schema: advancedSearchSchema.requirements,
     defaultValues: {
       ages: {
         min: session.user!.age,
         max: session.user!.age,
       },
-      fame: 0,
+      fame: 1,
       location: '',
       tags: [],
       ...defaultValues,
@@ -59,7 +59,7 @@ export const AdvancedSearchForm: React.FC<TFormProps<TForm>> = ({
         method: 'POST',
         url: getUrl('api-search', { type: 'advancedSearch' }),
         data,
-        schemas: targetedSearchSchema,
+        schemas: advancedSearchSchema,
         form,
         handleEnding: {
           errorMessage: 'Error searching',

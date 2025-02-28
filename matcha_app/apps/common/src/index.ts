@@ -32,6 +32,7 @@ export type {
 } from './utils/getUrl';
 export {
   capitalize,
+  containsUpperCase,
   quoteUppercase,
   removeDuplicate,
   typedEntries,
@@ -58,8 +59,8 @@ export { errorSchema } from './schemas/api/error.schema';
 export type { TErrorSchema } from './schemas/api/error.schema';
 export { getGlobalLocationsSchemas } from './schemas/api/globalLocations.schema';
 export type { TGlobalLocationsSchemas } from './schemas/api/globalLocations.schema';
-export { targetedSearchSchema } from './schemas/api/search.schema';
-export type { TTargetedSearchSchema } from './schemas/api/search.schema';
+export { advancedSearchSchema } from './schemas/api/search.schema';
+export type { TAdvancedSearchSchema } from './schemas/api/search.schema';
 export { createTagSchemas, getTagsSchemas } from './schemas/api/tags.schema';
 export type { TCreateTagSchemas, TTagSchemas } from './schemas/api/tags.schema';
 export {
@@ -68,6 +69,7 @@ export {
   globalLocationSchema,
   imageSchema,
   likeSchema,
+  locationSchema,
   messageSchema,
   notificationSchema,
   orientationSchema,
@@ -84,6 +86,7 @@ export type {
   TGlobalLocation,
   TImage,
   TLike,
+  TLocation,
   TMessage,
   TNotification,
   TOrientation,

@@ -3,6 +3,7 @@ import {
   globalLocationSchema,
   imageSchema,
   likeSchema,
+  locationSchema,
   messageSchema,
   notificationSchema,
   reportSchema,
@@ -30,7 +31,7 @@ export type UserIncludes = {
   like?: TLike;
   notification?: TNotification;
   block?: TBlock;
-  location?: TUserLocation;
+  userLocation?: TUserLocation;
   view?: TView;
   image?: TImage;
 };
@@ -69,6 +70,7 @@ export const tableKeys: Record<string, Record<string, string>> = {
   notification: transformSchema(notificationSchema),
   block: transformSchema(blockSchema),
   globalLocation: transformSchema(globalLocationSchema),
+  location: transformSchema(locationSchema),
   userLocation: transformSchema(userLocationSchema),
   view: transformSchema(viewSchema),
   image: transformSchema(imageSchema),
@@ -89,7 +91,14 @@ export type OrderBy<T> = {
 export type WhereClause<T> = {
   [P in keyof T]?:
     | T[P]
-    | { $gt?: T[P]; $lt?: T[P]; $gte?: T[P]; $lte?: T[P]; $not?: T[P] };
+    | {
+        $gt?: T[P];
+        $lt?: T[P];
+        $gte?: T[P];
+        $lte?: T[P];
+        $not?: T[P];
+        $in?: T[P][];
+      };
 };
 
 export type CommonOptions<T, I> = {

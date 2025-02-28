@@ -1,3 +1,4 @@
+import { containsUpperCase } from '@matcha/common';
 import type { WhereClause } from '../type.js';
 
 type TReturnType = {
@@ -17,7 +18,8 @@ export const generateWhereClauseSql = <T>(
   const values: any[] = [];
   let indexCounter = index || 1;
   for (const [key, value] of Object.entries(where)) {
-    if (typeof value !== 'object') {
+    if (typeof value !== 'object' || (Array.isArray(value) && key === '$in')) {
+      parentKey = containsUpperCase(parentKey!) ? `"${parentKey}"` : parentKey;
       switch (key) {
         case '$gt':
           sql.push(`${parentKey} > $${indexCounter}`);
@@ -34,11 +36,23 @@ export const generateWhereClauseSql = <T>(
         case '$not':
           sql.push(`${parentKey} <> $${indexCounter}`);
           break;
+        case '$in':
+          sql.push(
+            `${parentKey} IN (${(value as unknown[])
+              .map((_, i) => `$${indexCounter + i}`)
+              .join(', ')})`
+          );
+          indexCounter += (value as unknown[]).length - 1;
+          break;
         default:
           sql.push(`${key} = $${indexCounter}`);
           break;
       }
-      values.push(value);
+      if (Array.isArray(value)) {
+        values.push(...value);
+      } else {
+        values.push(value);
+      }
       indexCounter++;
     } else {
       if (value !== null) {
@@ -51,5 +65,6 @@ export const generateWhereClauseSql = <T>(
     }
   }
   if (parentKey) return { whereClause: `(${sql.join(' AND ')})`, values };
+  console.log(`WHERE ${sql.join(' AND ')}`, values);
   return { whereClause: `WHERE ${sql.join(' AND ')}`, values };
 };
