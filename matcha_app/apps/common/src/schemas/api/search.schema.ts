@@ -1,13 +1,13 @@
 import { Infer, z } from '../../validator/validator';
 import { userSchema } from '../database.schema';
 
-export const targetedSearchSchema = {
+export const advancedSearchSchema = {
   requirements: z.object({
     ages: z.object({
       min: z.number(),
       max: z.number(),
     }),
-    fame: z.number(),
+    fame: z.number().min(1),
     location: z.string(),
     tags: z.array(z.string()),
   }),
@@ -15,7 +15,7 @@ export const targetedSearchSchema = {
     users: z.array(userSchema),
   }),
 };
-export type TTargetedSearchSchema = {
-  requirements: Infer<typeof targetedSearchSchema.requirements>;
-  response: Infer<typeof targetedSearchSchema.response>;
+export type TAdvancedSearchSchema = {
+  requirements: Infer<typeof advancedSearchSchema.requirements>;
+  response: Infer<typeof advancedSearchSchema.response>;
 };

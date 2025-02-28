@@ -7,6 +7,7 @@ import { Server } from 'socket.io';
 import { env, envSchema } from './env.js';
 import { default as authRouter } from './routes/auth.route.js';
 import globalLocationRouter from './routes/globalLocation.route.js';
+import searchRouter from './routes/search.route.js';
 import tagRouter from './routes/tag.route.js';
 import usersRouter from './routes/users.route.js';
 import { socketHandler } from './sockets/sockets.js';
@@ -37,6 +38,7 @@ app.use(getUrl('api-auth'), authRouter);
 app.use(getUrl('api-tags'), tagRouter);
 app.use(getUrl('api-globalLocations'), globalLocationRouter);
 app.use(getUrl('api-users'), usersRouter);
+app.use(getUrl('api-search'), searchRouter);
 
 if (env.NODE_ENV === 'PROD') {
   app.use(express.static(path.join(__dirname, '../../../public/dist')));

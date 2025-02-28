@@ -1,11 +1,11 @@
 import {
   AUTH_COOKIE_NAME,
   Infer,
-  loginSchemas,
   sessionSchemas,
-  signupSchemas,
   TGender,
+  TLoginSchemas,
   TOrientation,
+  TSignupSchemas,
   wait,
 } from '@matcha/common';
 import type { Request, Response } from 'express';
@@ -16,9 +16,8 @@ import { hashPassword } from '../services/auth.service.js';
 import { defaultResponse } from '../utils/defaultResponse.js';
 
 export const signup = async (req: Request, res: Response) => {
-  const { password, gender, preference, ...userData } = req.body as Infer<
-    typeof signupSchemas.requirements
-  >;
+  const { password, gender, preference, ...userData } =
+    req.body as TSignupSchemas['requirements'];
   const hashedPassword = hashPassword(password, env.AUTH_SECRET);
 
   let user = await db.user.findFirst({
@@ -81,9 +80,7 @@ export const signup = async (req: Request, res: Response) => {
 };
 
 export const login = async (req: Request, res: Response) => {
-  const { email, password } = req.body as Infer<
-    typeof loginSchemas.requirements
-  >;
+  const { email, password } = req.body as TLoginSchemas['requirements'];
   const hashedPassword = hashPassword(password, env.AUTH_SECRET);
   await wait(2000);
 

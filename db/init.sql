@@ -17,6 +17,12 @@ CREATE TABLE "User" (
   "biography" VARCHAR(1000),
   "lastTimeOnline" DATE NOT NULL DEFAULT CURRENT_DATE
 );
+INSERT INTO "User" ("name", "lastName", "email", "password", "age", "gender", "preference", "biography") 
+VALUES ('Alice', 'Smith', 'test1@mail.com', '094513168d4401c9dc5d693b3fbb9382ce68e54bafbd180f990bdf193f7c0948', 25, 'Female', 'Bisexual', NULL),
+('David', 'Johnson', 'test2@mail.com', '094513168d4401c9dc5d693b3fbb9382ce68e54bafbd180f990bdf193f7c0948', 35, 'Male', 'Heterosexual', NULL),
+('Emma', 'Brown', 'test3@mail.com', '094513168d4401c9dc5d693b3fbb9382ce68e54bafbd180f990bdf193f7c0948', 29, 'Female', 'Homosexual', NULL),
+('Michael', 'Williams', 'test4@mail.com', '094513168d4401c9dc5d693b3fbb9382ce68e54bafbd180f990bdf193f7c0948', 42, 'Male', 'Heterosexual', NULL),
+('Sophia', 'Martinez', 'test5@mail.com', '094513168d4401c9dc5d693b3fbb9382ce68e54bafbd180f990bdf193f7c0948', 31, 'Female', 'Heterosexual', NULL);
 
 DROP TABLE IF EXISTS "Tag" CASCADE;
 CREATE TABLE "Tag" (
@@ -140,15 +146,36 @@ VALUES ('Paris', 48.8566, 2.3522),
 ('Lille', 50.6292, 3.0573),
 ('Rennes', 48.1173, -1.6778);
 
-DROP TABLE IF EXISTS "UserLocation";
-CREATE TABLE "UserLocation" (
+DROP TABLE IF EXISTS "Location";
+CREATE TABLE "Location" (
   "id" SERIAL PRIMARY KEY,
-  "userId" INT NOT NULL,
   "latitude" FLOAT NOT NULL,
   "longitude" FLOAT NOT NULL,
-  "date" DATE NOT NULL DEFAULT CURRENT_DATE,
-  FOREIGN KEY ("userId") REFERENCES "User" ("id")  ON DELETE CASCADE
+  "date" DATE NOT NULL DEFAULT CURRENT_DATE
 );
+INSERT INTO "Location" ("latitude", "longitude", "date") 
+VALUES 
+(48.8566, 2.3522, CURRENT_DATE), -- Paris, France
+(40.7128, -74.0060, CURRENT_DATE), -- New York, USA
+(35.6895, 139.6917, CURRENT_DATE), -- Tokyo, Japan
+(51.5074, -0.1278, CURRENT_DATE), -- Londres, Royaume-Uni
+(34.0522, -118.2437, CURRENT_DATE); -- Los Angeles, USA
+
+DROP TABLE IF EXISTS "UserLocation";
+CREATE TABLE "UserLocation" (
+  "userId" INT NOT NULL,
+  "locationId" INT NOT NULL,
+  PRIMARY KEY ("userId", "locationId"),
+  FOREIGN KEY ("userId") REFERENCES "User" ("id")  ON DELETE CASCADE,
+  FOREIGN KEY ("locationId") REFERENCES "Location" ("id")  ON DELETE CASCADE
+);
+INSERT INTO "UserLocation" ("userId", "locationId") 
+VALUES 
+(1, 1), -- Alice Smith -> Paris
+(2, 2), -- David Johnson -> New York
+(3, 3), -- Emma Brown -> Tokyo
+(4, 4), -- Michael Williams -> Paris
+(5, 5); -- Sophia Martinez -> New York
 
 DROP TABLE IF EXISTS "View";
 CREATE TABLE "View" (
