@@ -49,7 +49,7 @@ export const Chat: React.FC<PrivateChatProps> = ({
       console.log('bye');
       socket.off(`pv-${session.user!.id}-${otherUser.id}`, messageHandler);
     };
-  }, [session.user, otherUser.id]);
+  }, []);
 
   const sendMessage = (e: React.FormEvent) => {
     e.preventDefault();
