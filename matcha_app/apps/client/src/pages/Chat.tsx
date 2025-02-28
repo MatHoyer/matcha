@@ -4,48 +4,37 @@ import { Input } from '@/components/ui/input';
 import { Typography } from '@/components/ui/typography';
 import { useSession } from '@/hooks/useSession';
 import { socket } from '@/lib/socket';
+import { TUser } from '@matcha/common';
 import { Minus, X } from 'lucide-react';
 import moment from 'moment';
 import React, { useEffect, useState } from 'react';
 
 interface PrivateChatProps {
-  otherUserId: number;
+  otherUser: TUser;
   status: 'full' | 'collapse';
-  otherUserName: string;
   toggleChat: () => void;
   closeChat: () => void;
 }
 
 export const Chat: React.FC<PrivateChatProps> = ({
-  otherUserId,
+  otherUser,
   status,
-  otherUserName,
   toggleChat,
   closeChat,
 }) => {
+  const session = useSession();
   const [messages, setMessages] = useState<
     { name: string; message: string; dateTime: Date; isOwnMessage: boolean }[]
   >([]);
   const [message, setMessage] = useState<string>('');
-  const [feedback, setFeedback] = useState('');
-  const { user } = useSession();
-  const name = user?.name || 'anonymous';
-  const data = {
-    otherUserId,
-    name,
-    message,
-    dateTime: new Date(),
-  };
 
-  // Receive message from the server
   useEffect(() => {
     const messageHandler = ({ message }: { message: string }) => {
       console.log('message received !', message);
-      // Add the message to the chat of the receiver
       setMessages((prevMessages) => [
         ...prevMessages,
         {
-          name: otherUserName,
+          name: otherUser.name,
           message: message,
           dateTime: new Date(),
           isOwnMessage: false,
@@ -53,42 +42,43 @@ export const Chat: React.FC<PrivateChatProps> = ({
       ]);
     };
 
-    // socket.on(SOCKETS_EVENTS.SERVER.ROOM_MESSAGE, messageHandler);
-    socket.on(`pv-${user!.id}-${otherUserId}`, messageHandler);
+    console.log('pv-', session.user!.id, '-', otherUser.id);
+    socket.on(`pv-${session.user!.id}-${otherUser.id}`, messageHandler);
 
     return () => {
-      socket.off(`pv-${user!.id}-${otherUserId}`, messageHandler);
+      console.log('bye');
+      socket.off(`pv-${session.user!.id}-${otherUser.id}`, messageHandler);
     };
-  }, []);
+  }, [session.user, otherUser.id]);
 
-  // Send message to the server
   const sendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     const messageToSend = message;
     if (messageToSend.trim() === '') return;
 
     socket.emit('send-message', {
-      userId: user!.id,
-      otherUserId,
-      messageToSend,
+      receiverId: otherUser.id,
+      senderId: session.user!.id,
+      message: messageToSend,
     });
-    // Add the message to the chat of the sender
     setMessages((prevMessages) => [
       ...prevMessages,
-      { ...data, isOwnMessage: true },
+      {
+        name: session.user!.name,
+        message: messageToSend,
+        dateTime: new Date(),
+        isOwnMessage: true,
+      },
     ]);
-    // Clear the input
     setMessage('');
-  };
-
-  const handleFeedback = (feedbackMessage: string) => {
-    socket.emit('feedback', { feedback: feedbackMessage });
   };
 
   return (
     <Card className="p-3 w-80 h-fit">
       <div className="flex items-center justify-between">
-        <Typography variant="small">Chat with {otherUserName}</Typography>
+        <Typography variant="small">
+          Chat with {otherUser.name} {otherUser.id}
+        </Typography>
         <div className="flex items-center gap-2">
           <Minus className="cursor-pointer" onClick={() => toggleChat()} />
           <X className="cursor-pointer" onClick={() => closeChat()} />
@@ -115,9 +105,6 @@ export const Chat: React.FC<PrivateChatProps> = ({
                 </span>
               </li>
             ))}
-            {feedback && (
-              <li className="text-sm italic text-gray-400">{feedback}</li>
-            )}
           </ul>
 
           <form
@@ -125,7 +112,9 @@ export const Chat: React.FC<PrivateChatProps> = ({
             onSubmit={sendMessage}
             className="mt-4 flex flex-col gap-2"
           >
-            <h2 className="text-xs mb-2 font-semibold">{name} :</h2>
+            <h2 className="text-xs mb-2 font-semibold">
+              {session.user!.name} :
+            </h2>
             <div className="flex items-center gap-2">
               <Input
                 id="message-input"
@@ -133,17 +122,8 @@ export const Chat: React.FC<PrivateChatProps> = ({
                 placeholder="Type a message..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                onFocus={() => handleFeedback(`${name} is typing...`)}
-                onKeyPress={() => handleFeedback(`${name} is typing...`)}
-                onBlur={() => handleFeedback('')}
-                // className="flex-1 p-2 bg-gray-700 text-white border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
-              <Button
-                type="submit"
-                // className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-              >
-                Send
-              </Button>
+              <Button type="submit">Send</Button>
             </div>
           </form>
         </>

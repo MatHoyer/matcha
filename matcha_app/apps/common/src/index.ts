@@ -98,6 +98,8 @@ export type {
   TUserWithNames,
   TView,
 } from './schemas/database.schema';
+export { sendMessageSchema } from './schemas/socket/send-message.schema';
+export type { TSendMessageSchema } from './schemas/socket/send-message.schema';
 export { getUserSchema } from './schemas/users.schema';
 
 //-----------------------Errors-----------------------
