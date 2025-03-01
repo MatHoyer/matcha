@@ -12,7 +12,7 @@ import { closeGlobalDialog } from '@/hooks/use-dialog';
 import { useZodForm } from '@/hooks/useZodForm';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import { defaultHandleSubmit } from '@/lib/fetch-utils/defaultHandleSubmit';
-import { getUrl, loginSchemas } from '@matcha/common';
+import { getUrl, loginSchemas, TLoginSchemas } from '@matcha/common';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { SubmitButtonForm } from './components/SubmitButton.form';
@@ -23,9 +23,10 @@ type TForm = {
   password: string;
 };
 
-const LoginForm: React.FC<TFormProps<TForm>> = ({
+const LoginForm: React.FC<TFormProps<TForm, TLoginSchemas['response']>> = ({
   defaultValues,
   modal = false,
+  getData,
 }) => {
   const navigate = useNavigate();
 
@@ -49,8 +50,9 @@ const LoginForm: React.FC<TFormProps<TForm>> = ({
         handleEnding: {
           successMessage: 'Login successful',
           errorMessage: 'Login failed',
-          cb: () => {
+          cb: (data) => {
             if (modal) closeGlobalDialog();
+            getData?.(data);
             navigate('/');
           },
         },

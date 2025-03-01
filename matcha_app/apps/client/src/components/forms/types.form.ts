@@ -1,5 +1,5 @@
-export type TFormProps<T> = {
+export type TFormProps<T, R> = {
   defaultValues?: Partial<T>;
   modal?: boolean;
-  getData?: (data: T) => void;
+  getData?: (data: R) => void;
 };

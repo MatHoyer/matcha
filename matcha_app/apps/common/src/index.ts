@@ -21,6 +21,7 @@ export {
   EMPTY_FIND_SEARCH,
   GENDERS,
   ORIENTATIONS,
+  PROMISE_BATCH_SIZE,
   THOUSAND_SEPARATOR,
 } from './utils/datas';
 export { getDateAsString, getNearDate } from './utils/date';
@@ -31,6 +32,7 @@ export type {
   TClientRouteDataRequirements,
 } from './utils/getUrl';
 export {
+  batchPromises,
   capitalize,
   containsUpperCase,
   quoteUppercase,

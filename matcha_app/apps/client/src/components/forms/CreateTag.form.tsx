@@ -2,7 +2,7 @@ import { closeGlobalDialog } from '@/hooks/use-dialog';
 import { useZodForm } from '@/hooks/useZodForm';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import { defaultHandleSubmit } from '@/lib/fetch-utils/defaultHandleSubmit';
-import { createTagSchemas, getUrl } from '@matcha/common';
+import { createTagSchemas, getUrl, TCreateTagSchemas } from '@matcha/common';
 import { useMutation } from '@tanstack/react-query';
 import {
   Form,
@@ -20,10 +20,9 @@ type TForm = {
   name: string;
 };
 
-export const CreateTagForm: React.FC<TFormProps<TForm>> = ({
-  defaultValues,
-  modal,
-}) => {
+export const CreateTagForm: React.FC<
+  TFormProps<TForm, TCreateTagSchemas['response']>
+> = ({ defaultValues, modal, getData }) => {
   const form = useZodForm<TForm>({
     schema: createTagSchemas.requirements,
     defaultValues: {
@@ -43,8 +42,9 @@ export const CreateTagForm: React.FC<TFormProps<TForm>> = ({
         handleEnding: {
           successMessage: 'Tag created',
           errorMessage: 'Error creating tag',
-          cb: () => {
+          cb: (data) => {
             if (modal) closeGlobalDialog();
+            getData?.(data);
           },
         },
       });

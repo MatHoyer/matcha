@@ -20,6 +20,7 @@ import {
   Infer,
   ORIENTATIONS,
   signupSchemas,
+  TSignupSchemas,
 } from '@matcha/common';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
@@ -36,9 +37,10 @@ type TForm = {
   preference: 'Heterosexual' | 'Bisexual' | 'Homosexual' | null;
 };
 
-const SignupForm: React.FC<TFormProps<TForm>> = ({
+const SignupForm: React.FC<TFormProps<TForm, TSignupSchemas['response']>> = ({
   defaultValues,
   modal = false,
+  getData,
 }) => {
   const navigate = useNavigate();
 
@@ -67,8 +69,9 @@ const SignupForm: React.FC<TFormProps<TForm>> = ({
         handleEnding: {
           successMessage: 'Signup successful',
           errorMessage: 'Signup failed',
-          cb: () => {
+          cb: (data) => {
             if (modal) closeGlobalDialog();
+            getData?.(data);
             navigate('/');
           },
         },

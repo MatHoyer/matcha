@@ -20,6 +20,7 @@ export const generateWhereClauseSql = <T>(
   for (const [key, value] of Object.entries(where)) {
     if (typeof value !== 'object' || (Array.isArray(value) && key === '$in')) {
       parentKey = containsUpperCase(parentKey!) ? `"${parentKey}"` : parentKey;
+      console.log('parentKey', parentKey);
       switch (key) {
         case '$gt':
           sql.push(`${parentKey} > $${indexCounter}`);
@@ -37,6 +38,10 @@ export const generateWhereClauseSql = <T>(
           sql.push(`${parentKey} <> $${indexCounter}`);
           break;
         case '$in':
+          if (!Array.isArray(value) || value.length === 0) {
+            sql.push('FALSE');
+            break;
+          }
           sql.push(
             `${parentKey} IN (${(value as unknown[])
               .map((_, i) => `$${indexCounter + i}`)
@@ -45,7 +50,9 @@ export const generateWhereClauseSql = <T>(
           indexCounter += (value as unknown[]).length - 1;
           break;
         default:
-          sql.push(`${key} = $${indexCounter}`);
+          sql.push(
+            `${containsUpperCase(key) ? `"${key}"` : key} = $${indexCounter}`
+          );
           break;
       }
       if (Array.isArray(value)) {
@@ -64,7 +71,11 @@ export const generateWhereClauseSql = <T>(
       }
     }
   }
-  if (parentKey) return { whereClause: `(${sql.join(' AND ')})`, values };
+  if (parentKey)
+    return {
+      whereClause: `(${sql.join(' AND ')})`,
+      values,
+    };
   console.log(`WHERE ${sql.join(' AND ')}`, values);
   return { whereClause: `WHERE ${sql.join(' AND ')}`, values };
 };

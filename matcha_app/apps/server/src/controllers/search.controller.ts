@@ -1,6 +1,7 @@
-import { TAdvancedSearchSchema } from '@matcha/common';
+import { batchPromises, TAdvancedSearchSchema } from '@matcha/common';
 import { Request, Response } from 'express';
 import db from '../database/Database';
+import { fameCalculator } from '../services/search.service';
 import { defaultResponse } from '../utils/defaultResponse';
 
 export const advancedSearch = async (req: Request, res: Response) => {
@@ -22,9 +23,9 @@ export const advancedSearch = async (req: Request, res: Response) => {
       },
     });
   }
+
   const { latitude, longitude } = dbLocation;
   const locationDiff = 0.1;
-
   const goodLocations = await db.location.findMany({
     where: {
       latitude: {
@@ -37,7 +38,6 @@ export const advancedSearch = async (req: Request, res: Response) => {
       },
     },
   });
-
   const userLocations = await db.userLocation.findMany({
     where: {
       locationId: {
@@ -46,14 +46,46 @@ export const advancedSearch = async (req: Request, res: Response) => {
     },
   });
 
-  const users = await db.user.findMany({
+  const goodTags = await db.tag.findMany({
     where: {
-      id: {
-        $in: userLocations.map((ul) => ul.userId),
+      name: {
+        $in: tags,
+      },
+    },
+  });
+  const userTags = await db.userTag.findMany({
+    where: {
+      tagId: {
+        $in: goodTags.map((t) => t.id),
       },
     },
   });
 
-  console.log(users);
+  let ids = [
+    ...new Set([
+      ...userTags.map((ut) => ut.userId),
+      ...userLocations.map((ul) => ul.userId),
+    ]),
+  ];
+
+  const fameResults = await batchPromises(ids.map((id) => fameCalculator(id)));
+  ids = ids.filter((id) => {
+    console.log(fameResults[id]);
+    return fame >= fameResults[id];
+  });
+
+  const users = await db.user.findMany({
+    where: {
+      id: {
+        $not: req.user.id,
+        $in: ids,
+      },
+      age: {
+        $gte: ages.min,
+        $lte: ages.max,
+      },
+    },
+  });
+
   res.status(200).json({ users });
 };

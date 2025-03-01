@@ -11,7 +11,11 @@ import { useSession } from '@/hooks/useSession';
 import { useZodForm } from '@/hooks/useZodForm';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import { defaultHandleSubmit } from '@/lib/fetch-utils/defaultHandleSubmit';
-import { advancedSearchSchema, getUrl } from '@matcha/common';
+import {
+  advancedSearchSchema,
+  getUrl,
+  TAdvancedSearchSchema,
+} from '@matcha/common';
 import { useMutation } from '@tanstack/react-query';
 import { Plus, Search } from 'lucide-react';
 import { default as GlobalLocationCombobox } from '../comboxes/GlobalLocation.combobox';
@@ -34,10 +38,9 @@ type TForm = {
   tags: string[];
 };
 
-export const AdvancedSearchForm: React.FC<TFormProps<TForm>> = ({
-  defaultValues,
-  modal,
-}) => {
+export const AdvancedSearchForm: React.FC<
+  TFormProps<TForm, TAdvancedSearchSchema['response']>
+> = ({ defaultValues, modal, getData }) => {
   const session = useSession();
   const form = useZodForm<TForm>({
     schema: advancedSearchSchema.requirements,
@@ -64,8 +67,9 @@ export const AdvancedSearchForm: React.FC<TFormProps<TForm>> = ({
         handleEnding: {
           errorMessage: 'Error searching',
           successMessage: 'Search successful',
-          cb: () => {
+          cb: (data) => {
             if (modal) closeGlobalDialog();
+            getData?.(data);
           },
         },
       });

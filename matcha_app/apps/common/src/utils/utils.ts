@@ -1,3 +1,5 @@
+import { PROMISE_BATCH_SIZE } from './datas';
+
 export const capitalize = (str: string): string => {
   return str.charAt(0).toUpperCase() + str.slice(1);
 };
@@ -24,4 +26,18 @@ export const wait = (ms: number): Promise<void> => {
 
 export const containsUpperCase = (str: string): boolean => {
   return /[A-Z]/.test(str);
+};
+
+export const batchPromises = async <T>(
+  promises: Promise<T>[],
+  batchSize: number = PROMISE_BATCH_SIZE
+) => {
+  const result: T[] = [];
+  for (let i = 0; i < promises.length; i += batchSize) {
+    const batch = promises.slice(i, i + batchSize);
+    const batchResult = await Promise.all(batch);
+    result.push(...batchResult);
+  }
+
+  return result;
 };
