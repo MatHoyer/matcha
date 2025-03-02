@@ -1,5 +1,6 @@
-import { TUser } from '@matcha/common';
+import { TGender, TOrientation, TUser } from '@matcha/common';
 import db from '../database/Database';
+import { WhereClause } from '../database/query/type';
 
 export const fameCalculator = async (userId: TUser['id']) => {
   const likes = await db.like.findMany({
@@ -7,6 +8,40 @@ export const fameCalculator = async (userId: TUser['id']) => {
       likedId: userId,
     },
   });
+  const fame = Math.max(Math.min(Math.floor(likes.length / 5), 5), 1);
+  console.log('fame', fame);
 
-  return Math.min(likes.length / 5, 5);
+  return { userId, fame };
+};
+
+export const getGenderPreferenceMatchCondition = (
+  gender: TGender,
+  preference: TOrientation
+) => {
+  let matchConditions = [] as WhereClause<TUser>[];
+
+  if (preference === 'Heterosexual') {
+    matchConditions = [
+      {
+        gender: gender === 'Male' ? 'Female' : 'Male',
+        preference: { $in: ['Heterosexual', 'Bisexual'] },
+      },
+    ];
+  } else if (preference === 'Homosexual') {
+    matchConditions = [
+      { gender, preference: { $in: ['Homosexual', 'Bisexual'] } },
+    ];
+  } else if (preference === 'Bisexual') {
+    matchConditions = [
+      {
+        gender: 'Male',
+        preference: { $in: ['Heterosexual', 'Bisexual', 'Homosexual'] },
+      },
+      {
+        gender: 'Female',
+        preference: { $in: ['Heterosexual', 'Bisexual', 'Homosexual'] },
+      },
+    ];
+  }
+  return matchConditions;
 };

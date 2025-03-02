@@ -88,7 +88,7 @@ export type OrderBy<T> = {
   [P in keyof T]?: 'asc' | 'desc';
 };
 
-export type WhereClause<T> = {
+type WhereClauseObject<T> = {
   [P in keyof T]?:
     | T[P]
     | {
@@ -100,6 +100,11 @@ export type WhereClause<T> = {
         $in?: T[P][];
       };
 };
+
+export type WhereClause<T> = {
+  AND?: WhereClause<T>[];
+  OR?: WhereClause<T>[];
+} & WhereClauseObject<T>;
 
 export type CommonOptions<T, I> = {
   where?: WhereClause<T>;

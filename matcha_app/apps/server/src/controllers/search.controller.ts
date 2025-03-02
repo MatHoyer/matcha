@@ -1,7 +1,10 @@
 import { batchPromises, TAdvancedSearchSchema } from '@matcha/common';
 import { Request, Response } from 'express';
 import db from '../database/Database';
-import { fameCalculator } from '../services/search.service';
+import {
+  fameCalculator,
+  getGenderPreferenceMatchCondition,
+} from '../services/search.service';
 import { defaultResponse } from '../utils/defaultResponse';
 
 export const advancedSearch = async (req: Request, res: Response) => {
@@ -69,9 +72,10 @@ export const advancedSearch = async (req: Request, res: Response) => {
   ];
 
   const fameResults = await batchPromises(ids.map((id) => fameCalculator(id)));
+  console.log('fameResults', fameResults);
   ids = ids.filter((id) => {
-    console.log(fameResults[id]);
-    return fame >= fameResults[id];
+    const fameResult = fameResults.find((f) => f.userId === id)?.fame;
+    return fameResult ? fameResult >= fame : false;
   });
 
   const users = await db.user.findMany({
@@ -84,6 +88,10 @@ export const advancedSearch = async (req: Request, res: Response) => {
         $gte: ages.min,
         $lte: ages.max,
       },
+      OR: getGenderPreferenceMatchCondition(
+        req.user.gender,
+        req.user.preference
+      ),
     },
   });
 

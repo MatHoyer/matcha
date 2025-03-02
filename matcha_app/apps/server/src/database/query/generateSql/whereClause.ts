@@ -19,8 +19,10 @@ export const generateWhereClauseSql = <T>(
   let indexCounter = index || 1;
   for (const [key, value] of Object.entries(where)) {
     if (typeof value !== 'object' || (Array.isArray(value) && key === '$in')) {
+      if (!value) {
+        continue;
+      }
       parentKey = containsUpperCase(parentKey!) ? `"${parentKey}"` : parentKey;
-      console.log('parentKey', parentKey);
       switch (key) {
         case '$gt':
           sql.push(`${parentKey} > $${indexCounter}`);
@@ -38,16 +40,20 @@ export const generateWhereClauseSql = <T>(
           sql.push(`${parentKey} <> $${indexCounter}`);
           break;
         case '$in':
-          if (!Array.isArray(value) || value.length === 0) {
+          if (!Array.isArray(value)) {
+            break;
+          }
+          if (value.length === 0) {
             sql.push('FALSE');
             break;
           }
           sql.push(
             `${parentKey} IN (${(value as unknown[])
-              .map((_, i) => `$${indexCounter + i}`)
+              .map((_, i) => {
+                return `$${indexCounter + i}`;
+              })
               .join(', ')})`
           );
-          indexCounter += (value as unknown[]).length - 1;
           break;
         default:
           sql.push(
@@ -55,27 +61,39 @@ export const generateWhereClauseSql = <T>(
           );
           break;
       }
-      if (Array.isArray(value)) {
+      if (value && Array.isArray(value) && value.length > 0) {
         values.push(...value);
-      } else {
-        values.push(value);
+        indexCounter += value.length;
       }
-      indexCounter++;
-    } else {
-      if (value !== null) {
-        const { whereClause: query, values: resultValues } =
-          generateWhereClauseSql(value, key, indexCounter);
+      if (value && !Array.isArray(value)) {
+        values.push(value);
+        indexCounter++;
+      }
+    } else if (value) {
+      const { whereClause: query, values: resultValues } =
+        generateWhereClauseSql(value, key, indexCounter);
+      if (query && resultValues.every((v) => v)) {
         sql.push(query);
         values.push(...resultValues);
-        indexCounter += values.length;
+        indexCounter += resultValues.length;
       }
     }
   }
   if (parentKey)
     return {
-      whereClause: `(${sql.join(' AND ')})`,
+      whereClause:
+        sql.length > 0
+          ? `(${sql.join(
+              ` ${
+                parentKey === 'AND' || parentKey === 'OR' ? parentKey : 'AND'
+              } `
+            )})`
+          : '',
       values,
     };
   console.log(`WHERE ${sql.join(' AND ')}`, values);
-  return { whereClause: `WHERE ${sql.join(' AND ')}`, values };
+  return {
+    whereClause: `WHERE ${sql.join(' AND ')}`,
+    values,
+  };
 };

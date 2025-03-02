@@ -17,12 +17,6 @@ CREATE TABLE "User" (
   "biography" VARCHAR(1000),
   "lastTimeOnline" DATE NOT NULL DEFAULT CURRENT_DATE
 );
-INSERT INTO "User" ("name", "lastName", "email", "password", "age", "gender", "preference", "biography") 
-VALUES ('Alice', 'Smith', 'test1@mail.com', '094513168d4401c9dc5d693b3fbb9382ce68e54bafbd180f990bdf193f7c0948', 25, 'Female', 'Bisexual', NULL),
-('David', 'Johnson', 'test2@mail.com', '094513168d4401c9dc5d693b3fbb9382ce68e54bafbd180f990bdf193f7c0948', 35, 'Male', 'Heterosexual', NULL),
-('Emma', 'Brown', 'test3@mail.com', '094513168d4401c9dc5d693b3fbb9382ce68e54bafbd180f990bdf193f7c0948', 29, 'Female', 'Homosexual', NULL),
-('Michael', 'Williams', 'test4@mail.com', '094513168d4401c9dc5d693b3fbb9382ce68e54bafbd180f990bdf193f7c0948', 42, 'Male', 'Heterosexual', NULL),
-('Sophia', 'Martinez', 'test5@mail.com', '094513168d4401c9dc5d693b3fbb9382ce68e54bafbd180f990bdf193f7c0948', 31, 'Female', 'Heterosexual', NULL);
 
 DROP TABLE IF EXISTS "Tag" CASCADE;
 CREATE TABLE "Tag" (
@@ -73,6 +67,7 @@ DROP TABLE IF EXISTS "Notification";
 CREATE TABLE "Notification" (
   "id" SERIAL PRIMARY KEY,
   "userId" INT NOT NULL,
+  "otherId" INT,
   "message" VARCHAR(1000) NOT NULL,
   "date" DATE NOT NULL DEFAULT CURRENT_DATE,
   "read" BOOLEAN NOT NULL DEFAULT FALSE,
@@ -95,6 +90,101 @@ CREATE TABLE "GlobalLocation" (
   "latitude" FLOAT NOT NULL,
   "longitude" FLOAT NOT NULL
 );
+
+DROP TABLE IF EXISTS "Location";
+CREATE TABLE "Location" (
+  "id" SERIAL PRIMARY KEY,
+  "latitude" FLOAT NOT NULL,
+  "longitude" FLOAT NOT NULL,
+  "date" DATE NOT NULL DEFAULT CURRENT_DATE
+);
+
+DROP TABLE IF EXISTS "UserLocation";
+CREATE TABLE "UserLocation" (
+  "userId" INT NOT NULL,
+  "locationId" INT NOT NULL,
+  PRIMARY KEY ("userId", "locationId"),
+  FOREIGN KEY ("userId") REFERENCES "User" ("id")  ON DELETE CASCADE,
+  FOREIGN KEY ("locationId") REFERENCES "Location" ("id")  ON DELETE CASCADE
+);
+
+DROP TABLE IF EXISTS "View";
+CREATE TABLE "View" (
+  "id" SERIAL PRIMARY KEY,
+  "userId" INT NOT NULL,
+  "viewerId" INT NOT NULL,
+  "date" DATE NOT NULL DEFAULT CURRENT_DATE,
+  FOREIGN KEY ("userId") REFERENCES "User" ("id")  ON DELETE CASCADE,
+  FOREIGN KEY ("viewerId") REFERENCES "User" ("id")  ON DELETE CASCADE
+);
+
+DROP TABLE IF EXISTS "Image";
+CREATE TABLE "Image" (
+  "id" SERIAL PRIMARY KEY,
+  "userId" INT NOT NULL,
+  "url" VARCHAR(255) NOT NULL,
+  "isProfile" BOOLEAN NOT NULL,
+  FOREIGN KEY ("userId") REFERENCES "User" ("id")  ON DELETE CASCADE
+);
+
+INSERT INTO "User" ("name", "lastName", "email", "password", "age", "gender", "preference", "biography") 
+VALUES ('Alice', 'Smith', 'test@mail.com', '094513168d4401c9dc5d693b3fbb9382ce68e54bafbd180f990bdf193f7c0948', 25, 'Female', 'Bisexual', NULL),
+('David', 'Johnson', 'test2@mail.com', '094513168d4401c9dc5d693b3fbb9382ce68e54bafbd180f990bdf193f7c0948', 35, 'Male', 'Heterosexual', NULL),
+('Emma', 'Brown', 'test3@mail.com', '094513168d4401c9dc5d693b3fbb9382ce68e54bafbd180f990bdf193f7c0948', 29, 'Female', 'Homosexual', NULL),
+('Michael', 'Williams', 'test4@mail.com', '094513168d4401c9dc5d693b3fbb9382ce68e54bafbd180f990bdf193f7c0948', 42, 'Male', 'Heterosexual', NULL),
+('Sophia', 'Martinez', 'test5@mail.com', '094513168d4401c9dc5d693b3fbb9382ce68e54bafbd180f990bdf193f7c0948', 31, 'Female', 'Heterosexual', NULL);
+
+INSERT INTO "Tag" ("name") VALUES
+('Sports'),
+('Music'),
+('Tech'),
+('Art'),
+('Travel');
+
+INSERT INTO "UserTag" ("userId", "tagId") VALUES
+(1, 5), -- Alice aime le voyage
+(2, 1), -- David aime le sport
+(2, 2), -- David aime la musique
+(3, 3), -- Emma aime la tech
+(4, 1), -- Michael aime le sport
+(5, 4), -- Sophia aime l'art
+(5, 2); -- Sophia aime la musique
+
+INSERT INTO "Message" ("userId", "receiverId", "message") VALUES
+(1, 2, 'Hey David its Alice, how are you?'),
+(2, 1, 'Hi Alice im David! I am good, you?'),
+(3, 4, 'Hello Michael its Emma, want to discuss tech?'),
+(4, 3, 'Sure Emma its Michael, I love learning new things!');
+
+INSERT INTO "Like" ("userId", "likedId") VALUES
+(1, 2), -- Alice aime David
+(2, 1), -- David aime Alice
+(3, 4), -- Emma aime Michael
+(4, 3); -- Michael aime Emma
+
+INSERT INTO "Notification" ("userId", "otherId", "message") VALUES
+(2, 1, 'Alice viewed your profile'),
+(2, 1, 'Alice liked your profile'),
+(1, 2, 'David viewed your profile'),
+(1, 2, 'David liked your profile'),
+(1, 2, 'You have a new message from David'),
+(3, 4, 'Michael viewed your profile'),
+(3, 4, 'Michael liked your profile'),
+(4, 3, 'Emma viewed your profile'),
+(4, 3, 'Emma liked your profile');
+
+INSERT INTO "Block" ("userId", "blockedId") VALUES
+(4, 3); -- Michael blocked Emma
+
+INSERT INTO "Report" ("userId", "reportedId", "reason") VALUES
+(1, 3, 'Suspicious activity'); -- Alice reported Emma
+
+INSERT INTO "View" ("userId", "viewerId") VALUES
+(1, 2), -- Alice viewed David
+(2, 1), -- David viewed Alice
+(3, 4), -- Emma viewed Michael
+(4, 3); -- Michael viewed Emma
+
 INSERT INTO "GlobalLocation" ("name", "latitude", "longitude") 
 VALUES ('Paris', 48.8566, 2.3522),
 ('London', 51.5074, 0.1278),
@@ -146,52 +236,18 @@ VALUES ('Paris', 48.8566, 2.3522),
 ('Lille', 50.6292, 3.0573),
 ('Rennes', 48.1173, -1.6778);
 
-DROP TABLE IF EXISTS "Location";
-CREATE TABLE "Location" (
-  "id" SERIAL PRIMARY KEY,
-  "latitude" FLOAT NOT NULL,
-  "longitude" FLOAT NOT NULL,
-  "date" DATE NOT NULL DEFAULT CURRENT_DATE
-);
 INSERT INTO "Location" ("latitude", "longitude", "date") 
 VALUES 
 (48.8566, 2.3522, CURRENT_DATE), -- Paris, France
 (40.7128, -74.0060, CURRENT_DATE), -- New York, USA
 (35.6895, 139.6917, CURRENT_DATE), -- Tokyo, Japan
 (51.5074, -0.1278, CURRENT_DATE), -- Londres, Royaume-Uni
-(34.0522, -118.2437, CURRENT_DATE); -- Los Angeles, USA
+(40.7128, -74.0060, CURRENT_DATE); -- New York, USA
 
-DROP TABLE IF EXISTS "UserLocation";
-CREATE TABLE "UserLocation" (
-  "userId" INT NOT NULL,
-  "locationId" INT NOT NULL,
-  PRIMARY KEY ("userId", "locationId"),
-  FOREIGN KEY ("userId") REFERENCES "User" ("id")  ON DELETE CASCADE,
-  FOREIGN KEY ("locationId") REFERENCES "Location" ("id")  ON DELETE CASCADE
-);
 INSERT INTO "UserLocation" ("userId", "locationId") 
 VALUES 
-(1, 1), -- Alice Smith -> Paris
-(2, 2), -- David Johnson -> New York
-(3, 3), -- Emma Brown -> Tokyo
-(4, 4), -- Michael Williams -> Paris
-(5, 5); -- Sophia Martinez -> New York
-
-DROP TABLE IF EXISTS "View";
-CREATE TABLE "View" (
-  "id" SERIAL PRIMARY KEY,
-  "userId" INT NOT NULL,
-  "viewerId" INT NOT NULL,
-  "date" DATE NOT NULL DEFAULT CURRENT_DATE,
-  FOREIGN KEY ("userId") REFERENCES "User" ("id")  ON DELETE CASCADE,
-  FOREIGN KEY ("viewerId") REFERENCES "User" ("id")  ON DELETE CASCADE
-);
-
-DROP TABLE IF EXISTS "Image";
-CREATE TABLE "Image" (
-  "id" SERIAL PRIMARY KEY,
-  "userId" INT NOT NULL,
-  "url" VARCHAR(255) NOT NULL,
-  "isProfile" BOOLEAN NOT NULL,
-  FOREIGN KEY ("userId") REFERENCES "User" ("id")  ON DELETE CASCADE
-);
+(1, 1), -- Alice -> Paris
+(2, 2), -- David -> New York
+(3, 3), -- Emma -> Tokyo
+(4, 4), -- Michael -> Paris
+(5, 5); -- Sophia -> New York
