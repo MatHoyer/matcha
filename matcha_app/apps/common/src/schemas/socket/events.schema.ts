@@ -1,11 +1,7 @@
-import { sendMessageSchema, TSendMessageSchema } from './send-message.schema';
 import { z } from '../../validator/validator';
+import { sendMessageSchema } from './send-message.schema';
 
 export const events = {
   'send-message': sendMessageSchema,
-  disconnect: z.string(),
-};
-
-export type eventTypes = {
-  'send-message': TSendMessageSchema;
+  disconnect: z.null(),
 };

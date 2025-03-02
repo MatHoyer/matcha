@@ -1,37 +1,25 @@
-import { sendMessageSchema, TUser } from '@matcha/common';
+import { events, Infer, TUser } from '@matcha/common';
 import { parse } from 'cookie';
 import jwt from 'jsonwebtoken';
 import { Server, Socket } from 'socket.io';
 import { env } from '../env';
-import { events, eventTypes } from '@matcha/common';
-import { Infer } from '@matcha/common';
-import { parseArgs } from 'util';
 
-// type EventHandlers = {
-//   'send-message': (
-//     senderId: number,
-//     receiverId: number,
-//     message: string
-//   ) => void;
-//   disconnect: () => void;
-// };
-type EventHandlers<T extends eventTypes> = {
-  [K in T]: (data: Infer<(typeof events)[K]>) => void;
-};
+type Events = typeof events;
+type InferEvent<T extends keyof Events> = Infer<Events[T]>;
 
-const socketMiddleware = <T extends keyof typeof events>(
+const socketMiddleware = <T extends keyof Events>(
   socket: Socket,
-  eventHandlers: Record<T, (args: Infer<(typeof events)[T]>) => void>
+  eventHandlers: { [K in T]: (args: InferEvent<K>) => void }
 ) => {
   for (const [event, handler] of Object.entries(eventHandlers) as [
-    keyof typeof eventHandlers,
-    (typeof eventHandlers)[keyof typeof eventHandlers]
+    T,
+    (args: InferEvent<T>) => void
   ][]) {
-    socket.on(event, (...args) => {
-      if (event !== 'disconnect') console.log(`${event} event triggered`);
+    socket.on(event as string, (args: unknown) => {
       try {
-        const parsedArgs = events[event].parse(args);
-        handler(parsedArgs);
+        events[event].parse(args);
+        // eslint-disable-next-line
+        handler(args as any);
       } catch (error) {
         console.error(`Error handling event ${event}`, error);
       }
@@ -70,26 +58,20 @@ export const socketHandler = (io: Server) => {
       return;
     }
 
-    const eventHandlers: EventHandlers = {
-      'send-message': (senderId, receiverId, message) => {
-        try {
-          // const { senderId, receiverId, message } =
-          //   sendMessageSchema.parse(data);
-          console.log('Message received ! : ', senderId, receiverId, message);
-          const sender = connectedUsers.find((u) => u.id === senderId);
-          if (!sender) return;
-          const receiver = connectedUsers.find((u) => u.id === receiverId);
-          if (!receiver) return;
-          receiver.socket.emit(`pv-${receiver.id}-${sender.id}`, { message });
-        } catch (error) {
-          console.error('Error parsing message', error);
-        }
+    socketMiddleware(socket, {
+      'send-message': (args) => {
+        const { senderId, receiverId, message } = args; // args parsed in socketMiddleware
+
+        const sender = connectedUsers.find((u) => u.id === senderId);
+        if (!sender) return;
+        const receiver = connectedUsers.find((u) => u.id === receiverId);
+        if (!receiver) return;
+
+        receiver.socket.emit(`pv-${receiver.id}-${sender.id}`, { message });
       },
-      disconnect: () => {
+      disconnect: (_args) => {
         console.log(`User disconnected: ${socket.id}`);
       },
-    };
-
-    socketMiddleware(socket, eventHandlers);
+    });
   });
 };
