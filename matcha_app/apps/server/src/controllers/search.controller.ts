@@ -72,7 +72,6 @@ export const advancedSearch = async (req: Request, res: Response) => {
   ];
 
   const fameResults = await batchPromises(ids.map((id) => fameCalculator(id)));
-  console.log('fameResults', fameResults);
   ids = ids.filter((id) => {
     const fameResult = fameResults.find((f) => f.userId === id)?.fame;
     return fameResult ? fameResult >= fame : false;

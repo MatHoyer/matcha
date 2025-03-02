@@ -25,7 +25,9 @@ export const AdvancedSearch: React.FC = () => {
           }}
         />
         {users.map((user) => (
-          <div key={user.id}>{user.name}</div>
+          <div key={user.id}>
+            {user.name}/{user.gender}/{user.preference}
+          </div>
         ))}
       </LayoutContent>
     </Layout>

@@ -34,12 +34,12 @@ export const getGenderPreferenceMatchCondition = (
   } else if (preference === 'Bisexual') {
     matchConditions = [
       {
-        gender: 'Male',
-        preference: { $in: ['Heterosexual', 'Bisexual', 'Homosexual'] },
+        gender: gender,
+        preference: { $in: ['Bisexual', 'Homosexual'] },
       },
       {
-        gender: 'Female',
-        preference: { $in: ['Heterosexual', 'Bisexual', 'Homosexual'] },
+        gender: gender === 'Male' ? 'Female' : 'Male',
+        preference: { $in: ['Bisexual', 'Heterosexual'] },
       },
     ];
   }

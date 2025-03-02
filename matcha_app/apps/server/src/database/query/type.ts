@@ -37,16 +37,19 @@ export type UserIncludes = {
 };
 
 export const tableAlias: Record<string, string> = {
-  user: 'a',
-  userTag: 'b',
-  message: 'c',
-  report: 'd',
-  like: 'e',
-  notification: 'f',
-  block: 'g',
-  location: 'h',
-  view: 'i',
-  image: 'j',
+  user: 'u',
+  tag: 't',
+  userTag: 'ut',
+  message: 'm',
+  report: 'r',
+  like: 'li',
+  notification: 'n',
+  block: 'b',
+  globalLocation: 'gl',
+  location: 'lo',
+  userLocation: 'ul',
+  view: 'v',
+  image: 'i',
 };
 
 // eslint-disable-next-line

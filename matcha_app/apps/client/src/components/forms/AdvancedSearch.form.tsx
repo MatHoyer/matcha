@@ -6,7 +6,7 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { closeGlobalDialog, openGlobalDialog } from '@/hooks/use-dialog';
+import { closeGlobalDialog } from '@/hooks/use-dialog';
 import { useSession } from '@/hooks/useSession';
 import { useZodForm } from '@/hooks/useZodForm';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
@@ -17,10 +17,9 @@ import {
   TAdvancedSearchSchema,
 } from '@matcha/common';
 import { useMutation } from '@tanstack/react-query';
-import { Plus, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { default as GlobalLocationCombobox } from '../comboxes/GlobalLocation.combobox';
 import MultiTagCombobox from '../comboxes/Tag.combobox';
-import { Button } from '../ui/button';
 import { FameSlider } from '../ui/FameRating';
 import { Label } from '../ui/label';
 import NumberInput from '../ui/NumberField';
@@ -161,17 +160,7 @@ export const AdvancedSearchForm: React.FC<
           <FormItem>
             <FormLabel>Tags</FormLabel>
             <FormControl>
-              <div className="flex gap-2">
-                <MultiTagCombobox {...field} modal={modal} />
-                <Button
-                  onClick={() => {
-                    openGlobalDialog('create-tag');
-                  }}
-                >
-                  <Typography variant="small">Create a tag</Typography>
-                  <Plus />
-                </Button>
-              </div>
+              <MultiTagCombobox {...field} modal={modal} />
             </FormControl>
             <FormMessage />
           </FormItem>
