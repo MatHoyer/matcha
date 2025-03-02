@@ -3,25 +3,35 @@ import { parse } from 'cookie';
 import jwt from 'jsonwebtoken';
 import { Server, Socket } from 'socket.io';
 import { env } from '../env';
+import { events, eventTypes } from '@matcha/common';
+import { Infer } from '@matcha/common';
+import { parseArgs } from 'util';
 
-type EventHandlers = {
-  'send-message': (
-    senderId: number,
-    receiverId: number,
-    message: string
-  ) => void;
-  disconnect: () => void;
+// type EventHandlers = {
+//   'send-message': (
+//     senderId: number,
+//     receiverId: number,
+//     message: string
+//   ) => void;
+//   disconnect: () => void;
+// };
+type EventHandlers<T extends eventTypes> = {
+  [K in T]: (data: Infer<(typeof events)[K]>) => void;
 };
 
-const socketMiddleware = (
+const socketMiddleware = <T extends keyof typeof events>(
   socket: Socket,
-  eventHandlers: Record<string, (...args: any) => void>
+  eventHandlers: Record<T, (args: Infer<(typeof events)[T]>) => void>
 ) => {
-  for (const [event, handler] of Object.entries(eventHandlers)) {
+  for (const [event, handler] of Object.entries(eventHandlers) as [
+    keyof typeof eventHandlers,
+    (typeof eventHandlers)[keyof typeof eventHandlers]
+  ][]) {
     socket.on(event, (...args) => {
       if (event !== 'disconnect') console.log(`${event} event triggered`);
       try {
-        handler(...args);
+        const parsedArgs = events[event].parse(args);
+        handler(parsedArgs);
       } catch (error) {
         console.error(`Error handling event ${event}`, error);
       }
