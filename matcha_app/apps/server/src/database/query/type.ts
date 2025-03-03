@@ -115,4 +115,5 @@ export type CommonOptions<T, I> = {
   select?: Select<T>;
   take?: number;
   skip?: number;
+  orderBy?: OrderBy<T>;
 };
