@@ -65,6 +65,11 @@ export { advancedSearchSchema } from './schemas/api/search.schema';
 export type { TAdvancedSearchSchema } from './schemas/api/search.schema';
 export { createTagSchemas, getTagsSchemas } from './schemas/api/tags.schema';
 export type { TCreateTagSchemas, TTagSchemas } from './schemas/api/tags.schema';
+export { getUserSchemas, getUsersSchemas } from './schemas/api/users.schema';
+export type {
+  TGetUserSchemas,
+  TGetUsersSchemas,
+} from './schemas/api/users.schema';
 export {
   blockSchema,
   genderSchema,
@@ -102,7 +107,6 @@ export type {
 } from './schemas/database.schema';
 export { sendMessageSchema } from './schemas/socket/send-message.schema';
 export type { TSendMessageSchema } from './schemas/socket/send-message.schema';
-export { getUserSchema } from './schemas/users.schema';
 
 //-----------------------Errors-----------------------
 export { SchemaError } from './errors/schema.error';

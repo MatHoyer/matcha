@@ -16,14 +16,14 @@ export type TApiRouteDataRequirements = {
     type: 'signup' | 'login' | 'logout' | 'session' | undefined;
   };
   'api-tags': {
-    id?: number;
+    id?: number | undefined;
   };
   'api-globalLocations': undefined;
   'api-search': {
     type: 'advancedSearch' | 'forYou';
   };
   'api-users': {
-    type: 'getUsers' | undefined;
+    id?: number | undefined;
   };
 };
 
@@ -49,7 +49,7 @@ const routes: {
   'api-tags': ({ id }) => (id ? `/api/tags/${id}` : '/api/tags'),
   'api-globalLocations': () => '/api/globalLocations',
   'api-search': ({ type }) => (type ? `/api/search/${type}` : '/api/search'),
-  'api-users': ({ type }) => (type ? `/api/users/${type}` : '/api/users'),
+  'api-users': ({ id }) => (id ? `/api/users/${id}` : '/api/users'),
 };
 
 type TUrlParams =

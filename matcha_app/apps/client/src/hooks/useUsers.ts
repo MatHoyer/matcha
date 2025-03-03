@@ -1,5 +1,5 @@
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
-import { getUrl, getUserSchema, TUser } from '@matcha/common';
+import { getUrl, getUsersSchemas, TUser } from '@matcha/common';
 import { useEffect, useState } from 'react';
 
 export const useUsers = () => {
@@ -13,13 +13,11 @@ export const useUsers = () => {
       try {
         await axiosFetch({
           method: 'GET',
-          url: getUrl('api-users', {
-            type: 'getUsers',
-          }),
+          url: getUrl('api-users'),
           config: {
             withCredentials: true,
           },
-          schemas: getUserSchema,
+          schemas: getUsersSchemas,
           handleEnding: {
             cb: (data) => {
               setUsers(data.users); // Set users list

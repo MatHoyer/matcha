@@ -94,5 +94,30 @@ export const advancedSearch = async (req: Request, res: Response) => {
     },
   });
 
-  res.status(200).json({ users });
+  const usersResponse: TAdvancedSearchSchema['response']['users'] =
+    await batchPromises(
+      users.map(async (user) => {
+        const allUserTags = await db.userTag.findMany({
+          where: {
+            userId: user.id,
+          },
+        });
+        const allTags = await db.tag.findMany({
+          where: {
+            id: {
+              $in: allUserTags.map((ut) => ut.tagId),
+            },
+          },
+        });
+
+        return {
+          user: user,
+          tags: allTags as { id: number; name: string }[],
+          fame: fameResults.find((f) => f.userId === user.id)?.fame || 1,
+          location,
+        };
+      })
+    );
+
+  res.status(200).json({ users: usersResponse });
 };
