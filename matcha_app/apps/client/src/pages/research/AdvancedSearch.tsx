@@ -13,46 +13,55 @@ import { FameRating } from '@/components/ui/FameRating';
 import { AppLoader } from '@/components/ui/loaders';
 import { Typography } from '@/components/ui/typography';
 import { TAdvancedSearchSchema } from '@matcha/common';
-import { MapPin } from 'lucide-react';
+import { ChevronRight, MapPin, Mars, Venus } from 'lucide-react';
 import { useState } from 'react';
 
 const MatchRow: React.FC<{
   gUser: TAdvancedSearchSchema['response']['users'][number];
 }> = ({ gUser }) => {
   return (
-    <Card className="w-full p-2">
+    <Card className="relative group w-full p-2 cursor-pointer">
       <div className="flex gap-2">
-        <div className="flex items-center gap-2">
-          <ImageContainer
-            size="sm"
-            imageSrc={''}
-            altImage="avatar"
-            className="h-full"
-          />
-        </div>
-        <div className="flex flex-col items-start justify-center flex-1">
-          <Typography variant="large" className="text-lg font-bold">
-            {gUser.user.name} {gUser.user.lastName}
+        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transform duration-500">
+          <Typography variant="muted" className="flex items-center">
+            See profile <ChevronRight />
           </Typography>
-          <div className="flex gap-1">
-            {gUser.tags.map((tag) => (
-              <Badge>{tag.name}</Badge>
-            ))}
+        </div>
+        <ImageContainer
+          size="sm"
+          imageSrc={''}
+          altImage="avatar"
+          className="h-full"
+        />
+        <div className="flex-1 flex flex-col gap-2">
+          <div className="flex-1 flex flex-col gap-2">
+            <Typography variant="large" className="text-lg font-bold">
+              {gUser.user.name} {gUser.user.lastName}
+            </Typography>
+            <div className="flex gap-1">
+              {gUser.tags.map((tag) => (
+                <Badge>{tag.name}</Badge>
+              ))}
+            </div>
+            <Typography variant="small" className="font-normal">
+              {gUser.user.biography}
+            </Typography>
           </div>
-          <Typography variant="small" className="font-normal">
-            {gUser.user.biography}
-          </Typography>
-        </div>
-        <div className="flex flex-col items-end gap-2">
-          <FameRating note={1} />
-          <div className="flex-1" />
-          <Typography variant="code">
-            <div className="flex gap-1 items-center">
+          <div className="flex gap-2">
+            <Typography variant="code" className="flex items-center gap-1">
+              {gUser.user.gender === 'Male' ? <Mars /> : <Venus />}{' '}
+              {gUser.user.gender}
+            </Typography>
+            <Typography variant="code" className="flex items-center">
+              {gUser.user.age} years old
+            </Typography>
+            <Typography variant="code" className="flex gap-1 items-center">
               <MapPin size={16} />
               {gUser.location}
-            </div>
-          </Typography>
-          <Typography variant="code">{gUser.user.age} years old</Typography>
+            </Typography>
+            <div className="flex-1" />
+            <FameRating note={1} />
+          </div>
         </div>
       </div>
     </Card>
