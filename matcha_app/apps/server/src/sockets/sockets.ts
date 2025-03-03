@@ -3,6 +3,7 @@ import { parse } from 'cookie';
 import jwt from 'jsonwebtoken';
 import { Server, Socket } from 'socket.io';
 import { env } from '../env';
+import db from '../database/Database';
 
 type Events = typeof events;
 type InferEvent<T extends keyof Events> = Infer<Events[T]>;
@@ -59,7 +60,7 @@ export const socketHandler = (io: Server) => {
     }
 
     socketMiddleware(socket, {
-      'send-message': (args) => {
+      'send-message': async (args) => {
         const { senderId, receiverId, message } = args; // args parsed in socketMiddleware
 
         const sender = connectedUsers.find((u) => u.id === senderId);
@@ -67,7 +68,30 @@ export const socketHandler = (io: Server) => {
         const receiver = connectedUsers.find((u) => u.id === receiverId);
         if (!receiver) return;
 
+        await db.message.create({
+          data: {
+            userId: senderId,
+            receiverId: receiverId,
+            message: message,
+            date: new Date(),
+          }
+        });
+
+        // console.log('about to save message');
+        // saveMessage(senderId, receiverId, message, new Date());
+
         receiver.socket.emit(`pv-${receiver.id}-${sender.id}`, { message });
+      },
+      'send-feedback': (args) => {
+        console.log('send-feedback from back');
+        const { senderId, receiverId, message } = args;
+
+        const sender = connectedUsers.find((u) => u.id === senderId);
+        if (!sender) return;
+        const receiver = connectedUsers.find((u) => u.id === receiverId);
+        if (!receiver) return;
+
+        receiver.socket.emit(`feedback-${receiver.id}-${sender.id}`, { message });        
       },
       disconnect: (_args) => {
         console.log(`User disconnected: ${socket.id}`);

@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Typography } from '@/components/ui/typography';
 import { useSession } from '@/hooks/useSession';
 import { socket } from '@/lib/socket';
+import { TSendMessageSchema } from '@matcha/common';
 import { TUser } from '@matcha/common';
 import { Minus, X } from 'lucide-react';
 import moment from 'moment';
@@ -27,10 +28,10 @@ export const Chat: React.FC<PrivateChatProps> = ({
     { name: string; message: string; dateTime: Date; isOwnMessage: boolean }[]
   >([]);
   const [message, setMessage] = useState<string>('');
+  const [feedback, setFeedback] = useState('');
 
   useEffect(() => {
     const messageHandler = ({ message }: { message: string }) => {
-      console.log('message received !', message);
       setMessages((prevMessages) => [
         ...prevMessages,
         {
@@ -42,8 +43,13 @@ export const Chat: React.FC<PrivateChatProps> = ({
       ]);
     };
 
+    const feedbackHandler = ({ message }: { message: string }) => {
+      setFeedback(message);
+    };
+
     console.log('pv-', session.user!.id, '-', otherUser.id);
     socket.on(`pv-${session.user!.id}-${otherUser.id}`, messageHandler);
+    socket.on(`feedback-${session.user!.id}-${otherUser.id}`, feedbackHandler);
 
     return () => {
       console.log('bye');
@@ -51,16 +57,25 @@ export const Chat: React.FC<PrivateChatProps> = ({
     };
   }, []);
 
+  const socketEmitter = (type: string, data: TSendMessageSchema) => {
+    const receiverId = data.receiverId;
+    const senderId = data.senderId;
+    const message = data.message;
+    console.log(`emitting ${type} with ${senderId}, ${receiverId}, ${message}`);
+    socket.emit(type, { senderId, receiverId, message });
+  };
+
   const sendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     const messageToSend = message;
     if (messageToSend.trim() === '') return;
 
-    socket.emit('send-message', {
+    socketEmitter('send-message', {
       receiverId: otherUser.id,
       senderId: session.user!.id,
       message: messageToSend,
     });
+
     setMessages((prevMessages) => [
       ...prevMessages,
       {
@@ -71,6 +86,14 @@ export const Chat: React.FC<PrivateChatProps> = ({
       },
     ]);
     setMessage('');
+  };
+
+  const sendFeedback = (feedbackMessage: string) => {
+    socketEmitter('send-feedback', {
+      receiverId: otherUser.id,
+      senderId: session.user!.id,
+      message: feedbackMessage,
+    });
   };
 
   return (
@@ -88,7 +111,7 @@ export const Chat: React.FC<PrivateChatProps> = ({
         <>
           <ul
             id="message-container"
-            className="h-60 overflow-y-auto bg-gray-800 rounded-lg p-3 shadow-inner"
+            className="relative flex flex-col h-60 overflow-y-auto bg-gray-800 rounded-lg p-3 shadow-inner"
           >
             {messages.map((data, index) => (
               <li
@@ -105,6 +128,11 @@ export const Chat: React.FC<PrivateChatProps> = ({
                 </span>
               </li>
             ))}
+            {feedback && (
+              <li className="mt-auto text-center text-sm italic text-gray-400">
+                {feedback}
+              </li>
+            )}
           </ul>
 
           <form
@@ -122,6 +150,13 @@ export const Chat: React.FC<PrivateChatProps> = ({
                 placeholder="Type a message..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
+                onFocus={() =>
+                  sendFeedback(`${session.user?.name} is typing...`)
+                }
+                onKeyDown={() =>
+                  sendFeedback(`${session.user?.name} is typing...`)
+                }
+                onBlur={() => sendFeedback('')}
               />
               <Button type="submit">Send</Button>
             </div>

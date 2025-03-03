@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ChatContainer } from './components/ChatContainer';
+import { ChatContainer } from './components/chat/ChatContainer';
 import { Logo } from './components/images/Logo';
 import { NavItemDropdown, NavItems } from './components/sidebar/NavComp';
 import { NavigationWrapper } from './components/sidebar/NavigationWrapper';
@@ -37,16 +37,10 @@ const App = () => {
   >([]);
 
   const handleChatClick = (otherUser: TUser) => {
-    // const createOrJoinRoom = (roomName: string) => {
-    //   socket.emit(SOCKETS_EVENTS.CLIENT.CREATE_ROOM, { roomName });
-    // };
-
-    // const chatRoom = await createOrGetRoom(otherUser.id);
     const sortedUserIds = [session.user!.id, otherUser.id].sort();
     const chatRoomName = `chat-${sortedUserIds[0]}-${sortedUserIds[1]}`;
-    // createOrJoinRoom(chatRoomName);
-    const windowRoom = { id: chatRoomName };
 
+    const windowRoom = { id: chatRoomName };
     setOpenChats((prev) => {
       if (!prev.some((chatWindow) => chatWindow.id === windowRoom.id)) {
         return [...prev, { otherUser, id: windowRoom.id, status: 'full' }];
