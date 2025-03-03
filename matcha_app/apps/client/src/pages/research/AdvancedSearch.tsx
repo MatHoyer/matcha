@@ -10,6 +10,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
 import { FameRating } from '@/components/ui/FameRating';
+import { AppLoader } from '@/components/ui/loaders';
 import { Typography } from '@/components/ui/typography';
 import { TAdvancedSearchSchema } from '@matcha/common';
 import { MapPin } from 'lucide-react';
@@ -62,6 +63,7 @@ export const AdvancedSearch: React.FC = () => {
   const [users, setUsers] = useState<
     TAdvancedSearchSchema['response']['users'][number][]
   >([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   return (
     <Layout>
@@ -74,12 +76,19 @@ export const AdvancedSearch: React.FC = () => {
           getData={(data) => {
             setUsers(data.users);
           }}
+          setIsLoading={setIsLoading}
         />
-        <div className="flex flex-col gap-2">
-          {users.map((gUser) => (
-            <MatchRow gUser={gUser} key={gUser.user.id} />
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="flex justify-center items-center">
+            <AppLoader size={60} />
+          </div>
+        ) : (
+          <div className="flex flex-col gap-2">
+            {users.map((gUser) => (
+              <MatchRow gUser={gUser} key={gUser.user.id} />
+            ))}
+          </div>
+        )}
       </LayoutContent>
     </Layout>
   );

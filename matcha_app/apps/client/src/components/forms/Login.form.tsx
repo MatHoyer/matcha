@@ -14,6 +14,7 @@ import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import { defaultHandleSubmit } from '@/lib/fetch-utils/defaultHandleSubmit';
 import { getUrl, loginSchemas, TLoginSchemas } from '@matcha/common';
 import { useMutation } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SubmitButtonForm } from './components/SubmitButton.form';
 import { TFormProps } from './types.form';
@@ -27,6 +28,7 @@ const LoginForm: React.FC<TFormProps<TForm, TLoginSchemas['response']>> = ({
   defaultValues,
   modal = false,
   getData,
+  setIsLoading,
 }) => {
   const navigate = useNavigate();
 
@@ -59,6 +61,10 @@ const LoginForm: React.FC<TFormProps<TForm, TLoginSchemas['response']>> = ({
       });
     },
   });
+
+  useEffect(() => {
+    setIsLoading?.(mutation.isPending);
+  }, [mutation.isPending]);
 
   const onSubmit = defaultHandleSubmit(form, mutation);
 

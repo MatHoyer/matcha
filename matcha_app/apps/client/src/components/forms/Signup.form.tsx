@@ -23,6 +23,7 @@ import {
   TSignupSchemas,
 } from '@matcha/common';
 import { useMutation } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SubmitButtonForm } from './components/SubmitButton.form';
 import { TFormProps } from './types.form';
@@ -41,6 +42,7 @@ const SignupForm: React.FC<TFormProps<TForm, TSignupSchemas['response']>> = ({
   defaultValues,
   modal = false,
   getData,
+  setIsLoading,
 }) => {
   const navigate = useNavigate();
 
@@ -78,6 +80,10 @@ const SignupForm: React.FC<TFormProps<TForm, TSignupSchemas['response']>> = ({
       });
     },
   });
+
+  useEffect(() => {
+    setIsLoading?.(mutation.isPending);
+  }, [mutation.isPending]);
 
   const onSubmit = defaultHandleSubmit(form, mutation);
 

@@ -4,6 +4,7 @@ import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import { defaultHandleSubmit } from '@/lib/fetch-utils/defaultHandleSubmit';
 import { createTagSchemas, getUrl, TCreateTagSchemas } from '@matcha/common';
 import { useMutation } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import {
   Form,
   FormControl,
@@ -22,7 +23,7 @@ type TForm = {
 
 export const CreateTagForm: React.FC<
   TFormProps<TForm, TCreateTagSchemas['response']>
-> = ({ defaultValues, modal, getData }) => {
+> = ({ defaultValues, modal, getData, setIsLoading }) => {
   const form = useZodForm<TForm>({
     schema: createTagSchemas.requirements,
     defaultValues: {
@@ -50,6 +51,10 @@ export const CreateTagForm: React.FC<
       });
     },
   });
+
+  useEffect(() => {
+    setIsLoading?.(mutation.isPending);
+  }, [mutation.isPending]);
 
   const onSubmit = defaultHandleSubmit(form, mutation);
 

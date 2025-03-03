@@ -18,6 +18,7 @@ import {
 } from '@matcha/common';
 import { useMutation } from '@tanstack/react-query';
 import { Search } from 'lucide-react';
+import { useEffect } from 'react';
 import { default as GlobalLocationCombobox } from '../comboxes/GlobalLocation.combobox';
 import MultiTagCombobox from '../comboxes/Tag.combobox';
 import { FameSlider } from '../ui/FameRating';
@@ -39,8 +40,9 @@ type TForm = {
 
 export const AdvancedSearchForm: React.FC<
   TFormProps<TForm, TAdvancedSearchSchema['response']>
-> = ({ defaultValues, modal, getData }) => {
+> = ({ defaultValues, modal, getData, setIsLoading }) => {
   const session = useSession();
+
   const form = useZodForm<TForm>({
     schema: advancedSearchSchema.requirements,
     defaultValues: {
@@ -75,6 +77,10 @@ export const AdvancedSearchForm: React.FC<
     },
   });
 
+  useEffect(() => {
+    setIsLoading?.(mutation.isPending);
+  }, [mutation.isPending]);
+
   const onSubmit = defaultHandleSubmit(form, mutation);
 
   return (
@@ -98,6 +104,7 @@ export const AdvancedSearchForm: React.FC<
                   <NumberInput
                     id="min-age"
                     min={18}
+                    max={field.value.max}
                     scale={0}
                     step={1}
                     value={field.value.min}
@@ -112,7 +119,7 @@ export const AdvancedSearchForm: React.FC<
                   </Label>
                   <NumberInput
                     id="max-age"
-                    min={18}
+                    min={Math.max(18, field.value.min)}
                     scale={0}
                     step={1}
                     value={field.value.max}
@@ -132,7 +139,7 @@ export const AdvancedSearchForm: React.FC<
         name="fame"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Fame</FormLabel>
+            <FormLabel>Minimum fame</FormLabel>
             <FormControl>
               <FameSlider {...field} />
             </FormControl>
@@ -167,7 +174,7 @@ export const AdvancedSearchForm: React.FC<
         )}
       />
       <FormMessage>{form.formState.errors.root?.message}</FormMessage>
-      <SubmitButtonForm modal={modal} isLoading={false}>
+      <SubmitButtonForm modal={modal} isLoading={mutation.isPending}>
         <Search />
         <Typography>Search</Typography>
       </SubmitButtonForm>
