@@ -53,6 +53,9 @@ const MatchRow: React.FC<{
               {gUser.user.gender}
             </Typography>
             <Typography variant="code" className="flex items-center">
+              {gUser.user.preference}
+            </Typography>
+            <Typography variant="code" className="flex items-center">
               {gUser.user.age} years old
             </Typography>
             <Typography variant="code" className="flex gap-1 items-center">
