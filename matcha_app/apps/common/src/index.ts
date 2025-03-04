@@ -63,6 +63,8 @@ export { advancedSearchSchema } from './schemas/api/search.schema';
 export type { TAdvancedSearchSchema } from './schemas/api/search.schema';
 export { createTagSchemas, getTagsSchemas } from './schemas/api/tags.schema';
 export type { TCreateTagSchemas, TTagSchemas } from './schemas/api/tags.schema';
+export { messagesSchemas } from './schemas/api/messages.schema';
+export type { TMessagesSchemas } from './schemas/api/messages.schema';
 export {
   blockSchema,
   genderSchema,

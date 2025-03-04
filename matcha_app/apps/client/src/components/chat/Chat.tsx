@@ -3,12 +3,16 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Typography } from '@/components/ui/typography';
 import { useSession } from '@/hooks/useSession';
+import { useMessages } from '@/hooks/useMessages';
 import { socket } from '@/lib/socket';
-import { TSendMessageSchema } from '@matcha/common';
+import { getUrl, messagesSchemas, TSendMessageSchema } from '@matcha/common';
 import { TUser } from '@matcha/common';
 import { Minus, X } from 'lucide-react';
 import moment from 'moment';
-import React, { useEffect, useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
+import { TMessage } from '@matcha/common';
+import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
+import { closeGlobalDialog } from '@/hooks/use-dialog';
 
 interface PrivateChatProps {
   otherUser: TUser;
@@ -29,6 +33,32 @@ export const Chat: React.FC<PrivateChatProps> = ({
   >([]);
   const [message, setMessage] = useState<string>('');
   const [feedback, setFeedback] = useState('');
+
+  const [chatMessages, setChatMessages] = useState<TMessage[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        await axiosFetch({
+          method: 'POST',
+          url: getUrl('api-messages'),
+          schemas: messagesSchemas,
+          data: { userId: session.user!.id },
+          handleEnding: {
+            cb: (data) => {
+              setChatMessages(data.messages);
+              console.log('chatMessages', data.messages);
+            },
+          },
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMessages();
+  }, []);
 
   useEffect(() => {
     const messageHandler = ({ message }: { message: string }) => {

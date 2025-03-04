@@ -25,6 +25,9 @@ export type TApiRouteDataRequirements = {
   'api-users': {
     type: 'getUsers' | undefined;
   };
+  'api-messages': {
+    id?: number;
+  };
 };
 
 type TRouteDataRequirements = TClientRouteDataRequirements &
@@ -50,6 +53,7 @@ const routes: {
   'api-globalLocations': () => '/api/globalLocations',
   'api-search': ({ type }) => (type ? `/api/search/${type}` : '/api/search'),
   'api-users': ({ type }) => (type ? `/api/users/${type}` : '/api/users'),
+  'api-messages': ({ id }) => (id ? `/api/messages/${id}` : '/api/messages'),
 };
 
 type TUrlParams =

@@ -11,6 +11,7 @@ import searchRouter from './routes/search.route.js';
 import tagRouter from './routes/tag.route.js';
 import usersRouter from './routes/users.route.js';
 import { socketHandler } from './sockets/sockets.js';
+import messagesRouter from './routes/messages.route.js';
 
 try {
   envSchema.parse(env);
@@ -39,6 +40,7 @@ app.use(getUrl('api-tags'), tagRouter);
 app.use(getUrl('api-globalLocations'), globalLocationRouter);
 app.use(getUrl('api-users'), usersRouter);
 app.use(getUrl('api-search'), searchRouter);
+app.use(getUrl('api-messages'), messagesRouter);
 
 if (env.NODE_ENV === 'PROD') {
   app.use(express.static(path.join(__dirname, '../../../public/dist')));
