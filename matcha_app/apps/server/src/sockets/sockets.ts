@@ -33,9 +33,11 @@ type TUserManager = {
 } & TUser;
 
 const connectedUsers = [] as TUserManager[];
+// const allUsers = [] as TUser[];
 
 export const socketHandler = (io: Server) => {
-  io.on('connection', (socket: Socket) => {
+  io.on('connection', async (socket: Socket) => {
+    const allUsers = await db.user.findMany({});
     const cookies = parse(socket.handshake.headers.cookie || '');
     const token = cookies['auth-token'];
     if (!token) {
@@ -65,8 +67,8 @@ export const socketHandler = (io: Server) => {
 
         const sender = connectedUsers.find((u) => u.id === senderId);
         if (!sender) return;
-        const receiver = connectedUsers.find((u) => u.id === receiverId);
-        if (!receiver) return;
+        const receiverDb = allUsers.find((u) => u.id === receiverId);
+        if (!receiverDb) return;
 
         await db.message.create({
           data: {
@@ -76,6 +78,9 @@ export const socketHandler = (io: Server) => {
             date: new Date(),
           },
         });
+
+        const receiver = connectedUsers.find((u) => u.id === receiverId);
+        if (!receiver) return;
 
         // console.log('about to save message');
         // saveMessage(senderId, receiverId, message, new Date());

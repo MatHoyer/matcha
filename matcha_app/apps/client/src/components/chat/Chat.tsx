@@ -3,7 +3,6 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Typography } from '@/components/ui/typography';
 import { useSession } from '@/hooks/useSession';
-import { useMessages } from '@/hooks/useMessages';
 import { socket } from '@/lib/socket';
 import { getUrl, messagesSchemas, TSendMessageSchema } from '@matcha/common';
 import { TUser } from '@matcha/common';
@@ -47,6 +46,31 @@ export const Chat: React.FC<PrivateChatProps> = ({
           data: { userId: session.user!.id },
           handleEnding: {
             cb: (data) => {
+              // Filter messages for the specific chat window
+              const filteredMessages = data.messages.filter(
+                (msg: TMessage) =>
+                  (msg.userId === session.user!.id &&
+                    msg.receiverId === otherUser.id) ||
+                  (msg.userId === otherUser.id &&
+                    msg.receiverId === session.user!.id)
+              );
+              console.log('session user id :', session.user!.id);
+              console.log('otherUser id :', otherUser.id);
+              console.log('filteredMessages :', filteredMessages);
+
+              // // Transform messages into the expected format
+              // const formattedMessages = filteredMessages.map((msg: any) => ({
+              //   name:
+              //     msg.senderId === session.user!.id ? 'You' : otherUser.name,
+              //   message: msg.content,
+              //   dateTime: new Date(msg.timestamp),
+              //   isOwnMessage: msg.senderId === session.user!.id,
+              // }));
+
+              // // Set state with the filtered messages
+              // console.log('formattedMessages', formattedMessages);
+              // setMessages(formattedMessages);
+
               setChatMessages(data.messages);
               console.log('chatMessages', data.messages);
             },
