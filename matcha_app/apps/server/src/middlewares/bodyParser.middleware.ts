@@ -11,7 +11,7 @@ export const bodyParser =
       return defaultResponse({
         res,
         status: 400,
-        json: { message: 'Bad body' },
+        json: { message: 'Bad body', fields: parsed.error.fields },
       });
     }
     next();

@@ -9,7 +9,6 @@ export const fameCalculator = async (userId: TUser['id']) => {
     },
   });
   const fame = Math.max(Math.min(Math.floor(likes.length / 5), 5), 1);
-  console.log('fame', fame);
 
   return { userId, fame };
 };

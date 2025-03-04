@@ -48,8 +48,20 @@ export abstract class ZodType<T> {
   refine(check: (data: T) => boolean, message: string): ZodType<T> {
     const self = this;
     return new (class extends ZodType<T> {
+      constructor() {
+        super();
+        // Propagate the coercive state from the parent
+        this._isCoercive = self._isCoercive;
+      }
+
+      _tryCoerce(data: unknown): unknown {
+        // Use the parent's coercion logic
+        return self._tryCoerce(data);
+      }
+
       parse(data: unknown): T {
-        const parsed = self.parse(data);
+        const coercedData = this._isCoercive ? this._tryCoerce(data) : data;
+        const parsed = self.parse(coercedData);
         if (!check(parsed)) {
           throw new Error(message);
         }

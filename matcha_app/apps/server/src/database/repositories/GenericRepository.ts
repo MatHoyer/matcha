@@ -68,7 +68,6 @@ class GenericRepository<T, I> {
       `;
 
     const rows = await this.#query(queryString, values);
-    console.log('END QUERY', queryString, values, rows?.length);
     return rows ? generateObject(rows, shouldGetIdList) : null;
   }
 

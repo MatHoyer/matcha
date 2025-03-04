@@ -147,7 +147,6 @@ export const DatePicker: React.FC<{
   };
 
   const handleMonthChange = (month: Date) => {
-    console.log(month);
     setMonthSelected(month);
   };
 
@@ -221,7 +220,6 @@ export const DatePicker: React.FC<{
                               onClick={() => {
                                 let newDate = new Date(monthSelected);
                                 newDate = setYear(newDate, year);
-                                console.log(newDate);
                                 handleMonthChange(newDate);
                                 setYearSelectorOpen(false);
                               }}
