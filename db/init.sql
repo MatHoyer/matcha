@@ -12,14 +12,13 @@ CREATE TABLE "User" (
   "email" VARCHAR(255) NOT NULL UNIQUE,
   "password" VARCHAR(255) NOT NULL,
   "birthDate" DATE NOT NULL,
-  "age" INT GENERATED ALWAYS AS (
-    EXTRACT(YEAR FROM age(CURRENT_DATE, "birthDate"))
-  ) STORED,
   "gender" "Gender" NOT NULL,
   "preference" "Orientation" NOT NULL,
   "biography" VARCHAR(1000),
   "lastTimeOnline" DATE NOT NULL DEFAULT CURRENT_DATE
 );
+CREATE OR REPLACE VIEW "User_v" AS 
+SELECT *, EXTRACT(YEAR FROM age(CURRENT_DATE, "birthDate"))::INT AS "age" FROM "User";
 
 DROP TABLE IF EXISTS "Tag" CASCADE;
 CREATE TABLE "Tag" (

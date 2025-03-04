@@ -21,7 +21,9 @@ class GenericRepository<T, I> {
   constructor(tableName: string, pool: pg.Pool) {
     this.alias = tableAlias[tableName];
     this.name = tableName;
-    this.tableName = `public."${capitalize(tableName)}"`;
+    this.tableName = `public."${capitalize(tableName)}${
+      tableName === 'user' ? '_v' : ''
+    }"`;
     this.pool = pool;
   }
 
