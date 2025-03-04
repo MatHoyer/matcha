@@ -65,6 +65,8 @@ export { advancedSearchSchema } from './schemas/api/search.schema';
 export type { TAdvancedSearchSchema } from './schemas/api/search.schema';
 export { createTagSchemas, getTagsSchemas } from './schemas/api/tags.schema';
 export type { TCreateTagSchemas, TTagSchemas } from './schemas/api/tags.schema';
+export { messagesSchemas } from './schemas/api/messages.schema';
+export type { TMessagesSchemas } from './schemas/api/messages.schema';
 export {
   getUserSchemas,
   getUsersSchemas,
@@ -110,6 +112,7 @@ export type {
   TUserWithNames,
   TView,
 } from './schemas/database.schema';
+export { events } from './schemas/socket/events.schema';
 export { sendMessageSchema } from './schemas/socket/send-message.schema';
 export type { TSendMessageSchema } from './schemas/socket/send-message.schema';
 

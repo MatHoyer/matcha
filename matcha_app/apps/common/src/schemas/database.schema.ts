@@ -38,8 +38,8 @@ export const messageSchema = z.object({
   id: z.number(),
   userId: userSchema.pick(['id']).shape.id,
   receiverId: userSchema.pick(['id']).shape.id,
-  content: z.string(),
-  createdAt: z.date(),
+  message: z.string(),
+  date: z.date(),
 });
 export type TMessage = Infer<typeof messageSchema>;
 

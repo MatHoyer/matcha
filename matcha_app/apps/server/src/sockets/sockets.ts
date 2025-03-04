@@ -1,8 +1,32 @@
-import { sendMessageSchema, TUser } from '@matcha/common';
+import { events, Infer, TUser } from '@matcha/common';
 import { parse } from 'cookie';
 import jwt from 'jsonwebtoken';
 import { Server, Socket } from 'socket.io';
 import { env } from '../env';
+import db from '../database/Database';
+
+type Events = typeof events;
+type InferEvent<T extends keyof Events> = Infer<Events[T]>;
+
+const socketMiddleware = <T extends keyof Events>(
+  socket: Socket,
+  eventHandlers: { [K in T]: (args: InferEvent<K>) => void }
+) => {
+  for (const [event, handler] of Object.entries(eventHandlers) as [
+    T,
+    (args: InferEvent<T>) => void
+  ][]) {
+    socket.on(event as string, (args: unknown) => {
+      try {
+        events[event].parse(args);
+        // eslint-disable-next-line
+        handler(args as any);
+      } catch (error) {
+        console.error(`Error handling event ${event}`, error);
+      }
+    });
+  }
+};
 
 type TUserManager = {
   socket: Socket;
@@ -18,7 +42,6 @@ export const socketHandler = (io: Server) => {
       socket.disconnect();
       return;
     }
-
     try {
       const userPayload = jwt.verify(token, env.JWT_SECRET) as TUser;
       const user = connectedUsers.find((user) => user.id === userPayload.id);
@@ -36,66 +59,43 @@ export const socketHandler = (io: Server) => {
       return;
     }
 
-    socket.on('send-message', (data) => {
-      try {
-        const { senderId, receiverId, message } = sendMessageSchema.parse(data);
+    socketMiddleware(socket, {
+      'send-message': async (args) => {
+        const { senderId, receiverId, message } = args; // args parsed in socketMiddleware
 
-        console.log('Message received ! : ', senderId, receiverId, message);
-
-        const sender = connectedUsers.find((user) => user.id === senderId);
+        const sender = connectedUsers.find((u) => u.id === senderId);
         if (!sender) return;
-        const receiver = connectedUsers.find((user) => user.id === receiverId);
+        const receiver = connectedUsers.find((u) => u.id === receiverId);
         if (!receiver) return;
-        receiver.socket.emit(`pv-${receiver.id}-${sender.id}`, {
-          message,
+
+        await db.message.create({
+          data: {
+            userId: senderId,
+            receiverId: receiverId,
+            message: message,
+            date: new Date(),
+          }
         });
-      } catch (error) {
-        console.error('Error parsing message', error);
-        return;
-      }
+
+        // console.log('about to save message');
+        // saveMessage(senderId, receiverId, message, new Date());
+
+        receiver.socket.emit(`pv-${receiver.id}-${sender.id}`, { message });
+      },
+      'send-feedback': (args) => {
+        console.log('send-feedback from back');
+        const { senderId, receiverId, message } = args;
+
+        const sender = connectedUsers.find((u) => u.id === senderId);
+        if (!sender) return;
+        const receiver = connectedUsers.find((u) => u.id === receiverId);
+        if (!receiver) return;
+
+        receiver.socket.emit(`feedback-${receiver.id}-${sender.id}`, { message });        
+      },
+      disconnect: (_args) => {
+        console.log(`User disconnected: ${socket.id}`);
+      },
     });
   });
 };
-
-// socket.on('feedback', (data) => {
-//   socket.broadcast.emit('feedback', data);
-// });
-
-// socket.on(SOCKETS_EVENTS.CLIENT.CREATE_ROOM, ({ roomName }) => {
-//   console.log('Room created ! : ', roomName);
-//   if (!rooms[roomName]) {
-//     rooms[roomName] = {
-//       id: roomName,
-//     };
-//   }
-//   socket.join(rooms[roomName].id);
-//   console.log('Room just joined ! : ', rooms[roomName].id);
-// });
-
-// socket.on(SOCKETS_EVENTS.CLIENT.SEND_ROOM_MESSAGE, (data) => {
-//   console.log('Sending message to room : ', data.roomId);
-//   const message = data.messageToSend;
-//   const userName = data.name;
-//   socket.to(data.roomId).emit(SOCKETS_EVENTS.SERVER.ROOM_MESSAGE, {
-//     message,
-//     userName,
-//   });
-// });
-
-// socket.on(SOCKETS_EVENTS.DISCONNECTION, () => {
-//   for (const roomId of Object.keys(rooms)) {
-//     rooms[roomId].delete(socket.id);
-//     if (rooms[roomId].size === 0) {
-//       delete rooms[roomId];
-//     }
-//   }
-//   connectedUsers.delete(socket.id);
-// });
-
-// socket.on('message', (data) => {
-//   // const schema = z.object({
-//   //   message: z.string(),
-//   // });
-//   // const parsedData = schema.parse(data);
-//   socket.broadcast.emit('private-message', data);
-// });

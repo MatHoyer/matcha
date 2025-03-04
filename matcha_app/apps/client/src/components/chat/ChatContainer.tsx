@@ -1,4 +1,4 @@
-import { Chat } from '@/pages/Chat';
+import { Chat } from '@/components/chat/Chat';
 import { TUser } from '@matcha/common';
 import React from 'react';
 
