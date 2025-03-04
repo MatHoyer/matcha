@@ -5,6 +5,7 @@ import LoginPage from './auth/Login';
 import SignupPage from './auth/Signup';
 import { Home } from './Home';
 import { NotFound } from './NotFound';
+import { Profile } from './Profile';
 import { AdvancedSearch } from './research/AdvancedSearch';
 
 const AuthRoute = () => {
@@ -55,6 +56,7 @@ export const Pages = () => {
           path={getUrl('client-search', { type: 'advancedSearch' })}
           element={<AdvancedSearch />}
         />
+        <Route path={`${getUrl('client-profile')}/*`} element={<Profile />} />
       </Route>
     </Routes>
   );

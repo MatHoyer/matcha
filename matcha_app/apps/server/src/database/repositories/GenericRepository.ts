@@ -3,6 +3,7 @@ import pg from 'pg';
 import { capitalize, quoteUppercase } from '@matcha/common';
 import { generateObject } from '../query/generateObject.js';
 import { generateIncludeSql } from '../query/generateSql/include.js';
+import { generateOrderBySql } from '../query/generateSql/orderBy.js';
 import { generateSelectSql } from '../query/generateSql/select.js';
 import { generateWhereClauseSql } from '../query/generateSql/whereClause.js';
 import {
@@ -48,6 +49,7 @@ class GenericRepository<T, I> {
       this.alias,
       include
     );
+    const orderBy = generateOrderBySql(this.alias, options.orderBy);
 
     shouldGetIdList['main'] = shouldGetId;
     selectColumns.push(...joinColumns);
@@ -58,11 +60,13 @@ class GenericRepository<T, I> {
     } 
       ${join} 
       ${whereClause} 
+      ${orderBy}
       ${'LIMIT ' + (take ?? 'ALL')} 
       ${skip ? `OFFSET ${skip}` : ''}
       `;
 
     const rows = await this.#query(queryString, values);
+    console.log('END QUERY', queryString, values, rows?.length);
     return rows ? generateObject(rows, shouldGetIdList) : null;
   }
 

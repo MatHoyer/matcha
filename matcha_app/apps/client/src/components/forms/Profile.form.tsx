@@ -1,3 +1,15 @@
+import { closeGlobalDialog } from '@/hooks/use-dialog';
+import { useZodForm } from '@/hooks/useZodForm';
+import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
+import { defaultHandleSubmit } from '@/lib/fetch-utils/defaultHandleSubmit';
+import {
+  getUrl,
+  getUserSchemas,
+  TUpdateUserSchemas,
+  updateUserSchemas,
+} from '@matcha/common';
+import { useMutation } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import {
   Form,
   FormControl,
@@ -5,38 +17,26 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import PasswordInput from '@/components/ui/password-input';
-import { closeGlobalDialog } from '@/hooks/use-dialog';
-import { useZodForm } from '@/hooks/useZodForm';
-import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
-import { defaultHandleSubmit } from '@/lib/fetch-utils/defaultHandleSubmit';
-import { getUrl, loginSchemas, TLoginSchemas } from '@matcha/common';
-import { useMutation } from '@tanstack/react-query';
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+} from '../ui/form';
+import { Input } from '../ui/input';
 import { SubmitButtonForm } from './components/SubmitButton.form';
 import { TFormProps } from './types.form';
 
 type TForm = {
-  email: string;
-  password: string;
+  name?: string;
+  lastName?: string;
+  email?: string;
+  gender?: string;
+  preference?: string;
+  age?: number;
 };
 
-const LoginForm: React.FC<TFormProps<TForm, TLoginSchemas['response']>> = ({
-  defaultValues,
-  modal = false,
-  getData,
-  setIsLoading,
-}) => {
-  const navigate = useNavigate();
-
+export const ProfileForm: React.FC<
+  TFormProps<TForm, TUpdateUserSchemas['response']>
+> = ({ defaultValues, modal, getData, setIsLoading }) => {
   const form = useZodForm<TForm>({
-    schema: loginSchemas.requirements,
+    schema: updateUserSchemas.requirements,
     defaultValues: {
-      email: '',
-      password: '',
       ...defaultValues,
     },
   });
@@ -45,17 +45,16 @@ const LoginForm: React.FC<TFormProps<TForm, TLoginSchemas['response']>> = ({
     mutationFn: async (data: TForm) => {
       return await axiosFetch({
         method: 'POST',
-        url: getUrl('api-auth', { type: 'login' }),
+        url: getUrl('api-users'),
         data,
-        schemas: loginSchemas,
+        schemas: getUserSchemas,
         form,
         handleEnding: {
-          successMessage: 'Login successful',
-          errorMessage: 'Login failed',
+          successMessage: 'Tag created',
+          errorMessage: 'Error creating tag',
           cb: (data) => {
             if (modal) closeGlobalDialog();
             getData?.(data);
-            navigate('/');
           },
         },
       });
@@ -76,17 +75,12 @@ const LoginForm: React.FC<TFormProps<TForm, TLoginSchemas['response']>> = ({
     >
       <FormField
         control={form.control}
-        name="email"
+        name="name"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Email</FormLabel>
+            <FormLabel>Name</FormLabel>
             <FormControl>
-              <Input
-                {...field}
-                type="email"
-                placeholder="example@domain.com"
-                autoComplete="email"
-              />
+              <Input {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -94,12 +88,12 @@ const LoginForm: React.FC<TFormProps<TForm, TLoginSchemas['response']>> = ({
       />
       <FormField
         control={form.control}
-        name="password"
+        name="email"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Password</FormLabel>
+            <FormLabel>Email</FormLabel>
             <FormControl>
-              <PasswordInput {...field} autoComplete="current-password" />
+              <Input type="email" {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -107,10 +101,8 @@ const LoginForm: React.FC<TFormProps<TForm, TLoginSchemas['response']>> = ({
       />
       <FormMessage>{form.formState.errors.root?.message}</FormMessage>
       <SubmitButtonForm modal={modal} isLoading={mutation.isPending}>
-        Login
+        Update profile
       </SubmitButtonForm>
     </Form>
   );
 };
-
-export default LoginForm;

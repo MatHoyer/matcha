@@ -37,16 +37,19 @@ export type UserIncludes = {
 };
 
 export const tableAlias: Record<string, string> = {
-  user: 'a',
-  userTag: 'b',
-  message: 'c',
-  report: 'd',
-  like: 'e',
-  notification: 'f',
-  block: 'g',
-  location: 'h',
-  view: 'i',
-  image: 'j',
+  user: 'u',
+  tag: 't',
+  userTag: 'ut',
+  message: 'm',
+  report: 'r',
+  like: 'li',
+  notification: 'n',
+  block: 'b',
+  globalLocation: 'gl',
+  location: 'lo',
+  userLocation: 'ul',
+  view: 'v',
+  image: 'i',
 };
 
 // eslint-disable-next-line
@@ -88,7 +91,7 @@ export type OrderBy<T> = {
   [P in keyof T]?: 'asc' | 'desc';
 };
 
-export type WhereClause<T> = {
+type WhereClauseObject<T> = {
   [P in keyof T]?:
     | T[P]
     | {
@@ -101,10 +104,16 @@ export type WhereClause<T> = {
       };
 };
 
+export type WhereClause<T> = {
+  AND?: WhereClause<T>[];
+  OR?: WhereClause<T>[];
+} & WhereClauseObject<T>;
+
 export type CommonOptions<T, I> = {
   where?: WhereClause<T>;
   include?: Include<I>;
   select?: Select<T>;
   take?: number;
   skip?: number;
+  orderBy?: OrderBy<T>;
 };

@@ -6,17 +6,21 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { closeGlobalDialog, openGlobalDialog } from '@/hooks/use-dialog';
+import { closeGlobalDialog } from '@/hooks/use-dialog';
 import { useSession } from '@/hooks/useSession';
 import { useZodForm } from '@/hooks/useZodForm';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import { defaultHandleSubmit } from '@/lib/fetch-utils/defaultHandleSubmit';
-import { advancedSearchSchema, getUrl } from '@matcha/common';
+import {
+  advancedSearchSchema,
+  getUrl,
+  TAdvancedSearchSchema,
+} from '@matcha/common';
 import { useMutation } from '@tanstack/react-query';
-import { Plus, Search } from 'lucide-react';
+import { Search } from 'lucide-react';
+import { useEffect } from 'react';
 import { default as GlobalLocationCombobox } from '../comboxes/GlobalLocation.combobox';
 import MultiTagCombobox from '../comboxes/Tag.combobox';
-import { Button } from '../ui/button';
 import { FameSlider } from '../ui/FameRating';
 import { Label } from '../ui/label';
 import NumberInput from '../ui/NumberField';
@@ -34,11 +38,11 @@ type TForm = {
   tags: string[];
 };
 
-export const AdvancedSearchForm: React.FC<TFormProps<TForm>> = ({
-  defaultValues,
-  modal,
-}) => {
+export const AdvancedSearchForm: React.FC<
+  TFormProps<TForm, TAdvancedSearchSchema['response']>
+> = ({ defaultValues, modal, getData, setIsLoading }) => {
   const session = useSession();
+
   const form = useZodForm<TForm>({
     schema: advancedSearchSchema.requirements,
     defaultValues: {
@@ -64,13 +68,18 @@ export const AdvancedSearchForm: React.FC<TFormProps<TForm>> = ({
         handleEnding: {
           errorMessage: 'Error searching',
           successMessage: 'Search successful',
-          cb: () => {
+          cb: (data) => {
             if (modal) closeGlobalDialog();
+            getData?.(data);
           },
         },
       });
     },
   });
+
+  useEffect(() => {
+    setIsLoading?.(mutation.isPending);
+  }, [mutation.isPending]);
 
   const onSubmit = defaultHandleSubmit(form, mutation);
 
@@ -95,6 +104,7 @@ export const AdvancedSearchForm: React.FC<TFormProps<TForm>> = ({
                   <NumberInput
                     id="min-age"
                     min={18}
+                    max={field.value.max}
                     scale={0}
                     step={1}
                     value={field.value.min}
@@ -109,7 +119,7 @@ export const AdvancedSearchForm: React.FC<TFormProps<TForm>> = ({
                   </Label>
                   <NumberInput
                     id="max-age"
-                    min={18}
+                    min={Math.max(18, field.value.min)}
                     scale={0}
                     step={1}
                     value={field.value.max}
@@ -129,7 +139,7 @@ export const AdvancedSearchForm: React.FC<TFormProps<TForm>> = ({
         name="fame"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Fame</FormLabel>
+            <FormLabel>Minimum fame</FormLabel>
             <FormControl>
               <FameSlider {...field} />
             </FormControl>
@@ -157,24 +167,14 @@ export const AdvancedSearchForm: React.FC<TFormProps<TForm>> = ({
           <FormItem>
             <FormLabel>Tags</FormLabel>
             <FormControl>
-              <div className="flex gap-2">
-                <MultiTagCombobox {...field} modal={modal} />
-                <Button
-                  onClick={() => {
-                    openGlobalDialog('create-tag');
-                  }}
-                >
-                  <Typography variant="small">Create a tag</Typography>
-                  <Plus />
-                </Button>
-              </div>
+              <MultiTagCombobox {...field} modal={modal} />
             </FormControl>
             <FormMessage />
           </FormItem>
         )}
       />
       <FormMessage>{form.formState.errors.root?.message}</FormMessage>
-      <SubmitButtonForm modal={modal} isLoading={false}>
+      <SubmitButtonForm modal={modal} isLoading={mutation.isPending}>
         <Search />
         <Typography>Search</Typography>
       </SubmitButtonForm>

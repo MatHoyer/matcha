@@ -21,6 +21,7 @@ export {
   EMPTY_FIND_SEARCH,
   GENDERS,
   ORIENTATIONS,
+  PROMISE_BATCH_SIZE,
   THOUSAND_SEPARATOR,
 } from './utils/datas';
 export { getDateAsString, getNearDate } from './utils/date';
@@ -31,6 +32,7 @@ export type {
   TClientRouteDataRequirements,
 } from './utils/getUrl';
 export {
+  batchPromises,
   capitalize,
   containsUpperCase,
   quoteUppercase,
@@ -63,6 +65,16 @@ export { advancedSearchSchema } from './schemas/api/search.schema';
 export type { TAdvancedSearchSchema } from './schemas/api/search.schema';
 export { createTagSchemas, getTagsSchemas } from './schemas/api/tags.schema';
 export type { TCreateTagSchemas, TTagSchemas } from './schemas/api/tags.schema';
+export {
+  getUserSchemas,
+  getUsersSchemas,
+  updateUserSchemas,
+} from './schemas/api/users.schema';
+export type {
+  TGetUserSchemas,
+  TGetUsersSchemas,
+  TUpdateUserSchemas,
+} from './schemas/api/users.schema';
 export {
   blockSchema,
   genderSchema,
@@ -100,7 +112,6 @@ export type {
 } from './schemas/database.schema';
 export { sendMessageSchema } from './schemas/socket/send-message.schema';
 export type { TSendMessageSchema } from './schemas/socket/send-message.schema';
-export { getUserSchema } from './schemas/users.schema';
 
 //-----------------------Errors-----------------------
 export { SchemaError } from './errors/schema.error';

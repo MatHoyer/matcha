@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { getUrl } from '@matcha/common';
-import { Bell, FileUser } from 'lucide-react';
+import { Bell, User } from 'lucide-react';
 import { PropsWithChildren } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LogoutButton } from '../ui/LogoutButton';
@@ -34,10 +34,10 @@ const UserDropdown: React.FC<PropsWithChildren> = ({ children }) => {
           </DropdownMenuItem>
           <DropdownMenuItem
             className="cursor-pointer"
-            onClick={() => navigate(getUrl('client-account'))}
+            onClick={() => navigate(getUrl('client-profile'))}
           >
-            <FileUser />
-            My account
+            <User />
+            My profile
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />

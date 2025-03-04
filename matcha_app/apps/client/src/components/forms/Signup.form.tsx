@@ -20,8 +20,10 @@ import {
   Infer,
   ORIENTATIONS,
   signupSchemas,
+  TSignupSchemas,
 } from '@matcha/common';
 import { useMutation } from '@tanstack/react-query';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { SubmitButtonForm } from './components/SubmitButton.form';
 import { TFormProps } from './types.form';
@@ -36,9 +38,11 @@ type TForm = {
   preference: 'Heterosexual' | 'Bisexual' | 'Homosexual' | null;
 };
 
-const SignupForm: React.FC<TFormProps<TForm>> = ({
+const SignupForm: React.FC<TFormProps<TForm, TSignupSchemas['response']>> = ({
   defaultValues,
   modal = false,
+  getData,
+  setIsLoading,
 }) => {
   const navigate = useNavigate();
 
@@ -67,14 +71,19 @@ const SignupForm: React.FC<TFormProps<TForm>> = ({
         handleEnding: {
           successMessage: 'Signup successful',
           errorMessage: 'Signup failed',
-          cb: () => {
+          cb: (data) => {
             if (modal) closeGlobalDialog();
+            getData?.(data);
             navigate('/');
           },
         },
       });
     },
   });
+
+  useEffect(() => {
+    setIsLoading?.(mutation.isPending);
+  }, [mutation.isPending]);
 
   const onSubmit = defaultHandleSubmit(form, mutation);
 

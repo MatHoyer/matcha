@@ -1,6 +1,10 @@
-import { TAdvancedSearchSchema } from '@matcha/common';
+import { batchPromises, TAdvancedSearchSchema } from '@matcha/common';
 import { Request, Response } from 'express';
 import db from '../database/Database';
+import {
+  fameCalculator,
+  getGenderPreferenceMatchCondition,
+} from '../services/search.service';
 import { defaultResponse } from '../utils/defaultResponse';
 
 export const advancedSearch = async (req: Request, res: Response) => {
@@ -22,9 +26,9 @@ export const advancedSearch = async (req: Request, res: Response) => {
       },
     });
   }
+
   const { latitude, longitude } = dbLocation;
   const locationDiff = 0.1;
-
   const goodLocations = await db.location.findMany({
     where: {
       latitude: {
@@ -37,7 +41,6 @@ export const advancedSearch = async (req: Request, res: Response) => {
       },
     },
   });
-
   const userLocations = await db.userLocation.findMany({
     where: {
       locationId: {
@@ -46,14 +49,75 @@ export const advancedSearch = async (req: Request, res: Response) => {
     },
   });
 
-  const users = await db.user.findMany({
+  const goodTags = await db.tag.findMany({
     where: {
-      id: {
-        $in: userLocations.map((ul) => ul.userId),
+      name: {
+        $in: tags,
+      },
+    },
+  });
+  const userTags = await db.userTag.findMany({
+    where: {
+      tagId: {
+        $in: goodTags.map((t) => t.id),
       },
     },
   });
 
-  console.log(users);
-  res.status(200).json({ users });
+  let ids = [
+    ...new Set([
+      ...userTags.map((ut) => ut.userId),
+      ...userLocations.map((ul) => ul.userId),
+    ]),
+  ];
+
+  const fameResults = await batchPromises(ids.map((id) => fameCalculator(id)));
+  ids = ids.filter((id) => {
+    const fameResult = fameResults.find((f) => f.userId === id)?.fame;
+    return fameResult ? fameResult >= fame : false;
+  });
+
+  const users = await db.user.findMany({
+    where: {
+      id: {
+        $not: req.user.id,
+        $in: ids,
+      },
+      age: {
+        $gte: ages.min,
+        $lte: ages.max,
+      },
+      OR: getGenderPreferenceMatchCondition(
+        req.user.gender,
+        req.user.preference
+      ),
+    },
+  });
+
+  const usersResponse: TAdvancedSearchSchema['response']['users'] =
+    await batchPromises(
+      users.map(async (user) => {
+        const allUserTags = await db.userTag.findMany({
+          where: {
+            userId: user.id,
+          },
+        });
+        const allTags = await db.tag.findMany({
+          where: {
+            id: {
+              $in: allUserTags.map((ut) => ut.tagId),
+            },
+          },
+        });
+
+        return {
+          user: user,
+          tags: allTags as { id: number; name: string }[],
+          fame: fameResults.find((f) => f.userId === user.id)?.fame || 1,
+          location,
+        };
+      })
+    );
+
+  res.status(200).json({ users: usersResponse });
 };

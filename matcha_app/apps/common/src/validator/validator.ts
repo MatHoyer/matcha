@@ -237,6 +237,13 @@ export class ZodObject<T extends { [key: string]: any }> extends ZodType<T> {
     }
     return new ZodObject(pickedShape);
   }
+  partial(): ZodObject<Partial<T>> {
+    const partialShape = {} as { [K in keyof T]: ZodType<T[K]> };
+    for (const key in this.shape) {
+      partialShape[key] = this.shape[key].optional() as any;
+    }
+    return new ZodObject(partialShape) as ZodObject<Partial<T>>;
+  }
 }
 
 // Array schema
