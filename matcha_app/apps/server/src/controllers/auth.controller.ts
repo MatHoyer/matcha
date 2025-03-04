@@ -159,7 +159,6 @@ export const session = async (req: Request, res: Response) => {
 
   try {
     const user = jwt.verify(token, env.JWT_SECRET);
-    console.log(user);
     res.status(200).json({ user } as Infer<typeof sessionSchemas.response>);
   } catch (_error) {
     return defaultResponse({
