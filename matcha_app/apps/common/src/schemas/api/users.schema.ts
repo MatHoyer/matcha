@@ -28,3 +28,19 @@ export const getUserSchemas = {
 export type TGetUserSchemas = {
   response: Infer<typeof getUserSchemas.response>;
 };
+
+export const updateUserSchemas = {
+  requirements: z.object({
+    id: userSchema.pick(['id']).shape.id,
+    ...userSchema
+      .pick(['name', 'lastName', 'email', 'gender', 'preference', 'age'])
+      .partial().shape,
+  }),
+  response: z.object({
+    user: userSchema,
+  }),
+};
+export type TUpdateUserSchemas = {
+  requirements: Infer<typeof updateUserSchemas.requirements>;
+  response: Infer<typeof updateUserSchemas.response>;
+};

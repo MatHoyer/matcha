@@ -9,7 +9,9 @@ export type TClientRouteDataRequirements = {
     type: 'forYou' | 'advancedSearch';
   };
   'client-notifications': undefined;
-  'client-account': undefined;
+  'client-profile': {
+    id?: number | undefined;
+  };
 };
 export type TApiRouteDataRequirements = {
   'api-auth': {
@@ -43,7 +45,7 @@ const routes: {
   'client-home': () => '/',
   'client-search': ({ type }) => `/research/${type}`,
   'client-notifications': () => '/notifications',
-  'client-account': () => '/account',
+  'client-profile': ({ id }) => (id ? `/profile/${id}` : '/profile'),
 
   'api-auth': ({ type }) => (type ? `/api/auth/${type}` : '/api/auth'),
   'api-tags': ({ id }) => (id ? `/api/tags/${id}` : '/api/tags'),

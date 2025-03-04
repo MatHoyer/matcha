@@ -65,10 +65,15 @@ export { advancedSearchSchema } from './schemas/api/search.schema';
 export type { TAdvancedSearchSchema } from './schemas/api/search.schema';
 export { createTagSchemas, getTagsSchemas } from './schemas/api/tags.schema';
 export type { TCreateTagSchemas, TTagSchemas } from './schemas/api/tags.schema';
-export { getUserSchemas, getUsersSchemas } from './schemas/api/users.schema';
+export {
+  getUserSchemas,
+  getUsersSchemas,
+  updateUserSchemas,
+} from './schemas/api/users.schema';
 export type {
   TGetUserSchemas,
   TGetUsersSchemas,
+  TUpdateUserSchemas,
 } from './schemas/api/users.schema';
 export {
   blockSchema,
