@@ -2,8 +2,8 @@ import { events, Infer, TUser } from '@matcha/common';
 import { parse } from 'cookie';
 import jwt from 'jsonwebtoken';
 import { Server, Socket } from 'socket.io';
-import { env } from '../env';
 import db from '../database/Database';
+import { env } from '../env';
 
 type Events = typeof events;
 type InferEvent<T extends keyof Events> = Infer<Events[T]>;
@@ -74,7 +74,7 @@ export const socketHandler = (io: Server) => {
             receiverId: receiverId,
             message: message,
             date: new Date(),
-          }
+          },
         });
 
         // console.log('about to save message');
@@ -91,7 +91,9 @@ export const socketHandler = (io: Server) => {
         const receiver = connectedUsers.find((u) => u.id === receiverId);
         if (!receiver) return;
 
-        receiver.socket.emit(`feedback-${receiver.id}-${sender.id}`, { message });        
+        receiver.socket.emit(`feedback-${receiver.id}-${sender.id}`, {
+          message,
+        });
       },
       disconnect: (_args) => {
         console.log(`User disconnected: ${socket.id}`);

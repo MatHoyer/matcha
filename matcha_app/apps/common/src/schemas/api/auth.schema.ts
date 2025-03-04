@@ -42,7 +42,17 @@ export type TLogoutSchemas = {
 
 export const sessionSchemas = {
   response: z.object({
-    user: userSchema,
+    user: userSchema.pick([
+      'id',
+      'name',
+      'lastName',
+      'email',
+      'gender',
+      'preference',
+      'age',
+      'birthDate',
+      'biography',
+    ]),
   }),
 };
 export type TSessionSchemas = {
