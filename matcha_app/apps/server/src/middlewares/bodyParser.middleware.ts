@@ -5,15 +5,14 @@ import { defaultResponse } from '../utils/defaultResponse';
 export const bodyParser =
   <T>(schema: ZodType<T>) =>
   (req: Request, res: Response, next: NextFunction) => {
-    try {
-      schema.parse(req.body);
-      next();
-    } catch (error) {
-      console.error(`Error at ${req.url}:`, error);
+    const parsed = schema.safeParse(req.body);
+    if (!parsed.success) {
+      console.error('Bad body error: ', parsed.error);
       return defaultResponse({
         res,
-        status: 500,
+        status: 400,
         json: { message: 'Bad body' },
       });
     }
+    next();
   };
