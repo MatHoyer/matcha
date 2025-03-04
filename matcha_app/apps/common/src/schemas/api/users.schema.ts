@@ -3,17 +3,7 @@ import { userSchema } from '../database.schema';
 
 export const getUsersSchemas = {
   response: z.object({
-    users: z.array(
-      userSchema.pick([
-        'id',
-        'name',
-        'lastName',
-        'email',
-        'age',
-        'gender',
-        'preference',
-      ])
-    ),
+    users: z.array(userSchema),
   }),
 };
 export type TGetUsersSchemas = {
@@ -33,7 +23,7 @@ export const updateUserSchemas = {
   requirements: z.object({
     id: userSchema.pick(['id']).shape.id,
     ...userSchema
-      .pick(['name', 'lastName', 'email', 'gender', 'preference', 'age'])
+      .pick(['name', 'lastName', 'email', 'gender', 'preference', 'birthDate'])
       .partial().shape,
   }),
   response: z.object({

@@ -1,4 +1,4 @@
-import { getUrl } from '@matcha/common';
+import { getUrl, z } from '@matcha/common';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
@@ -7,11 +7,11 @@ import { Server } from 'socket.io';
 import { env, envSchema } from './env.js';
 import { default as authRouter } from './routes/auth.route.js';
 import globalLocationRouter from './routes/globalLocation.route.js';
+import messagesRouter from './routes/messages.route.js';
 import searchRouter from './routes/search.route.js';
 import tagRouter from './routes/tag.route.js';
 import userRouter from './routes/user.route.js';
 import { socketHandler } from './sockets/sockets.js';
-import messagesRouter from './routes/messages.route.js';
 
 try {
   envSchema.parse(env);
@@ -47,6 +47,18 @@ if (env.NODE_ENV === 'PROD') {
   app.get('*', (_req, res) => {
     res.sendFile(path.join(__dirname, '../../../public/dist/index.html'));
   });
+}
+
+const schema = z.object({
+  date: z.date(),
+});
+const data = {
+  date: '1990-01-01',
+};
+const parsed = schema.safeParse(data);
+console.log(parsed);
+if (parsed.success) {
+  console.log(parsed.data.date);
 }
 
 const server = app.listen(env.SERVER_PORT, () => {

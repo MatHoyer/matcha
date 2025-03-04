@@ -8,6 +8,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Typography } from '@/components/ui/typography';
 import { useSession } from '@/hooks/useSession';
+import { getDateAsString } from '@matcha/common';
 
 export const Home = () => {
   const { user } = useSession();
@@ -28,7 +29,13 @@ export const Home = () => {
               {user &&
                 Object.entries(user).map(([key, value]) => (
                   <Typography key={key} variant="muted">
-                    {key}: {value}
+                    {key}:{' '}
+                    {value instanceof Date
+                      ? getDateAsString({
+                          date: value as Date,
+                          type: 'FULL',
+                        })
+                      : (value as string | number | null | undefined)}
                   </Typography>
                 ))}
             </div>
