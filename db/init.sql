@@ -295,7 +295,7 @@ VALUES  ('Willey', 'Bridie', 'wbridie0@yellowbook.com', '094513168d4401c9dc5d693
 ('Nancey', 'Bowshire', 'nbowshirev@people.com.cn', '094513168d4401c9dc5d693b3fbb9382ce68e54bafbd180f990bdf193f7c0948', '1981-12-31', 'Female', 'Bisexual', 'Maecenas pulvinar lobortis est. Phasellus sit amet erat. Nulla tempus.'),
 ('Elmore', 'Payn', 'epaynw@fda.gov', '094513168d4401c9dc5d693b3fbb9382ce68e54bafbd180f990bdf193f7c0948', '1996-05-31', 'Female', 'Heterosexual', 'Proin interdum mauris non ligula pellentesque ultrices. Phasellus id sapien in sapien iaculis congue. Vivamus metus arcu, adipiscing molestie, hendrerit at, vulputate vitae, nisl.'),
 ('Margie', 'Reinmar', 'mreinmarx@washingtonpost.com', '094513168d4401c9dc5d693b3fbb9382ce68e54bafbd180f990bdf193f7c0948', '2002-03-18', 'Male', 'Homosexual', 'In eleifend quam a odio.'),
-('Raddie', 'Varran', 'rvarrany@123-reg.co.uk', '094513168d4401c9dc5d693b3fbb9382ce68e54bafbd180f990bdf193f7c0948', '1968-04-29', 'Male', 'Bisexual', 'Suspendisse potenti.'),
+('Raddie', 'Varran', 'rvarrany@123-reg.co.uk', '094513168d4401c9dc5d693b3fbb9382ce68e54bafbd180f990bdf193f7c0948', '1968-04-29', 'Male', 'Bisexual', 'Suspendisse potenti.');
 
 INSERT INTO "UserLocation" ("userId", "locationId")
 VALUES (6, 2),
@@ -332,4 +332,4 @@ VALUES (6, 2),
 (37, 2),
 (38, 7),
 (39, 8),
-(40, 7),
+(40, 7);
