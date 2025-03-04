@@ -7,7 +7,7 @@ export const signupSchemas = {
     'lastName',
     'email',
     'password',
-    'age',
+    'birthDate',
     'gender',
     'preference',
   ]),
@@ -42,15 +42,7 @@ export type TLogoutSchemas = {
 
 export const sessionSchemas = {
   response: z.object({
-    user: userSchema.pick([
-      'id',
-      'name',
-      'lastName',
-      'email',
-      'age',
-      'gender',
-      'preference',
-    ]),
+    user: userSchema,
   }),
 };
 export type TSessionSchemas = {
