@@ -24,6 +24,7 @@ export const userSchema = z.object({
   gender: genderSchema,
   preference: orientationSchema,
   biography: z.string().optional().nullable(),
+  lastTimeOnline: z.date(),
 });
 export type TUser = Infer<typeof userSchema>;
 export type TUserWithNames = Pick<TUser, 'id' | 'name' | 'lastName'>;

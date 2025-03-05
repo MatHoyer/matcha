@@ -16,14 +16,16 @@ class GenericRepository<T, I> {
   alias: string;
   name: string;
   tableName: string;
+  tableView?: string;
   pool: pg.Pool;
 
   constructor(tableName: string, pool: pg.Pool) {
     this.alias = tableAlias[tableName];
     this.name = tableName;
-    this.tableName = `public."${capitalize(tableName)}${
-      tableName === 'user' ? '_v' : ''
-    }"`;
+    this.tableName = `public."${capitalize(tableName)}"`;
+    this.tableView = ['user'].includes(tableName)
+      ? `public."${capitalize(tableName)}_v"`
+      : undefined;
     this.pool = pool;
   }
 
@@ -57,9 +59,9 @@ class GenericRepository<T, I> {
     selectColumns.push(...joinColumns);
     const columns = selectColumns.join(', ');
 
-    const queryString = `SELECT ${columns} FROM ${this.tableName} as ${
-      this.alias
-    } 
+    const queryString = `SELECT ${columns} FROM ${
+      this.tableView ?? this.tableName
+    } as ${this.alias} 
       ${join} 
       ${whereClause} 
       ${orderBy}
@@ -113,6 +115,22 @@ class GenericRepository<T, I> {
 
   async remove(options: { where: WhereClause<T> }) {
     return await this.#remove(options);
+  }
+
+  async update(options: { where: WhereClause<T>; data: Partial<T> }) {
+    const { where, data } = options;
+    const { whereClause, values } = generateWhereClauseSql(where);
+    if (!whereClause) throw new Error('No where clause provided');
+    const columns = Object.keys(data)
+      .filter((column) => !['id', 'age'].includes(column))
+      .map((column, index) => `${quoteUppercase(column)} = $${index + 2}`)
+      .join(', ');
+    const dataValues = Object.values(data);
+    const rows = await this.#query(
+      `UPDATE ${this.tableName} SET ${columns} ${whereClause} RETURNING *;`,
+      [...values, ...dataValues]
+    );
+    return rows ? rows[0] : null;
   }
 }
 

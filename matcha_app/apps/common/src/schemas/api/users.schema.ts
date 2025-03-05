@@ -21,13 +21,17 @@ export type TGetUserSchemas = {
 
 export const updateUserSchemas = {
   requirements: z.object({
-    id: userSchema.pick(['id']).shape.id,
-    ...userSchema
-      .pick(['name', 'lastName', 'email', 'gender', 'preference', 'birthDate'])
-      .partial().shape,
+    ...userSchema.pick([
+      'name',
+      'lastName',
+      'email',
+      'gender',
+      'preference',
+      'birthDate',
+    ]).shape,
   }),
   response: z.object({
-    user: userSchema,
+    message: z.string(),
   }),
 };
 export type TUpdateUserSchemas = {

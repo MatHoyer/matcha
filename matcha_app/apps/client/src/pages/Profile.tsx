@@ -1,3 +1,4 @@
+import { ProfileForm } from '@/components/forms/Profile.form';
 import {
   Layout,
   LayoutContent,
@@ -12,7 +13,7 @@ export const Profile = () => {
         <LayoutTitle>My profile</LayoutTitle>
       </LayoutHeader>
       <LayoutContent>
-        <h1>Profile</h1>
+        <ProfileForm />
       </LayoutContent>
     </Layout>
   );

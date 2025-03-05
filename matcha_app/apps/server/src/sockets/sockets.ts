@@ -35,7 +35,7 @@ type TUserManager = {
 const connectedUsers = [] as TUserManager[];
 
 export const socketHandler = (io: Server) => {
-  io.on('connection', (socket: Socket) => {
+  io.on('connection', async (socket: Socket) => {
     const cookies = parse(socket.handshake.headers.cookie || '');
     const token = cookies['auth-token'];
     if (!token) {
@@ -43,11 +43,20 @@ export const socketHandler = (io: Server) => {
       return;
     }
     try {
-      const userPayload = jwt.verify(token, env.JWT_SECRET) as TUser;
-      const user = connectedUsers.find((user) => user.id === userPayload.id);
+      const userPayload = jwt.verify(token, env.JWT_SECRET) as { id: number };
+      const dbUser = await db.user.findFirst({
+        where: {
+          id: userPayload.id,
+        },
+      });
+      if (!dbUser) {
+        socket.disconnect();
+        return;
+      }
+      const user = connectedUsers.find((user) => user.id === dbUser.id);
       if (!user) {
         connectedUsers.push({
-          ...userPayload,
+          ...dbUser,
           socket,
         });
       } else {

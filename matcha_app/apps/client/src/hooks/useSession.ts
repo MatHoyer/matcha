@@ -16,5 +16,9 @@ export const useSession = () => {
     refetchOnWindowFocus: true,
   });
 
-  return { user: query.data?.user, loading: query.isLoading };
+  return {
+    user: query.data?.user,
+    loading: query.isLoading,
+    refetch: query.refetch,
+  };
 };
