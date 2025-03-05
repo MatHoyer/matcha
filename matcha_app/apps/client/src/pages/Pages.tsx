@@ -7,6 +7,7 @@ import { Home } from './Home';
 import { NotFound } from './NotFound';
 import { Profile } from './Profile';
 import { AdvancedSearch } from './research/AdvancedSearch';
+import { Notifications } from './Notifications';
 
 const AuthRoute = () => {
   const { user, loading } = useSession();
@@ -57,6 +58,10 @@ export const Pages = () => {
           element={<AdvancedSearch />}
         />
         <Route path={`${getUrl('client-profile')}/*`} element={<Profile />} />
+        <Route
+          path={`${getUrl('client-notifications')}/*`}
+          element={<Notifications />}
+        />
       </Route>
     </Routes>
   );

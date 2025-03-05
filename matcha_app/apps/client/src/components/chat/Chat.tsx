@@ -64,7 +64,7 @@ export const Chat: React.FC<PrivateChatProps> = ({
                       : otherUser.name,
                   message: msg.message,
                   dateTime: msg.date,
-                  isOwnMessage: msg.receiverId === session.user!.id,
+                  isOwnMessage: msg.userId === session.user!.id,
                 })
               );
               setChatMessages(chatMessages);

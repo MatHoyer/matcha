@@ -64,6 +64,16 @@ export const socketHandler = (io: Server) => {
       } else {
         user.socket = socket;
       }
+      setInterval(async () => {
+        await db.user.update({
+          where: {
+            id: userPayload.id,
+          },
+          data: {
+            lastTimeOnline: new Date(),
+          },
+        });
+      }, 5 * 60 * 1000);
     } catch (error) {
       console.error('Error parsing token', error);
       socket.disconnect();
