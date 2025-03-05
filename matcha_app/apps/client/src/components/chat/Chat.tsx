@@ -49,8 +49,26 @@ export const Chat: React.FC<PrivateChatProps> = ({
           data: { userId: session.user!.id },
           handleEnding: {
             cb: (data) => {
-              setChatMessages(data.messages);
-              console.log('chatMessages', data.messages);
+              const filteredMessages = data.messages.filter(
+                (msg: TMessage) =>
+                  (msg.userId === session.user!.id &&
+                    msg.receiverId === otherUser.id) ||
+                  (msg.userId === otherUser.id &&
+                    msg.receiverId === session.user!.id)
+              );
+              const formattedMessages = filteredMessages.map(
+                (msg: TMessage) => ({
+                  name:
+                    msg.userId === session.user!.id
+                      ? session.user!.name
+                      : otherUser.name,
+                  message: msg.message,
+                  dateTime: msg.date,
+                  isOwnMessage: msg.receiverId === session.user!.id,
+                })
+              );
+              setChatMessages(chatMessages);
+              setMessages(formattedMessages);
             },
           },
         });
