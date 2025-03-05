@@ -7,7 +7,6 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import NumberInput from '@/components/ui/NumberField';
 import PasswordInput from '@/components/ui/password-input';
 import Selector from '@/components/ui/selector';
 import { closeGlobalDialog } from '@/hooks/use-dialog';
@@ -25,6 +24,7 @@ import {
 import { useMutation } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { DatePicker } from '../ui/date-time-picker';
 import { SubmitButtonForm } from './components/SubmitButton.form';
 import { TFormProps } from './types.form';
 
@@ -33,7 +33,7 @@ type TForm = {
   lastName: string;
   email: string;
   password: string;
-  age: number;
+  birthDate: Date;
   gender: 'Male' | 'Female' | null;
   preference: 'Heterosexual' | 'Bisexual' | 'Homosexual' | null;
 };
@@ -53,7 +53,7 @@ const SignupForm: React.FC<TFormProps<TForm, TSignupSchemas['response']>> = ({
       lastName: '',
       email: '',
       password: '',
-      age: 0,
+      birthDate: new Date(),
       gender: null,
       preference: null,
       ...defaultValues,
@@ -125,6 +125,19 @@ const SignupForm: React.FC<TFormProps<TForm, TSignupSchemas['response']>> = ({
       />
       <FormField
         control={form.control}
+        name="birthDate"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Birth date</FormLabel>
+            <FormControl>
+              <DatePicker {...field} modal={modal} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
         name="email"
         render={({ field }) => (
           <FormItem>
@@ -149,19 +162,6 @@ const SignupForm: React.FC<TFormProps<TForm, TSignupSchemas['response']>> = ({
             <FormLabel>Password</FormLabel>
             <FormControl>
               <PasswordInput {...field} autoComplete="current-password" />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={form.control}
-        name="age"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Age</FormLabel>
-            <FormControl>
-              <NumberInput {...field} scale={0} step={1} min={0} />
             </FormControl>
             <FormMessage />
           </FormItem>

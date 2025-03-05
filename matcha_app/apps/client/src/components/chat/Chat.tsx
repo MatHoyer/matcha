@@ -3,16 +3,18 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Typography } from '@/components/ui/typography';
 import { useSession } from '@/hooks/useSession';
-import { useMessages } from '@/hooks/useMessages';
-import { socket } from '@/lib/socket';
-import { getUrl, messagesSchemas, TSendMessageSchema } from '@matcha/common';
-import { TUser } from '@matcha/common';
-import { Minus, X } from 'lucide-react';
-import moment from 'moment';
-import React, { use, useEffect, useState } from 'react';
-import { TMessage } from '@matcha/common';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
-import { closeGlobalDialog } from '@/hooks/use-dialog';
+import { socket } from '@/lib/socket';
+import {
+  getNearDate,
+  getUrl,
+  messagesSchemas,
+  TMessage,
+  TSendMessageSchema,
+  TUser,
+} from '@matcha/common';
+import { Minus, X } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 
 interface PrivateChatProps {
   otherUser: TUser;
@@ -154,7 +156,7 @@ export const Chat: React.FC<PrivateChatProps> = ({
               >
                 <p className="text-sm">{data.message}</p>
                 <span className="text-xs block text-gray-400">
-                  {data.name} • {moment(data.dateTime).fromNow()}
+                  {data.name} • {getNearDate(data.dateTime)}
                 </span>
               </li>
             ))}

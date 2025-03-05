@@ -1,4 +1,4 @@
-import { getUrl, z } from '@matcha/common';
+import { getUrl } from '@matcha/common';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import express from 'express';
@@ -47,18 +47,6 @@ if (env.NODE_ENV === 'PROD') {
   app.get('*', (_req, res) => {
     res.sendFile(path.join(__dirname, '../../../public/dist/index.html'));
   });
-}
-
-const schema = z.object({
-  date: z.date(),
-});
-const data = {
-  date: '1990-01-01',
-};
-const parsed = schema.safeParse(data);
-console.log(parsed);
-if (parsed.success) {
-  console.log(parsed.data.date);
 }
 
 const server = app.listen(env.SERVER_PORT, () => {

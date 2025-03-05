@@ -15,7 +15,7 @@ CREATE TABLE "User" (
   "gender" "Gender" NOT NULL,
   "preference" "Orientation" NOT NULL,
   "biography" VARCHAR(1000),
-  "lastTimeOnline" DATE NOT NULL DEFAULT CURRENT_DATE
+  "lastTimeOnline" TIMESTAMP NOT NULL DEFAULT NOW()
 );
 CREATE OR REPLACE VIEW "User_v" AS 
 SELECT *, EXTRACT(YEAR FROM age(CURRENT_DATE, "birthDate"))::INT AS "age" FROM "User";
@@ -41,7 +41,7 @@ CREATE TABLE "Message" (
   "userId" INT NOT NULL,
   "receiverId" INT NOT NULL,
   "message" VARCHAR(1000) NOT NULL,
-  "date" DATE NOT NULL DEFAULT CURRENT_DATE,
+  "date" TIMESTAMP NOT NULL DEFAULT NOW(),
   FOREIGN KEY ("userId") REFERENCES "User" ("id")  ON DELETE CASCADE,
   FOREIGN KEY ("receiverId") REFERENCES "User" ("id")  ON DELETE CASCADE
 );
@@ -71,7 +71,7 @@ CREATE TABLE "Notification" (
   "userId" INT NOT NULL,
   "otherId" INT,
   "message" VARCHAR(1000) NOT NULL,
-  "date" DATE NOT NULL DEFAULT CURRENT_DATE,
+  "date" TIMESTAMP NOT NULL DEFAULT NOW(),
   "read" BOOLEAN NOT NULL DEFAULT FALSE,
   FOREIGN KEY ("userId") REFERENCES "User" ("id")  ON DELETE CASCADE
 );
@@ -98,7 +98,7 @@ CREATE TABLE "Location" (
   "id" SERIAL PRIMARY KEY,
   "latitude" FLOAT NOT NULL,
   "longitude" FLOAT NOT NULL,
-  "date" DATE NOT NULL DEFAULT CURRENT_DATE
+  "date" TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 DROP TABLE IF EXISTS "UserLocation";
@@ -115,7 +115,7 @@ CREATE TABLE "View" (
   "id" SERIAL PRIMARY KEY,
   "userId" INT NOT NULL,
   "viewerId" INT NOT NULL,
-  "date" DATE NOT NULL DEFAULT CURRENT_DATE,
+  "date" TIMESTAMP NOT NULL DEFAULT NOW(),
   FOREIGN KEY ("userId") REFERENCES "User" ("id")  ON DELETE CASCADE,
   FOREIGN KEY ("viewerId") REFERENCES "User" ("id")  ON DELETE CASCADE
 );

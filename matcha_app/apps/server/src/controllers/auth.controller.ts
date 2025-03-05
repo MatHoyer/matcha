@@ -54,9 +54,7 @@ export const signup = async (req: Request, res: Response) => {
     });
   }
 
-  const { password: _, ...userWithoutPassword } = user;
-
-  const token = jwt.sign({ ...userWithoutPassword }, env.JWT_SECRET, {
+  const token = jwt.sign({ id: user.id }, env.JWT_SECRET, {
     expiresIn: 30 * 24 * 60 * 60,
   });
 
@@ -100,9 +98,7 @@ export const login = async (req: Request, res: Response) => {
     });
   }
 
-  const { password: _, ...userWithoutPassword } = user;
-
-  const token = jwt.sign({ ...userWithoutPassword }, env.JWT_SECRET, {
+  const token = jwt.sign({ id: user.id }, env.JWT_SECRET, {
     expiresIn: 30 * 24 * 60 * 60,
   });
 
@@ -158,8 +154,17 @@ export const session = async (req: Request, res: Response) => {
   }
 
   try {
-    const user = jwt.verify(token, env.JWT_SECRET);
-    res.status(200).json({ user } as Infer<typeof sessionSchemas.response>);
+    const user = jwt.verify(token, env.JWT_SECRET) as {
+      id: number;
+    };
+    const dbUser = await db.user.findFirst({
+      where: {
+        id: user.id,
+      },
+    });
+    res
+      .status(200)
+      .json({ user: dbUser } as Infer<typeof sessionSchemas.response>);
   } catch (_error) {
     return defaultResponse({
       res,

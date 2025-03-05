@@ -1,15 +1,20 @@
 import { closeGlobalDialog } from '@/hooks/use-dialog';
+import { useSession } from '@/hooks/useSession';
 import { useZodForm } from '@/hooks/useZodForm';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import { defaultHandleSubmit } from '@/lib/fetch-utils/defaultHandleSubmit';
 import {
+  GENDERS,
   getUrl,
-  getUserSchemas,
+  ORIENTATIONS,
+  TGender,
+  TOrientation,
   TUpdateUserSchemas,
   updateUserSchemas,
 } from '@matcha/common';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect } from 'react';
+import { DatePicker } from '../ui/date-time-picker';
 import {
   Form,
   FormControl,
@@ -19,42 +24,47 @@ import {
   FormMessage,
 } from '../ui/form';
 import { Input } from '../ui/input';
+import Selector from '../ui/selector';
 import { SubmitButtonForm } from './components/SubmitButton.form';
 import { TFormProps } from './types.form';
 
 type TForm = {
-  name?: string;
-  lastName?: string;
-  email?: string;
-  gender?: string;
-  preference?: string;
-  age?: number;
+  name: string;
+  lastName: string;
+  email: string;
+  gender: TGender;
+  preference: TOrientation;
+  birthDate: Date;
 };
 
 export const ProfileForm: React.FC<
   TFormProps<TForm, TUpdateUserSchemas['response']>
-> = ({ defaultValues, modal, getData, setIsLoading }) => {
+> = ({ defaultValues: _, modal, getData, setIsLoading }) => {
+  const session = useSession();
   const form = useZodForm<TForm>({
     schema: updateUserSchemas.requirements,
     defaultValues: {
-      ...defaultValues,
+      ...session!.user,
     },
   });
 
   const mutation = useMutation({
     mutationFn: async (data: TForm) => {
       return await axiosFetch({
-        method: 'POST',
-        url: getUrl('api-users'),
+        method: 'PUT',
+        url: getUrl('api-users', {
+          id: session!.user!.id,
+        }),
         data,
-        schemas: getUserSchemas,
+        schemas: updateUserSchemas,
         form,
         handleEnding: {
-          successMessage: 'Tag created',
-          errorMessage: 'Error creating tag',
+          successMessage: 'Profile updated',
+          errorMessage: 'Error updating profile',
           cb: (data) => {
             if (modal) closeGlobalDialog();
             getData?.(data);
+            session!.refetch();
           },
         },
       });
@@ -80,7 +90,33 @@ export const ProfileForm: React.FC<
           <FormItem>
             <FormLabel>Name</FormLabel>
             <FormControl>
-              <Input {...field} />
+              <Input {...field} autoComplete="name" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="lastName"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Familly name</FormLabel>
+            <FormControl>
+              <Input {...field} autoComplete="family-name" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="birthDate"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Birth date</FormLabel>
+            <FormControl>
+              <DatePicker {...field} modal={modal} />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -93,7 +129,43 @@ export const ProfileForm: React.FC<
           <FormItem>
             <FormLabel>Email</FormLabel>
             <FormControl>
-              <Input type="email" {...field} />
+              <Input type="email" {...field} autoComplete="email" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="gender"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Gender</FormLabel>
+            <FormControl>
+              <Selector
+                list={[...GENDERS]}
+                value={field.value || 'Select gender'}
+                onChange={(value) => field.onChange(value)}
+                modal={modal}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="preference"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Orientation</FormLabel>
+            <FormControl>
+              <Selector
+                list={[...ORIENTATIONS]}
+                value={field.value || 'Select orientation'}
+                onChange={(value) => field.onChange(value)}
+                modal={modal}
+              />
             </FormControl>
             <FormMessage />
           </FormItem>

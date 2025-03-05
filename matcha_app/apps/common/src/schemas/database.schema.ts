@@ -1,3 +1,4 @@
+import { differenceInYears } from 'date-fns';
 import { GENDERS, ORIENTATIONS } from '../utils/datas';
 import { Infer, z } from '../validator/validator';
 
@@ -14,10 +15,16 @@ export const userSchema = z.object({
   email: z.string().email(),
   password: z.string(),
   age: z.number(),
-  birthDate: z.date(),
+  birthDate: z
+    .date()
+    .refine(
+      (date) => differenceInYears(new Date(), date) >= 18,
+      'You must be at least 18 years old to use this app'
+    ),
   gender: genderSchema,
   preference: orientationSchema,
   biography: z.string().optional().nullable(),
+  lastTimeOnline: z.date(),
 });
 export type TUser = Infer<typeof userSchema>;
 export type TUserWithNames = Pick<TUser, 'id' | 'name' | 'lastName'>;
