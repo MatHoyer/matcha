@@ -33,11 +33,9 @@ type TUserManager = {
 } & TUser;
 
 const connectedUsers = [] as TUserManager[];
-// const allUsers = [] as TUser[];
 
 export const socketHandler = (io: Server) => {
   io.on('connection', async (socket: Socket) => {
-    const allUsers = await db.user.findMany({});
     const cookies = parse(socket.handshake.headers.cookie || '');
     const token = cookies['auth-token'];
     if (!token) {
@@ -45,7 +43,9 @@ export const socketHandler = (io: Server) => {
       return;
     }
     try {
-      const userPayload = jwt.verify(token, env.JWT_SECRET) as { id: number };
+      const userPayload = jwt.verify(token, env.JWT_SECRET) as {
+        id: TUser['id'];
+      };
       const dbUser = await db.user.findFirst({
         where: {
           id: userPayload.id,
@@ -74,11 +74,6 @@ export const socketHandler = (io: Server) => {
       'send-message': async (args) => {
         const { senderId, receiverId, message } = args; // args parsed in socketMiddleware
 
-        const sender = connectedUsers.find((u) => u.id === senderId);
-        if (!sender) return;
-        const receiverDb = allUsers.find((u) => u.id === receiverId);
-        if (!receiverDb) return;
-
         await db.message.create({
           data: {
             userId: senderId,
@@ -88,6 +83,8 @@ export const socketHandler = (io: Server) => {
           },
         });
 
+        const sender = connectedUsers.find((u) => u.id === senderId);
+        if (!sender) return;
         const receiver = connectedUsers.find((u) => u.id === receiverId);
         if (!receiver) return;
 
