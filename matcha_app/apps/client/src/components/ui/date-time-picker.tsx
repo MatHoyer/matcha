@@ -212,7 +212,7 @@ export const DatePicker: React.FC<{
                   <DropdownMenuContent>
                     <ScrollArea className="h-72">
                       <div className="grid grid-cols-3 gap-2 p-2">
-                        {Array.from({ length: 200 }, (_, i) => {
+                        {Array.from({ length: 120 }, (_, i) => {
                           const year = getYear(new Date()) - i;
                           return (
                             <DropdownMenuItem
