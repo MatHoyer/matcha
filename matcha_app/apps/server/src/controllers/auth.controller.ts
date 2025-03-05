@@ -162,9 +162,20 @@ export const session = async (req: Request, res: Response) => {
         id: user.id,
       },
     });
+    if (!dbUser) {
+      return defaultResponse({
+        res,
+        status: 401,
+        json: { message: 'Unauthorized' },
+      });
+    }
+
+    const { password: _, ...userWithoutPassword } = dbUser;
     res
       .status(200)
-      .json({ user: dbUser } as Infer<typeof sessionSchemas.response>);
+      .json({ user: userWithoutPassword } as Infer<
+        typeof sessionSchemas.response
+      >);
   } catch (_error) {
     return defaultResponse({
       res,

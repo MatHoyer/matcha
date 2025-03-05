@@ -135,42 +135,44 @@ export const ProfileForm: React.FC<
           </FormItem>
         )}
       />
-      <FormField
-        control={form.control}
-        name="gender"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Gender</FormLabel>
-            <FormControl>
-              <Selector
-                list={[...GENDERS]}
-                value={field.value || 'Select gender'}
-                onChange={(value) => field.onChange(value)}
-                modal={modal}
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={form.control}
-        name="preference"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Orientation</FormLabel>
-            <FormControl>
-              <Selector
-                list={[...ORIENTATIONS]}
-                value={field.value || 'Select orientation'}
-                onChange={(value) => field.onChange(value)}
-                modal={modal}
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+      <div className="flex flex-col gap-2 md:flex-row">
+        <FormField
+          control={form.control}
+          name="gender"
+          render={({ field }) => (
+            <FormItem className="flex-1">
+              <FormLabel>Gender</FormLabel>
+              <FormControl>
+                <Selector
+                  list={[...GENDERS]}
+                  value={field.value || 'Select gender'}
+                  onChange={(value) => field.onChange(value)}
+                  modal={modal}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="preference"
+          render={({ field }) => (
+            <FormItem className="flex-1">
+              <FormLabel>Orientation</FormLabel>
+              <FormControl>
+                <Selector
+                  list={[...ORIENTATIONS]}
+                  value={field.value || 'Select orientation'}
+                  onChange={(value) => field.onChange(value)}
+                  modal={modal}
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
       <FormMessage>{form.formState.errors.root?.message}</FormMessage>
       <SubmitButtonForm modal={modal} isLoading={mutation.isPending}>
         Update profile

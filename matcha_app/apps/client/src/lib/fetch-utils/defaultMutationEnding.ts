@@ -12,6 +12,7 @@ export const defaultMutationEnding = async <T extends ZodType<D>, D>(data: {
   const { cb, res, successMessage, responseSchema } = data;
 
   const responseData = responseSchema.safeParse(res?.data);
+  console.log(res?.data);
   if (!responseData.success) {
     console.error('Axios fetch response type invalid:', responseData.error);
     return null;

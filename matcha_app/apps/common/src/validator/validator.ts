@@ -404,6 +404,50 @@ export class ZodUnion<T extends ZodType<any>[]> extends ZodType<
   }
 }
 
+// File schema
+export class ZodFile extends ZodType<File> {
+  private _maxSize?: number;
+  private _acceptedTypes?: string[];
+
+  _tryCoerce(data: unknown): unknown {
+    // Files can't really be coerced from other types
+    return data;
+  }
+
+  parse(data: unknown): File {
+    if (!(data instanceof File)) {
+      throw new Error('Expected File, got ' + data);
+    }
+
+    if (this._maxSize && data.size > this._maxSize) {
+      throw new Error(
+        `File size must be less than ${this._maxSize / (1024 * 1024)}MB`
+      );
+    }
+
+    if (this._acceptedTypes && this._acceptedTypes.length > 0) {
+      const fileType = data.type;
+      if (!this._acceptedTypes.some((type) => fileType.startsWith(type))) {
+        throw new Error(
+          `File must be one of: ${this._acceptedTypes.join(', ')}`
+        );
+      }
+    }
+
+    return data;
+  }
+
+  maxSize(size: number) {
+    this._maxSize = size;
+    return this;
+  }
+
+  accept(types: string[]) {
+    this._acceptedTypes = types;
+    return this;
+  }
+}
+
 // A utility object to create schemas easily
 export const z = {
   string: () => new ZodString(),
@@ -411,11 +455,12 @@ export const z = {
   boolean: () => new ZodBoolean(),
   date: () => new ZodDate(),
   null: () => new ZodNull(),
+  file: () => new ZodFile(),
   enum: <T extends readonly string[]>(values: T) =>
     new ZodEnum<T[number]>(values),
   object: <T extends { [key: string]: any }>(shape: {
     [K in keyof T]: ZodType<T[K]>;
-  }) => new ZodObject<T>(shape).coercive(),
+  }) => new ZodObject<T>(shape),
   array: <T>(itemType: ZodType<T>) => new ZodArray(itemType),
   union: <T extends ZodType<any>[]>(schemas: T): ZodUnion<T> =>
     new ZodUnion(schemas),

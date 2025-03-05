@@ -61,12 +61,24 @@ export { errorSchema } from './schemas/api/error.schema';
 export type { TErrorSchema } from './schemas/api/error.schema';
 export { getGlobalLocationsSchemas } from './schemas/api/globalLocations.schema';
 export type { TGlobalLocationsSchemas } from './schemas/api/globalLocations.schema';
+export { lastOnlineSchema } from './schemas/api/lastOnline.schema';
+export type { TLastOnlineSchema } from './schemas/api/lastOnline.schema';
+export { messagesSchemas } from './schemas/api/messages.schema';
+export type { TMessagesSchemas } from './schemas/api/messages.schema';
+export {
+  createPictureSchemas,
+  getPictureSchemas,
+  getPicturesSchemas,
+} from './schemas/api/picture.schema';
+export type {
+  TCreatePictureSchemas,
+  TGetPictureSchemas,
+  TGetPicturesSchemas,
+} from './schemas/api/picture.schema';
 export { advancedSearchSchema } from './schemas/api/search.schema';
 export type { TAdvancedSearchSchema } from './schemas/api/search.schema';
 export { createTagSchemas, getTagsSchemas } from './schemas/api/tags.schema';
 export type { TCreateTagSchemas, TTagSchemas } from './schemas/api/tags.schema';
-export { messagesSchemas } from './schemas/api/messages.schema';
-export type { TMessagesSchemas } from './schemas/api/messages.schema';
 export {
   getUserSchemas,
   getUsersSchemas,
@@ -115,8 +127,6 @@ export type {
 export { events } from './schemas/socket/events.schema';
 export { sendMessageSchema } from './schemas/socket/send-message.schema';
 export type { TSendMessageSchema } from './schemas/socket/send-message.schema';
-export { lastOnlineSchema } from './schemas/api/lastOnline.schema';
-export type { TLastOnlineSchema } from './schemas/api/lastOnline.schema';
 
 //-----------------------Errors-----------------------
 export { SchemaError } from './errors/schema.error';

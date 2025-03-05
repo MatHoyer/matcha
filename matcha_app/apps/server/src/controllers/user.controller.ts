@@ -14,7 +14,15 @@ import { defaultResponse } from '../utils/defaultResponse';
 export const getUsers = async (_req: Request, res: Response) => {
   try {
     const users = await db.user.findMany({});
-    res.status(200).json({ users } as Infer<typeof getUsersSchemas.response>);
+    const usersWithoutPassword = users.map((user) => {
+      const { password: _, ...userWithoutPassword } = user;
+      return userWithoutPassword;
+    });
+    res
+      .status(200)
+      .json({ users: usersWithoutPassword } as Infer<
+        typeof getUsersSchemas.response
+      >);
   } catch (error) {
     console.error('Error fetching users:', error);
     defaultResponse({

@@ -3,7 +3,20 @@ import { userSchema } from '../database.schema';
 
 export const getUsersSchemas = {
   response: z.object({
-    users: z.array(userSchema),
+    users: z.array(
+      userSchema.pick([
+        'id',
+        'name',
+        'lastName',
+        'email',
+        'gender',
+        'preference',
+        'age',
+        'birthDate',
+        'biography',
+        'lastTimeOnline',
+      ])
+    ),
   }),
 };
 export type TGetUsersSchemas = {
@@ -12,7 +25,17 @@ export type TGetUsersSchemas = {
 
 export const getUserSchemas = {
   response: z.object({
-    user: userSchema,
+    user: userSchema.pick([
+      'id',
+      'name',
+      'lastName',
+      'email',
+      'gender',
+      'preference',
+      'age',
+      'birthDate',
+      'biography',
+    ]),
   }),
 };
 export type TGetUserSchemas = {

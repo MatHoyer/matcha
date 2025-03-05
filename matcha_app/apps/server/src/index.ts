@@ -8,11 +8,11 @@ import { env, envSchema } from './env.js';
 import { default as authRouter } from './routes/auth.route.js';
 import globalLocationRouter from './routes/globalLocation.route.js';
 import messagesRouter from './routes/messages.route.js';
+import pictureRouter from './routes/picture.route.js';
 import searchRouter from './routes/search.route.js';
 import tagRouter from './routes/tag.route.js';
 import userRouter from './routes/user.route.js';
 import { socketHandler } from './sockets/sockets.js';
-import lastOnlineRouter from './routes/lastOnline.route.js';
 
 try {
   envSchema.parse(env);
@@ -23,7 +23,11 @@ try {
 
 const app = express();
 
-app.use(express.json());
+app.use(
+  express.json({
+    limit: '4mb',
+  })
+);
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(
@@ -42,7 +46,7 @@ app.use(getUrl('api-globalLocations'), globalLocationRouter);
 app.use(getUrl('api-users'), userRouter);
 app.use(getUrl('api-search'), searchRouter);
 app.use(getUrl('api-messages'), messagesRouter);
-app.use(getUrl('api-lastOnline'), lastOnlineRouter);
+app.use(getUrl('api-picture'), pictureRouter);
 
 if (env.NODE_ENV === 'PROD') {
   app.use(express.static(path.join(__dirname, '../../../public/dist')));
