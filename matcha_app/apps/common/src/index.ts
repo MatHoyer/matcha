@@ -115,6 +115,8 @@ export type {
 export { events } from './schemas/socket/events.schema';
 export { sendMessageSchema } from './schemas/socket/send-message.schema';
 export type { TSendMessageSchema } from './schemas/socket/send-message.schema';
+export { lastOnlineSchema } from './schemas/api/lastOnline.schema';
+export type { TLastOnlineSchema } from './schemas/api/lastOnline.schema';
 
 //-----------------------Errors-----------------------
 export { SchemaError } from './errors/schema.error';

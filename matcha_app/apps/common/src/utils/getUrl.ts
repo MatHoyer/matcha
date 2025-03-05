@@ -30,6 +30,9 @@ export type TApiRouteDataRequirements = {
   'api-messages': {
     id?: number;
   };
+  'api-lastOnline': {
+    id?: number;
+  };
 };
 
 type TRouteDataRequirements = TClientRouteDataRequirements &
@@ -56,6 +59,8 @@ const routes: {
   'api-search': ({ type }) => (type ? `/api/search/${type}` : '/api/search'),
   'api-users': ({ id }) => (id ? `/api/users/${id}` : '/api/users'),
   'api-messages': ({ id }) => (id ? `/api/messages/${id}` : '/api/messages'),
+  'api-lastOnline': ({ id }) =>
+    id ? `/api/lastOnline/${id}` : '/api/lastOnline',
 };
 
 type TUrlParams =

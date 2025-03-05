@@ -82,9 +82,6 @@ export const socketHandler = (io: Server) => {
         const receiver = connectedUsers.find((u) => u.id === receiverId);
         if (!receiver) return;
 
-        // console.log('about to save message');
-        // saveMessage(senderId, receiverId, message, new Date());
-
         receiver.socket.emit(`pv-${receiver.id}-${sender.id}`, { message });
       },
       'send-feedback': (args) => {
