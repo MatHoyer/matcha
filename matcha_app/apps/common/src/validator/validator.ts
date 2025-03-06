@@ -352,24 +352,27 @@ export class ZodFile extends ZodType<File> {
   private _maxSize?: number;
   private _acceptedTypes?: string[];
 
-  _tryCoerce(data: unknown): unknown {
-    // Files can't really be coerced from other types
+  #tryCoerce(data: unknown): unknown {
+    if (data instanceof Blob) {
+      return new File([data], 'tmpFile', { type: data.type });
+    }
     return data;
   }
 
   parse(data: unknown): File {
-    if (!(data instanceof File)) {
+    const coercedData = this.#tryCoerce(data);
+    if (!(coercedData instanceof File)) {
       throw new Error('Expected File, got ' + data);
     }
 
-    if (this._maxSize && data.size > this._maxSize) {
+    if (this._maxSize && coercedData.size > this._maxSize) {
       throw new Error(
         `File size must be less than ${this._maxSize / (1024 * 1024)}MB`
       );
     }
 
     if (this._acceptedTypes && this._acceptedTypes.length > 0) {
-      const fileType = data.type;
+      const fileType = coercedData.type;
       if (!this._acceptedTypes.some((type) => fileType.startsWith(type))) {
         throw new Error(
           `File must be one of: ${this._acceptedTypes.join(', ')}`
@@ -377,7 +380,7 @@ export class ZodFile extends ZodType<File> {
       }
     }
 
-    return data;
+    return coercedData;
   }
 
   maxSize(size: number) {

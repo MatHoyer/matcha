@@ -23,7 +23,7 @@ export const axiosFetch = async <
 }: {
   method: 'GET' | 'POST' | 'PUT' | 'DELETE';
   url: string;
-  data?: Infer<R>;
+  data?: Infer<R> | FormData;
   config?: AxiosRequestConfig;
   schemas: {
     requirements?: R;
@@ -38,6 +38,17 @@ export const axiosFetch = async <
   };
 }): Promise<Infer<T>> => {
   try {
+    if (data instanceof FormData) {
+      config = {
+        ...config,
+        headers: {
+          ...config.headers,
+          'Content-Type': 'multipart/form-data',
+        },
+        transformRequest: [],
+      };
+    }
+
     const response = await axios({
       method,
       url,

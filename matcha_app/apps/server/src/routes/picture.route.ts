@@ -1,8 +1,9 @@
-import { createPictureSchemas, z } from '@matcha/common';
+import { createPictureSchemas, getPicturesSchemas, z } from '@matcha/common';
 import { Router } from 'express';
 import {
   createPicture,
   getPicture,
+  getPictures,
 } from '../controllers/picture.controller.js';
 import { bodyParser } from '../middlewares/bodyParser.middleware.js';
 import { isLogged } from '../middlewares/isLogged.middleware.js';
@@ -18,6 +19,12 @@ pictureRouter.get(
 );
 pictureRouter.post(
   '/',
+  isLogged,
+  bodyParser(getPicturesSchemas.requirements),
+  getPictures
+);
+pictureRouter.post(
+  '/new',
   isLogged,
   bodyParser(createPictureSchemas.requirements),
   createPicture

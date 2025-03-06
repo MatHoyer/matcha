@@ -1,8 +1,7 @@
+import { Infer, messagesSchemas } from '@matcha/common';
 import type { Request, Response } from 'express';
 import db from '../database/Database';
 import { defaultResponse } from '../utils/defaultResponse';
-import { Infer } from '@matcha/common/';
-import { messagesSchemas } from '@matcha/common';
 
 export const getMessages = async (req: Request, res: Response) => {
   try {

@@ -7,7 +7,12 @@ export const getPictureSchemas = {
   response: z.object({
     id: imageSchema.pick(['id']).shape.id,
     isProfile: z.boolean(),
-    file: z.file(),
+    file: z.object({
+      name: z.string(),
+      type: z.string(),
+      size: z.number(),
+      buffer: z.array(z.number()),
+    }),
   }),
 };
 export type TGetPictureSchemas = {
@@ -23,7 +28,12 @@ export const getPicturesSchemas = {
       z.object({
         id: imageSchema.pick(['id']).shape.id,
         isProfile: z.boolean(),
-        file: z.file(),
+        file: z.object({
+          name: z.string(),
+          type: z.string(),
+          size: z.number(),
+          buffer: z.array(z.number()),
+        }),
       })
     ),
   }),
@@ -35,7 +45,12 @@ export type TGetPicturesSchemas = {
 
 export const createPictureSchemas = {
   requirements: z.object({
-    picture: z.file().accept(['image/']),
+    picture: z.object({
+      name: z.string(),
+      type: z.string(),
+      size: z.number(),
+      buffer: z.array(z.number()),
+    }),
   }),
   response: z.object({
     message: z.string(),
