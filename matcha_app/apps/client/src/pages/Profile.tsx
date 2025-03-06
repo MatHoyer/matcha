@@ -21,7 +21,6 @@ import {
 } from '@matcha/common';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus, Star, Trash2 } from 'lucide-react';
-import { useEffect } from 'react';
 
 const PictureCard: React.FC<{
   id: number;
@@ -140,12 +139,6 @@ export const Profile = () => {
       });
     },
   });
-
-  useEffect(() => {
-    if (imageQuery.data) {
-      console.log(imageQuery.data);
-    }
-  }, [imageQuery.data]);
 
   return (
     <Layout size="lg">
