@@ -7,7 +7,7 @@ import {
   MessageCircleHeart,
   Search,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChatContainer } from './components/chat/ChatContainer';
 import { Logo } from './components/images/Logo';
@@ -24,6 +24,7 @@ import { Typography } from './components/ui/typography';
 import { useSession } from './hooks/useSession';
 import { useUsers } from './hooks/useUsers';
 import { Pages } from './pages/Pages';
+import { socket } from '@/lib/socket';
 
 const App = () => {
   const session = useSession();
@@ -48,6 +49,32 @@ const App = () => {
       return prev;
     });
   };
+
+  useEffect(() => {
+    const notificationBubbleHandler = ({ message }: { message: string }) => {
+      //   setMessages((prevMessages) => [
+      //     ...prevMessages,
+      //     {
+      //       name: otherUser.name,
+      //       message: message,
+      //       dateTime: new Date(),
+      //       isOwnMessage: false,
+      //     },
+      //   ]);
+      // };
+
+      // const feedbackHandler = ({ message }: { message: string }) => {
+      //   setFeedback(message);
+      // };
+
+      socket.on(`notification-bubble`, notificationBubbleHandler);
+
+      return () => {
+        console.log('bye');
+        socket.off(`notification-bubble`, notificationBubbleHandler);
+      };
+    };
+  }, []);
 
   return (
     <NavigationWrapper
@@ -108,9 +135,15 @@ const App = () => {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground cursor-pointer"
             >
               <div className="flex size-full items-center gap-2">
-                <Avatar>
-                  <AvatarImage src="https://github.com/MatHoyer.png" alt="Pp" />
-                </Avatar>
+                <div className="relative">
+                  <Avatar>
+                    <AvatarImage
+                      src="https://github.com/MatHoyer.png"
+                      alt="Pp"
+                    />
+                  </Avatar>
+                  <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-500 rounded-full border"></div>
+                </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <Typography variant="large" className="truncate">
                     {session.user?.name}

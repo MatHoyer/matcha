@@ -7,6 +7,7 @@ import TagRepository from './repositories/TagRepository.js';
 import UserLocationRepository from './repositories/UserLocationRepository.js';
 import UserRepository from './repositories/UserRepository.js';
 import UserTagRepository from './repositories/UserTagRepository.js';
+import NotificationRepository from './repositories/NotificationRepository';
 
 class Database {
   pool: pg.Pool;
@@ -18,6 +19,7 @@ class Database {
   userLocation: UserLocationRepository;
   like: LikeRepository;
   message: MessageRepository;
+  notification: NotificationRepository;
 
   constructor() {
     this.pool = new pg.Pool({
@@ -37,6 +39,7 @@ class Database {
     this.userLocation = new UserLocationRepository(this.pool);
     this.like = new LikeRepository(this.pool);
     this.message = new MessageRepository(this.pool);
+    this.notification = new NotificationRepository(this.pool);
   }
 }
 
