@@ -5,7 +5,8 @@ import LoginPage from './auth/Login';
 import SignupPage from './auth/Signup';
 import { Home } from './Home';
 import { NotFound } from './NotFound';
-import { Profile } from './Profile';
+import { PersonnalProfile } from './profiles/PersonnalProfile';
+import { UserProfile } from './profiles/UserProfile';
 import { AdvancedSearch } from './research/AdvancedSearch';
 
 const AuthRoute = () => {
@@ -56,7 +57,14 @@ export const Pages = () => {
           path={getUrl('client-search', { type: 'advancedSearch' })}
           element={<AdvancedSearch />}
         />
-        <Route path={`${getUrl('client-profile')}/*`} element={<Profile />} />
+        <Route
+          path={`${getUrl('client-profile')}`}
+          element={<PersonnalProfile />}
+        />
+        <Route
+          path={`${getUrl('client-profile')}/:id`}
+          element={<UserProfile />}
+        />
       </Route>
     </Routes>
   );

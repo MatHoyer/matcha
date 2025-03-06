@@ -20,7 +20,8 @@ import {
   updatePictureSchemas,
 } from '@matcha/common';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Plus, Star, Trash2 } from 'lucide-react';
+import { Heart, Plus, Trash2 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const PictureCard: React.FC<{
   id: number;
@@ -92,17 +93,12 @@ const PictureCard: React.FC<{
         <>
           <div className="absolute top-2 right-2 flex gap-2">
             <Button
-              variant="secondary"
               size="icon"
-              className={`rounded-full ${
-                isProfile
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-background/80'
-              }`}
+              className={'rounded-full border boder-black bg-primary'}
               onClick={() => updateMutation.mutate()}
               disabled={isProfile}
             >
-              <Star />
+              <Heart fill={isProfile ? 'red' : 'none'} />
             </Button>
             <Button
               variant="destructive"
@@ -124,8 +120,9 @@ const PictureCard: React.FC<{
   );
 };
 
-export const Profile = () => {
+export const PersonnalProfile = () => {
   const session = useSession();
+  const navigate = useNavigate();
   const imageQuery = useQuery({
     queryKey: ['images-profile', 'profile'],
     queryFn: async () => {
@@ -180,6 +177,18 @@ export const Profile = () => {
         <div className="flex flex-col gap-2">
           <Typography variant="large">Informations</Typography>
           <ProfileForm />
+        </div>
+        <Separator />
+        <div className="w-full">
+          <Button
+            variant="ghost"
+            className="w-full"
+            onClick={() =>
+              navigate(getUrl('client-profile', { id: session!.user!.id }))
+            }
+          >
+            View my profile
+          </Button>
         </div>
       </LayoutContent>
     </Layout>
