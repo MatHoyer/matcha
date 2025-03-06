@@ -148,14 +148,14 @@ export const Profile = () => {
   }, [imageQuery.data]);
 
   return (
-    <Layout>
+    <Layout size="lg">
       <LayoutHeader>
         <LayoutTitle>My profile</LayoutTitle>
       </LayoutHeader>
       <LayoutContent className="flex flex-col gap-6">
-        <div className="hidden md:flex flex-col gap-2">
-          <Typography variant="large">Pictures</Typography>
-          <div className="flex flex-col gap-4">
+        <Typography variant="large">Pictures</Typography>
+        <div className="flex flex-col items-center gap-2">
+          <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-2">
             {imageQuery.data?.pictures.map((picture) => {
               const uint8Array = new Uint8Array(picture.file.buffer);
               const file = new File([uint8Array], picture.file.name, {
