@@ -1,4 +1,8 @@
-import { TCreatePictureSchemas, TGetPicturesSchemas } from '@matcha/common';
+import {
+  TCreatePictureSchemas,
+  TGetPicturesSchemas,
+  TUpdatePictureSchemas,
+} from '@matcha/common';
 import { Request, Response } from 'express';
 import fs from 'fs';
 import { nanoid } from 'nanoid';
@@ -45,11 +49,99 @@ export const getPicture = async (req: Request, res: Response) => {
   }
 };
 
+export const deletePicture = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const userId = req.user.id;
+
+  const picture = await db.image.findFirst({
+    where: { id: +id, userId },
+  });
+
+  if (!picture) {
+    return defaultResponse({
+      res,
+      status: 404,
+      json: { message: 'Picture not found' },
+    });
+  }
+
+  const deletedPicture = await db.image.remove({
+    where: { id: +id, userId },
+  });
+
+  try {
+    const picturePath = path.join(PICTURES_DIR, deletedPicture.url);
+    fs.unlinkSync(picturePath);
+  } catch (_error) {
+    return defaultResponse({
+      res,
+      status: 404,
+      json: { message: 'Picture not found' },
+    });
+  }
+
+  if (deletedPicture.isProfile) {
+    await db.image.update({
+      where: { userId },
+      data: { isProfile: true },
+    });
+  }
+
+  return defaultResponse({
+    res,
+    status: 200,
+    json: { message: 'Picture deleted' },
+  });
+};
+
+export const updatePicture = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const body = req.body as TUpdatePictureSchemas['requirements'];
+  const userId = req.user.id;
+
+  const picture = await db.image.findFirst({
+    where: { id: +id, userId },
+  });
+  if (!picture) {
+    return defaultResponse({
+      res,
+      status: 404,
+      json: { message: 'Picture not found' },
+    });
+  }
+
+  const pictures = await db.image.findMany({
+    where: { userId },
+  });
+
+  const profilePicture = pictures.find((picture) => picture.isProfile);
+  if (profilePicture) {
+    await db.image.update({
+      where: { id: profilePicture.id, userId },
+      data: { isProfile: false },
+    });
+  }
+
+  await db.image.update({
+    where: { id: +id, userId },
+    data: { ...body },
+  });
+
+  return defaultResponse({
+    res,
+    status: 200,
+    json: { message: 'Picture updated' },
+  });
+};
+
 export const getPictures = async (req: Request, res: Response) => {
   const { userId } = req.body as TGetPicturesSchemas['requirements'];
   const pictures = await db.image.findMany({
     where: {
       userId,
+    },
+    orderBy: {
+      isProfile: 'desc',
     },
   });
   try {

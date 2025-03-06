@@ -60,3 +60,25 @@ export type TCreatePictureSchemas = {
   requirements: Infer<typeof createPictureSchemas.requirements>;
   response: Infer<typeof createPictureSchemas.response>;
 };
+
+export const deletePictureSchemas = {
+  response: z.object({
+    message: z.string(),
+  }),
+};
+export type TDeletePictureSchemas = {
+  response: Infer<typeof deletePictureSchemas.response>;
+};
+
+export const updatePictureSchemas = {
+  requirements: z.object({
+    ...imageSchema.pick(['isProfile']).partial().shape,
+  }),
+  response: z.object({
+    message: z.string(),
+  }),
+};
+export type TUpdatePictureSchemas = {
+  requirements: Infer<typeof updatePictureSchemas.requirements>;
+  response: Infer<typeof updatePictureSchemas.response>;
+};

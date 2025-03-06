@@ -67,13 +67,17 @@ export { messagesSchemas } from './schemas/api/messages.schema';
 export type { TMessagesSchemas } from './schemas/api/messages.schema';
 export {
   createPictureSchemas,
+  deletePictureSchemas,
   getPictureSchemas,
   getPicturesSchemas,
+  updatePictureSchemas,
 } from './schemas/api/picture.schema';
 export type {
   TCreatePictureSchemas,
+  TDeletePictureSchemas,
   TGetPictureSchemas,
   TGetPicturesSchemas,
+  TUpdatePictureSchemas,
 } from './schemas/api/picture.schema';
 export { advancedSearchSchema } from './schemas/api/search.schema';
 export type { TAdvancedSearchSchema } from './schemas/api/search.schema';

@@ -13,8 +13,13 @@ import { Typography } from '@/components/ui/typography';
 import { openGlobalDialog } from '@/hooks/use-dialog';
 import { useSession } from '@/hooks/useSession';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
-import { getPicturesSchemas, getUrl } from '@matcha/common';
-import { useQuery } from '@tanstack/react-query';
+import {
+  deletePictureSchemas,
+  getPicturesSchemas,
+  getUrl,
+  updatePictureSchemas,
+} from '@matcha/common';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Plus, Star, Trash2 } from 'lucide-react';
 import { useEffect } from 'react';
 
@@ -24,6 +29,53 @@ const PictureCard: React.FC<{
   file: File | null;
   isLoading?: boolean;
 }> = ({ id, isProfile, file, isLoading }) => {
+  const queryClient = useQueryClient();
+
+  const deleteMutation = useMutation({
+    mutationFn: async () => {
+      return await axiosFetch({
+        method: 'DELETE',
+        url: getUrl('api-picture', {
+          id: id,
+        }),
+        schemas: deletePictureSchemas,
+        handleEnding: {
+          successMessage: 'Picture deleted successfully',
+          errorMessage: 'Failed to delete picture',
+          cb: () => {
+            queryClient.invalidateQueries({
+              queryKey: ['images-profile'],
+            });
+          },
+        },
+      });
+    },
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async () => {
+      return await axiosFetch({
+        method: 'PATCH',
+        url: getUrl('api-picture', {
+          id: id,
+        }),
+        schemas: updatePictureSchemas,
+        data: {
+          isProfile: !isProfile,
+        },
+        handleEnding: {
+          successMessage: 'Picture updated successfully',
+          errorMessage: 'Failed to update picture',
+          cb: () => {
+            queryClient.invalidateQueries({
+              queryKey: ['images-profile'],
+            });
+          },
+        },
+      });
+    },
+  });
+
   return (
     <div className="relative size-fit">
       <ImageContainer
@@ -48,11 +100,17 @@ const PictureCard: React.FC<{
                   ? 'bg-primary text-primary-foreground'
                   : 'bg-background/80'
               }`}
+              onClick={() => updateMutation.mutate()}
               disabled={isProfile}
             >
               <Star />
             </Button>
-            <Button variant="destructive" size="icon" className="rounded-full">
+            <Button
+              variant="destructive"
+              size="icon"
+              className="rounded-full"
+              onClick={() => deleteMutation.mutate()}
+            >
               <Trash2 />
             </Button>
           </div>
@@ -70,7 +128,7 @@ const PictureCard: React.FC<{
 export const Profile = () => {
   const session = useSession();
   const imageQuery = useQuery({
-    queryKey: [`images-${session!.user!.id}`],
+    queryKey: ['images-profile'],
     queryFn: async () => {
       return await axiosFetch({
         method: 'POST',

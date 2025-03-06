@@ -21,7 +21,7 @@ export const axiosFetch = async <
   form,
   handleEnding,
 }: {
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE';
+  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
   url: string;
   data?: Infer<R> | FormData;
   config?: AxiosRequestConfig;

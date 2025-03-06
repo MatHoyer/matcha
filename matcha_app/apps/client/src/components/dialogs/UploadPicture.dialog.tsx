@@ -1,7 +1,7 @@
 import { closeGlobalDialog } from '@/hooks/use-dialog';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import { createPictureSchemas, getUrl, z } from '@matcha/common';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { ImageContainer } from '../images/ImageContainer';
@@ -23,6 +23,7 @@ const imageSchema = z
   .accept(['image/']);
 
 export const UplaodPictureDialog: React.FC = () => {
+  const queryClient = useQueryClient();
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
@@ -53,6 +54,9 @@ export const UplaodPictureDialog: React.FC = () => {
             setFile(null);
             setPreviewUrl(null);
             closeGlobalDialog();
+            queryClient.invalidateQueries({
+              queryKey: ['images-profile'],
+            });
           },
         },
       });
