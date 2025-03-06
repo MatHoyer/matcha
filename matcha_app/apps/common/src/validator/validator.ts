@@ -5,13 +5,6 @@ import { TErrorSchema } from '../schemas/api/error.schema';
 
 // Base schema type
 export abstract class ZodType<T> {
-  _isCoercive = false;
-
-  coercive(): this {
-    this._isCoercive = true;
-    return this;
-  }
-
   /**
    * Parse the input data.
    * If invalid, throw an error.
@@ -26,8 +19,7 @@ export abstract class ZodType<T> {
     data: unknown
   ): { success: true; data: T } | { success: false; error: SchemaError } {
     try {
-      const coercedData = this._isCoercive ? this._tryCoerce(data) : data;
-      const parsed = this.parse(coercedData);
+      const parsed = this.parse(data);
       return { success: true, data: parsed };
     } catch (error) {
       if (error instanceof SchemaError) {
@@ -48,20 +40,8 @@ export abstract class ZodType<T> {
   refine(check: (data: T) => boolean, message: string): ZodType<T> {
     const self = this;
     return new (class extends ZodType<T> {
-      constructor() {
-        super();
-        // Propagate the coercive state from the parent
-        this._isCoercive = self._isCoercive;
-      }
-
-      _tryCoerce(data: unknown): unknown {
-        // Use the parent's coercion logic
-        return self._tryCoerce(data);
-      }
-
       parse(data: unknown): T {
-        const coercedData = this._isCoercive ? this._tryCoerce(data) : data;
-        const parsed = self.parse(coercedData);
+        const parsed = self.parse(data);
         if (!check(parsed)) {
           throw new Error(message);
         }
@@ -93,15 +73,11 @@ export abstract class ZodType<T> {
       }
     })();
   }
-
-  _tryCoerce(data: unknown): unknown {
-    return data;
-  }
 }
 
 // String schema
 export class ZodString extends ZodType<string> {
-  _tryCoerce(data: unknown): unknown {
+  #tryCoerce(data: unknown): unknown {
     if (typeof data === 'number' || typeof data === 'boolean') {
       return String(data);
     }
@@ -112,10 +88,11 @@ export class ZodString extends ZodType<string> {
   }
 
   parse(data: unknown): string {
-    if (typeof data !== 'string') {
-      throw new Error('Expected string, got ' + data);
+    const coercedData = this.#tryCoerce(data);
+    if (typeof coercedData !== 'string') {
+      throw new Error('Expected string, got ' + coercedData);
     }
-    return data;
+    return coercedData;
   }
 
   email() {
@@ -151,7 +128,7 @@ export class ZodString extends ZodType<string> {
 
 // Number schema
 export class ZodNumber extends ZodType<number> {
-  _tryCoerce(data: unknown): unknown {
+  #tryCoerce(data: unknown): unknown {
     if (typeof data === 'string') {
       const num = Number(data);
       if (isNaN(num)) {
@@ -166,10 +143,11 @@ export class ZodNumber extends ZodType<number> {
   }
 
   parse(data: unknown): number {
-    if (typeof data !== 'number') {
-      throw new Error('Expected number, got ' + data);
+    const coercedData = this.#tryCoerce(data);
+    if (typeof coercedData !== 'number') {
+      throw new Error('Expected number, got ' + coercedData);
     }
-    return data;
+    return coercedData;
   }
 
   positive() {
@@ -194,7 +172,7 @@ export class ZodNumber extends ZodType<number> {
 
 // Boolean schema
 export class ZodBoolean extends ZodType<boolean> {
-  _tryCoerce(data: unknown): unknown {
+  #tryCoerce(data: unknown): unknown {
     if (typeof data === 'string') {
       if (data.toLowerCase() === 'true') return true;
       if (data.toLowerCase() === 'false') return false;
@@ -207,16 +185,17 @@ export class ZodBoolean extends ZodType<boolean> {
   }
 
   parse(data: unknown): boolean {
-    if (typeof data !== 'boolean') {
-      throw new Error('Expected boolean, got ' + data);
+    const coercedData = this.#tryCoerce(data);
+    if (typeof coercedData !== 'boolean') {
+      throw new Error('Expected boolean, got ' + coercedData);
     }
-    return data;
+    return coercedData;
   }
 }
 
 // Date schema
 export class ZodDate extends ZodType<Date> {
-  _tryCoerce(data: unknown): unknown {
+  #tryCoerce(data: unknown): unknown {
     if (typeof data === 'string' || typeof data === 'number') {
       const date = new Date(data);
       if (isNaN(date.getTime())) {
@@ -228,24 +207,26 @@ export class ZodDate extends ZodType<Date> {
   }
 
   parse(data: unknown): Date {
-    if (!(data instanceof Date)) {
-      throw new Error('Expected date, got ' + data);
+    const coercedData = this.#tryCoerce(data);
+    if (!(coercedData instanceof Date)) {
+      throw new Error('Expected date, got ' + coercedData);
     }
-    return data;
+    return coercedData;
   }
 }
 
 // Null schema
 export class ZodNull extends ZodType<null> {
-  _tryCoerce(data: unknown): unknown {
+  #tryCoerce(data: unknown): unknown {
     if (data !== null) {
       throw new Error(`Expected null, but received ${typeof data}`);
     }
     return null;
   }
   parse(data: unknown): null {
-    if (data !== null) {
-      throw new Error(`Expected null, but received ${typeof data}`);
+    const coercedData = this.#tryCoerce(data);
+    if (coercedData !== null) {
+      throw new Error(`Expected null, but received ${typeof coercedData}`);
     }
     return null;
   }
@@ -277,33 +258,6 @@ export class ZodObject<T extends { [key: string]: any }> extends ZodType<T> {
   constructor(shape: { [K in keyof T]: ZodType<T[K]> }) {
     super();
     this.shape = shape;
-  }
-
-  coercive(): this {
-    super.coercive();
-    // Make all fields coercive
-    for (const key in this.shape) {
-      if (!(this.shape[key] instanceof ZodEnum)) {
-        this.shape[key].coercive();
-      }
-    }
-    return this;
-  }
-
-  _tryCoerce(data: unknown): unknown {
-    if (typeof data !== 'object' || data === null) {
-      return data;
-    }
-
-    const result: any = {};
-    for (const key in this.shape) {
-      const value = (data as any)[key];
-      if (value !== undefined) {
-        const validator = this.shape[key];
-        result[key] = validator._tryCoerce(value);
-      }
-    }
-    return result;
   }
 
   parse(data: unknown): T {
@@ -359,17 +313,6 @@ export class ZodArray<T> extends ZodType<T[]> {
   constructor(itemType: ZodType<T>) {
     super();
     this.itemType = itemType;
-  }
-
-  _tryCoerce(data: unknown): unknown {
-    if (!Array.isArray(data)) {
-      return data;
-    }
-
-    if (this.itemType._isCoercive) {
-      return data.map((item) => this.itemType._tryCoerce(item));
-    }
-    return data;
   }
 
   parse(data: unknown): T[] {
@@ -464,15 +407,6 @@ export const z = {
   array: <T>(itemType: ZodType<T>) => new ZodArray(itemType),
   union: <T extends ZodType<any>[]>(schemas: T): ZodUnion<T> =>
     new ZodUnion(schemas),
-  coerce: {
-    string: () => new ZodString().coercive(),
-    number: () => new ZodNumber().coercive(),
-    boolean: () => new ZodBoolean().coercive(),
-    date: () => new ZodDate().coercive(),
-    object: <T extends { [key: string]: any }>(shape: {
-      [K in keyof T]: ZodType<T[K]>;
-    }) => new ZodObject<T>(shape).coercive(),
-  },
 };
 
 type OptionalKeys<T> = {
