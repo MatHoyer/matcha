@@ -27,7 +27,7 @@ const MatchRow: React.FC<{
 }> = ({ gUser }) => {
   const [file, setFile] = useState<File | null>(null);
   useQuery({
-    queryKey: [`picture-${gUser.user.id}`],
+    queryKey: [`picture-search`, gUser.user.id],
     queryFn: async () => {
       return await axiosFetch({
         method: 'POST',

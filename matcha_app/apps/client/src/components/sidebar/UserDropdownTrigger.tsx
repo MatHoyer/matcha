@@ -14,7 +14,7 @@ export const UserDropdownTrigger: React.FC<{
   const [file, setFile] = useState<File | null>(null);
 
   useQuery({
-    queryKey: [`picture-${user.id}`],
+    queryKey: ['images-profile', 'dropdown'],
     queryFn: async () => {
       return await axiosFetch({
         method: 'POST',

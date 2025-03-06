@@ -127,7 +127,7 @@ const PictureCard: React.FC<{
 export const Profile = () => {
   const session = useSession();
   const imageQuery = useQuery({
-    queryKey: ['images-profile'],
+    queryKey: ['images-profile', 'profile'],
     queryFn: async () => {
       return await axiosFetch({
         method: 'POST',
