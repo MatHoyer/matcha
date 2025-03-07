@@ -5,6 +5,7 @@ import LoginPage from './auth/Login';
 import SignupPage from './auth/Signup';
 import { Home } from './Home';
 import { NotFound } from './NotFound';
+import { Notifications } from './notification/Notifications';
 import { PersonnalProfile } from './profiles/PersonnalProfile';
 import { UserProfile } from './profiles/UserProfile';
 import { AdvancedSearch } from './research/AdvancedSearch';
@@ -64,6 +65,10 @@ export const Pages = () => {
         <Route
           path={`${getUrl('client-profile')}/:id`}
           element={<UserProfile />}
+        />
+        <Route
+          path={`${getUrl('client-notifications')}/*`}
+          element={<Notifications />}
         />
       </Route>
     </Routes>

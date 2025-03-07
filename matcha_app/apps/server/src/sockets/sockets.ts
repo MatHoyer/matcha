@@ -64,6 +64,16 @@ export const socketHandler = (io: Server) => {
       } else {
         user.socket = socket;
       }
+      setInterval(async () => {
+        await db.user.update({
+          where: {
+            id: userPayload.id,
+          },
+          data: {
+            lastTimeOnline: new Date(),
+          },
+        });
+      }, 5 * 60 * 1000);
     } catch (error) {
       console.error('Error parsing token', error);
       socket.disconnect();
@@ -72,7 +82,7 @@ export const socketHandler = (io: Server) => {
 
     socketMiddleware(socket, {
       'send-message': async (args) => {
-        const { senderId, receiverId, message } = args; // args parsed in socketMiddleware
+        const { senderId, receiverId, message } = args;
 
         await db.message.create({
           data: {
@@ -88,7 +98,23 @@ export const socketHandler = (io: Server) => {
         const receiver = connectedUsers.find((u) => u.id === receiverId);
         if (!receiver) return;
 
+        // Add notification to the db
+        await db.notification.create({
+          data: {
+            userId: receiverId,
+            otherId: senderId,
+            message: 'You have a new message from ' + sender.name,
+            date: new Date(),
+            read: false,
+          },
+        });
+
         receiver.socket.emit(`pv-${receiver.id}-${sender.id}`, { message });
+        receiver.socket.emit(`notification-${receiver.id}`, {
+          message: 'You have a new message from ' + sender.name,
+        });
+        console.log('send-notif-bubble from back');
+        receiver.socket.emit(`notification-bubble`);
       },
       'send-feedback': (args) => {
         console.log('send-feedback from back');

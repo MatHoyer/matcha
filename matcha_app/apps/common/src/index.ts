@@ -65,6 +65,8 @@ export { lastOnlineSchema } from './schemas/api/lastOnline.schema';
 export type { TLastOnlineSchema } from './schemas/api/lastOnline.schema';
 export { messagesSchemas } from './schemas/api/messages.schema';
 export type { TMessagesSchemas } from './schemas/api/messages.schema';
+export { notificationsSchemas } from './schemas/api/notifications.schema';
+export type { TNotificationsSchemas } from './schemas/api/notifications.schema';
 export {
   createPictureSchemas,
   deletePictureSchemas,

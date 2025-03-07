@@ -12,10 +12,11 @@ import { Bell, User } from 'lucide-react';
 import { PropsWithChildren } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LogoutButton } from '../ui/LogoutButton';
+import { useNotification } from '../../pages/notification/Notificationcontext';
 
 const UserDropdown: React.FC<PropsWithChildren> = ({ children }) => {
   const navigate = useNavigate();
-
+  const { showBubble, setShowBubble } = useNotification();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>{children}</DropdownMenuTrigger>
@@ -27,7 +28,11 @@ const UserDropdown: React.FC<PropsWithChildren> = ({ children }) => {
         <DropdownMenuGroup>
           <DropdownMenuItem
             className="cursor-pointer"
-            onClick={() => navigate(getUrl('client-notifications'))}
+            onClick={() => {
+              navigate(getUrl('client-notifications'));
+              setShowBubble(false);
+              localStorage.setItem('showBubble', JSON.stringify(false));
+            }}
           >
             <Bell />
             Notifications

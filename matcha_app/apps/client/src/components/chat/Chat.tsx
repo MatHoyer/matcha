@@ -36,7 +36,6 @@ export const Chat: React.FC<PrivateChatProps> = ({
   const [message, setMessage] = useState<string>('');
   const [feedback, setFeedback] = useState('');
 
-  const [chatMessages, setChatMessages] = useState<TMessage[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -64,14 +63,15 @@ export const Chat: React.FC<PrivateChatProps> = ({
                       : otherUser.name,
                   message: msg.message,
                   dateTime: msg.date,
-                  isOwnMessage: msg.receiverId === session.user!.id,
+                  isOwnMessage: msg.userId === session.user!.id,
                 })
               );
-              setChatMessages(chatMessages);
               setMessages(formattedMessages);
             },
           },
         });
+      } catch (error) {
+        console.error(`Error while fetching messages: ${error}`);
       } finally {
         setLoading(false);
       }

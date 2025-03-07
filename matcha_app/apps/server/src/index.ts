@@ -8,6 +8,7 @@ import { env, envSchema } from './env.js';
 import { default as authRouter } from './routes/auth.route.js';
 import globalLocationRouter from './routes/globalLocation.route.js';
 import messagesRouter from './routes/messages.route.js';
+import notificationsRouter from './routes/notifications.route.js';
 import pictureRouter from './routes/picture.route.js';
 import searchRouter from './routes/search.route.js';
 import tagRouter from './routes/tag.route.js';
@@ -47,6 +48,7 @@ app.use(getUrl('api-users'), userRouter);
 app.use(getUrl('api-search'), searchRouter);
 app.use(getUrl('api-messages'), messagesRouter);
 app.use(getUrl('api-picture'), pictureRouter);
+app.use(getUrl('api-notifications'), notificationsRouter);
 
 if (env.NODE_ENV === 'PROD') {
   app.use(express.static(path.join(__dirname, '../../../public/dist')));
