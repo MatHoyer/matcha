@@ -36,7 +36,7 @@ const MatchRow: React.FC<{
         method: 'GET',
         schemas: getProfilePictureSchemas,
         url: getUrl('api-picture', {
-          type: 'profile',
+          type: 'user-pp',
           id: gUser.user.id,
         }),
         handleEnding: {
