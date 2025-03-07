@@ -25,6 +25,7 @@ import { useSession } from './hooks/useSession';
 import { useUsers } from './hooks/useUsers';
 import { Pages } from './pages/Pages';
 import { socket } from '@/lib/socket';
+import { useNotification } from './pages/notification/Notificationcontext';
 
 const App = () => {
   const session = useSession();
@@ -50,29 +51,17 @@ const App = () => {
     });
   };
 
+  const { showBubble, setShowBubble } = useNotification();
   useEffect(() => {
-    const notificationBubbleHandler = ({ message }: { message: string }) => {
-      //   setMessages((prevMessages) => [
-      //     ...prevMessages,
-      //     {
-      //       name: otherUser.name,
-      //       message: message,
-      //       dateTime: new Date(),
-      //       isOwnMessage: false,
-      //     },
-      //   ]);
-      // };
-
-      // const feedbackHandler = ({ message }: { message: string }) => {
-      //   setFeedback(message);
-      // };
-
-      socket.on(`notification-bubble`, notificationBubbleHandler);
-
-      return () => {
-        console.log('bye');
-        socket.off(`notification-bubble`, notificationBubbleHandler);
-      };
+    const notificationBubbleHandler = () => {
+      setShowBubble(true);
+      localStorage.setItem('showBubble', JSON.stringify(true));
+    };
+    socket.on(`notification-bubble`, notificationBubbleHandler);
+    console.log('notif bubble received');
+    return () => {
+      console.log('bye');
+      socket.off(`notification-bubble`, notificationBubbleHandler);
     };
   }, []);
 
@@ -142,7 +131,9 @@ const App = () => {
                       alt="Pp"
                     />
                   </Avatar>
-                  <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-500 rounded-full border"></div>
+                  {showBubble && (
+                    <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-500 rounded-full border"></div>
+                  )}
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <Typography variant="large" className="truncate">

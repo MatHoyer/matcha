@@ -113,6 +113,8 @@ export const socketHandler = (io: Server) => {
         receiver.socket.emit(`notification-${receiver.id}`, {
           message: 'You have a new message from ' + sender.name,
         });
+        console.log('send-notif-bubble from back');
+        receiver.socket.emit(`notification-bubble`);
       },
       'send-feedback': (args) => {
         console.log('send-feedback from back');

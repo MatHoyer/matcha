@@ -7,7 +7,7 @@ import { Home } from './Home';
 import { NotFound } from './NotFound';
 import { Profile } from './Profile';
 import { AdvancedSearch } from './research/AdvancedSearch';
-import { Notifications } from './Notifications';
+import { Notifications } from './notification/Notifications';
 
 const AuthRoute = () => {
   const { user, loading } = useSession();
