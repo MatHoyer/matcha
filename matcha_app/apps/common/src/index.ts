@@ -61,8 +61,6 @@ export { errorSchema } from './schemas/api/error.schema';
 export type { TErrorSchema } from './schemas/api/error.schema';
 export { getGlobalLocationsSchemas } from './schemas/api/globalLocations.schema';
 export type { TGlobalLocationsSchemas } from './schemas/api/globalLocations.schema';
-export { lastOnlineSchema } from './schemas/api/lastOnline.schema';
-export type { TLastOnlineSchema } from './schemas/api/lastOnline.schema';
 export { messagesSchemas } from './schemas/api/messages.schema';
 export type { TMessagesSchemas } from './schemas/api/messages.schema';
 export { notificationsSchemas } from './schemas/api/notifications.schema';

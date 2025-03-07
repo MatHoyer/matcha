@@ -5,20 +5,20 @@ import {
   LayoutHeader,
   LayoutTitle,
 } from '@/components/pagination/Layout';
+import { Avatar, AvatarImage } from '@/components/ui/avatar';
+import { Card, CardDescription } from '@/components/ui/card';
+import { cn } from '@/lib/utils';
 import {
   TNotification,
   getNearDate,
   notificationsSchemas,
 } from '@matcha/common';
-import { Card, CardDescription } from '@/components/ui/card';
+import { Eye, Heart, MessageCircle } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { axiosFetch } from '../../lib/fetch-utils/axiosFetch';
+import { useNavigate } from 'react-router-dom';
 import { getUrl } from '../../../../common/src/utils/getUrl';
 import { useSession } from '../../hooks/useSession';
-import { MessageCircle, Heart, Eye } from 'lucide-react';
-import { Avatar, AvatarImage } from '@/components/ui/avatar';
-import { useNavigate } from 'react-router-dom';
-import { cn } from '@/lib/utils';
+import { axiosFetch } from '../../lib/fetch-utils/axiosFetch';
 
 const NotificationsList: React.FC = () => {
   const [notifications, setNotifications] = useState<TNotification[]>([]);
