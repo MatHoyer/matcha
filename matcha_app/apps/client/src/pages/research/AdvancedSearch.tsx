@@ -14,37 +14,38 @@ import { AppLoader } from '@/components/ui/loaders';
 import { Typography } from '@/components/ui/typography';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import {
-  getPicturesSchemas,
+  getProfilePictureSchemas,
   getUrl,
   TAdvancedSearchSchema,
 } from '@matcha/common';
 import { useQuery } from '@tanstack/react-query';
 import { ChevronRight, MapPin, Mars, Venus } from 'lucide-react';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const MatchRow: React.FC<{
   gUser: TAdvancedSearchSchema['response']['users'][number];
 }> = ({ gUser }) => {
+  const navigate = useNavigate();
   const [file, setFile] = useState<File | null>(null);
+
   useQuery({
     queryKey: [`picture-search`, gUser.user.id],
     queryFn: async () => {
       return await axiosFetch({
-        method: 'POST',
-        schemas: getPicturesSchemas,
-        url: getUrl('api-picture'),
-        data: {
-          userId: gUser.user.id,
-        },
+        method: 'GET',
+        schemas: getProfilePictureSchemas,
+        url: getUrl('api-picture', {
+          type: 'profile',
+          id: gUser.user.id,
+        }),
         handleEnding: {
           cb: (data) => {
-            if (data.pictures.length > 0) {
-              const uint8Array = new Uint8Array(data.pictures[0].file.buffer);
-              const file = new File([uint8Array], data.pictures[0].file.name, {
-                type: data.pictures[0].file.type,
-              });
-              setFile(file);
-            }
+            const uint8Array = new Uint8Array(data.picture.file.buffer);
+            const file = new File([uint8Array], data.picture.file.name, {
+              type: data.picture.file.type,
+            });
+            setFile(file);
           },
         },
       });
@@ -52,7 +53,16 @@ const MatchRow: React.FC<{
   });
 
   return (
-    <Card className="relative group w-full p-2 cursor-pointer">
+    <Card
+      className="relative group w-full p-2 cursor-pointer"
+      onClick={() =>
+        navigate(
+          getUrl('client-profile', {
+            id: gUser.user.id,
+          })
+        )
+      }
+    >
       <div className="flex gap-2">
         <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transform duration-500">
           <Typography variant="muted" className="flex items-center">

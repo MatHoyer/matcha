@@ -32,7 +32,7 @@ export type TApiRouteDataRequirements = {
   };
   'api-picture': {
     id?: number;
-    type?: 'new';
+    type?: 'new' | 'profile';
   };
 };
 
@@ -61,12 +61,13 @@ const routes: {
   'api-users': ({ id }) => (id ? `/api/users/${id}` : '/api/users'),
   'api-messages': ({ id }) => (id ? `/api/messages/${id}` : '/api/messages'),
   'api-picture': ({ id, type }) => {
-    switch (type) {
-      case 'new':
-        return '/api/picture/new';
-      default:
-        return id ? `/api/picture/${id}` : '/api/picture';
+    if (type) {
+      if (type === 'profile' && id) {
+        return `/api/picture/${type}/${id}`;
+      }
+      return `/api/picture/${type}`;
     }
+    return id ? `/api/picture/${id}` : '/api/picture';
   },
 };
 

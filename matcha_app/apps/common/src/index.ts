@@ -70,6 +70,7 @@ export {
   deletePictureSchemas,
   getPictureSchemas,
   getPicturesSchemas,
+  getProfilePictureSchemas,
   updatePictureSchemas,
 } from './schemas/api/picture.schema';
 export type {
@@ -77,6 +78,7 @@ export type {
   TDeletePictureSchemas,
   TGetPictureSchemas,
   TGetPicturesSchemas,
+  TGetProfilePictureSchemas,
   TUpdatePictureSchemas,
 } from './schemas/api/picture.schema';
 export { advancedSearchSchema } from './schemas/api/search.schema';

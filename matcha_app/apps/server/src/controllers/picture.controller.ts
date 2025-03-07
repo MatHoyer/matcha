@@ -174,6 +174,37 @@ export const getPictures = async (req: Request, res: Response) => {
   }
 };
 
+export const getProfilePicture = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const picture = await db.image.findFirst({
+    where: { userId: +id, isProfile: true },
+  });
+
+  if (!picture) {
+    return defaultResponse({
+      res,
+      status: 404,
+      json: { message: 'Picture not found' },
+    });
+  }
+
+  const picturePath = path.join(PICTURES_DIR, picture.url);
+  const readResponse = fs.readFileSync(picturePath);
+  res.status(200).json({
+    picture: {
+      id: picture.id,
+      isProfile: picture.isProfile,
+      file: {
+        name: picture.url,
+        type: 'image/webp',
+        size: readResponse.length,
+        buffer: Array.from(readResponse),
+      },
+    },
+  });
+};
+
 export const createPicture = async (req: Request, res: Response) => {
   const { picture } = req.body as TCreatePictureSchemas['requirements'];
   const userId = req.user.id;

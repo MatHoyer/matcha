@@ -43,6 +43,24 @@ export type TGetPicturesSchemas = {
   response: Infer<typeof getPicturesSchemas.response>;
 };
 
+export const getProfilePictureSchemas = {
+  response: z.object({
+    picture: z.object({
+      id: imageSchema.pick(['id']).shape.id,
+      isProfile: z.boolean(),
+      file: z.object({
+        name: z.string(),
+        type: z.string(),
+        size: z.number(),
+        buffer: z.array(z.number()),
+      }),
+    }),
+  }),
+};
+export type TGetProfilePictureSchemas = {
+  response: Infer<typeof getProfilePictureSchemas.response>;
+};
+
 export const createPictureSchemas = {
   requirements: z.object({
     picture: z.object({
