@@ -12,13 +12,13 @@ import {
   getPicturesSchemas,
   getUrl,
   getUserSchemas,
+  getUserTagsSchemas,
   TTag,
 } from '@matcha/common';
 import { useQuery } from '@tanstack/react-query';
 import { Heart, MessageCircle } from 'lucide-react';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { getUserTagsSchemas } from '../../../../common/src/schemas/api/tags.schema';
 
 export const UserProfile = () => {
   const { id } = useParams();

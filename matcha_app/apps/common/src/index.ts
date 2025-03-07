@@ -83,8 +83,16 @@ export type {
 } from './schemas/api/picture.schema';
 export { advancedSearchSchema } from './schemas/api/search.schema';
 export type { TAdvancedSearchSchema } from './schemas/api/search.schema';
-export { createTagSchemas, getTagsSchemas } from './schemas/api/tags.schema';
-export type { TCreateTagSchemas, TTagSchemas } from './schemas/api/tags.schema';
+export {
+  createTagSchemas,
+  getTagsSchemas,
+  getUserTagsSchemas,
+} from './schemas/api/tags.schema';
+export type {
+  TCreateTagSchemas,
+  TGetUserTagsSchemas,
+  TTagSchemas,
+} from './schemas/api/tags.schema';
 export {
   getUserSchemas,
   getUsersSchemas,
