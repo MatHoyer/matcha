@@ -1,8 +1,4 @@
-import {
-  TCreatePictureSchemas,
-  TGetPicturesSchemas,
-  TUpdatePictureSchemas,
-} from '@matcha/common';
+import { TCreatePictureSchemas, TUpdatePictureSchemas } from '@matcha/common';
 import { Request, Response } from 'express';
 import fs from 'fs';
 import { nanoid } from 'nanoid';
@@ -134,77 +130,6 @@ export const updatePicture = async (req: Request, res: Response) => {
   });
 };
 
-export const getPictures = async (req: Request, res: Response) => {
-  const { userId } = req.body as TGetPicturesSchemas['requirements'];
-  const pictures = await db.image.findMany({
-    where: {
-      userId,
-    },
-    orderBy: {
-      isProfile: 'desc',
-    },
-  });
-  try {
-    const files = pictures
-      .map((picture) => {
-        const picturePath = path.join(PICTURES_DIR, picture.url);
-        const readResponse = fs.readFileSync(picturePath);
-        return {
-          id: picture.id,
-          isProfile: picture.isProfile,
-          file: {
-            name: picture.url,
-            type: 'image/webp',
-            size: readResponse.length,
-            buffer: Array.from(readResponse),
-          },
-        };
-      })
-      .filter(Boolean);
-
-    res.status(200).json({
-      pictures: files,
-    });
-  } catch (_error) {
-    return defaultResponse({
-      res,
-      status: 404,
-      json: { message: 'Failed to get pictures' },
-    });
-  }
-};
-
-export const getProfilePicture = async (req: Request, res: Response) => {
-  const { id } = req.params;
-
-  const picture = await db.image.findFirst({
-    where: { userId: +id, isProfile: true },
-  });
-
-  if (!picture) {
-    return defaultResponse({
-      res,
-      status: 404,
-      json: { message: 'Picture not found' },
-    });
-  }
-
-  const picturePath = path.join(PICTURES_DIR, picture.url);
-  const readResponse = fs.readFileSync(picturePath);
-  res.status(200).json({
-    picture: {
-      id: picture.id,
-      isProfile: picture.isProfile,
-      file: {
-        name: picture.url,
-        type: 'image/webp',
-        size: readResponse.length,
-        buffer: Array.from(readResponse),
-      },
-    },
-  });
-};
-
 export const createPicture = async (req: Request, res: Response) => {
   const { picture } = req.body as TCreatePictureSchemas['requirements'];
   const userId = req.user.id;
@@ -270,4 +195,75 @@ export const createPicture = async (req: Request, res: Response) => {
       },
     });
   }
+};
+
+export const getPictures = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const pictures = await db.image.findMany({
+    where: {
+      userId: +id,
+    },
+    orderBy: {
+      isProfile: 'desc',
+    },
+  });
+  try {
+    const files = pictures
+      .map((picture) => {
+        const picturePath = path.join(PICTURES_DIR, picture.url);
+        const readResponse = fs.readFileSync(picturePath);
+        return {
+          id: picture.id,
+          isProfile: picture.isProfile,
+          file: {
+            name: picture.url,
+            type: 'image/webp',
+            size: readResponse.length,
+            buffer: Array.from(readResponse),
+          },
+        };
+      })
+      .filter(Boolean);
+
+    res.status(200).json({
+      pictures: files,
+    });
+  } catch (_error) {
+    return defaultResponse({
+      res,
+      status: 404,
+      json: { message: 'Failed to get pictures' },
+    });
+  }
+};
+
+export const getProfilePicture = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const picture = await db.image.findFirst({
+    where: { userId: +id, isProfile: true },
+  });
+
+  if (!picture) {
+    return defaultResponse({
+      res,
+      status: 404,
+      json: { message: 'Picture not found' },
+    });
+  }
+
+  const picturePath = path.join(PICTURES_DIR, picture.url);
+  const readResponse = fs.readFileSync(picturePath);
+  res.status(200).json({
+    picture: {
+      id: picture.id,
+      isProfile: picture.isProfile,
+      file: {
+        name: picture.url,
+        type: 'image/webp',
+        size: readResponse.length,
+        buffer: Array.from(readResponse),
+      },
+    },
+  });
 };

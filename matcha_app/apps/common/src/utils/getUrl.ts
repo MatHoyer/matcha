@@ -18,7 +18,8 @@ export type TApiRouteDataRequirements = {
     type: 'signup' | 'login' | 'logout' | 'session' | undefined;
   };
   'api-tags': {
-    id?: number | undefined;
+    id?: number;
+    type?: 'new' | 'user';
   };
   'api-globalLocations': undefined;
   'api-search': {
@@ -32,7 +33,7 @@ export type TApiRouteDataRequirements = {
   };
   'api-picture': {
     id?: number;
-    type?: 'new' | 'profile';
+    type?: 'new' | 'user-pp' | 'user';
   };
 };
 
@@ -55,14 +56,22 @@ const routes: {
   'client-profile': ({ id }) => (id ? `/profile/${id}` : '/profile'),
 
   'api-auth': ({ type }) => (type ? `/api/auth/${type}` : '/api/auth'),
-  'api-tags': ({ id }) => (id ? `/api/tags/${id}` : '/api/tags'),
+  'api-tags': ({ id, type }) => {
+    if (type) {
+      if (['user'].includes(type) && id) {
+        return `/api/tags/${type}/${id}`;
+      }
+      return `/api/tags/${type}`;
+    }
+    return '/api/tags';
+  },
   'api-globalLocations': () => '/api/globalLocations',
   'api-search': ({ type }) => (type ? `/api/search/${type}` : '/api/search'),
   'api-users': ({ id }) => (id ? `/api/users/${id}` : '/api/users'),
   'api-messages': ({ id }) => (id ? `/api/messages/${id}` : '/api/messages'),
   'api-picture': ({ id, type }) => {
     if (type) {
-      if (type === 'profile' && id) {
+      if (['user-pp', 'user'].includes(type) && id) {
         return `/api/picture/${type}/${id}`;
       }
       return `/api/picture/${type}`;

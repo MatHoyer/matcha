@@ -1,6 +1,5 @@
 import {
   createPictureSchemas,
-  getPicturesSchemas,
   imageSchema,
   updatePictureSchemas,
   userSchema,
@@ -21,18 +20,6 @@ import { paramsParser } from '../middlewares/paramsParser.middleware.js';
 
 const pictureRouter = Router();
 
-pictureRouter.post(
-  '/',
-  isLogged,
-  bodyParser(getPicturesSchemas.requirements),
-  getPictures
-);
-pictureRouter.get(
-  '/profile/:id',
-  isLogged,
-  paramsParser(z.object({ id: userSchema.pick(['id']).shape.id })),
-  getProfilePicture
-);
 pictureRouter.get(
   '/:id',
   isLogged,
@@ -57,6 +44,18 @@ pictureRouter.post(
   isLogged,
   bodyParser(createPictureSchemas.requirements),
   createPicture
+);
+pictureRouter.get(
+  '/user/:id',
+  isLogged,
+  paramsParser(z.object({ id: userSchema.pick(['id']).shape.id })),
+  getPictures
+);
+pictureRouter.get(
+  '/user-pp/:id',
+  isLogged,
+  paramsParser(z.object({ id: userSchema.pick(['id']).shape.id })),
+  getProfilePicture
 );
 
 export default pictureRouter;

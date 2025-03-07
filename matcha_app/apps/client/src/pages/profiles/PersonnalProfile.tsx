@@ -127,12 +127,12 @@ export const PersonnalProfile = () => {
     queryKey: ['images-profile', 'profile'],
     queryFn: async () => {
       return await axiosFetch({
-        method: 'POST',
+        method: 'GET',
         schemas: getPicturesSchemas,
-        url: getUrl('api-picture'),
-        data: {
-          userId: session!.user!.id,
-        },
+        url: getUrl('api-picture', {
+          type: 'user',
+          id: session!.user!.id,
+        }),
       });
     },
   });

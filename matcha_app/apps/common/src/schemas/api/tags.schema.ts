@@ -22,3 +22,12 @@ export type TCreateTagSchemas = {
   requirements: Infer<typeof createTagSchemas.requirements>;
   response: Infer<typeof createTagSchemas.response>;
 };
+
+export const getUserTagsSchemas = {
+  response: z.object({
+    tags: z.array(tagSchema),
+  }),
+};
+export type TGetUserTagsSchemas = {
+  response: Infer<typeof getUserTagsSchemas.response>;
+};

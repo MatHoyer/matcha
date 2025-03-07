@@ -8,16 +8,23 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Typography } from '@/components/ui/typography';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
-import { getPicturesSchemas, getUrl, getUserSchemas } from '@matcha/common';
+import {
+  getPicturesSchemas,
+  getUrl,
+  getUserSchemas,
+  TTag,
+} from '@matcha/common';
 import { useQuery } from '@tanstack/react-query';
 import { Heart, MessageCircle } from 'lucide-react';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { getUserTagsSchemas } from '../../../../common/src/schemas/api/tags.schema';
 
 export const UserProfile = () => {
   const { id } = useParams();
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [pictures, setPictures] = useState<File[]>([]);
+  const [tags, setTags] = useState<TTag[]>([]);
 
   const userQuery = useQuery({
     queryKey: ['user', id],
@@ -35,12 +42,12 @@ export const UserProfile = () => {
     queryKey: ['images-profile', 'profile', id],
     queryFn: async () => {
       return await axiosFetch({
-        method: 'POST',
-        url: getUrl('api-picture'),
+        method: 'GET',
+        url: getUrl('api-picture', {
+          type: 'user',
+          id: +id!,
+        }),
         schemas: getPicturesSchemas,
-        data: {
-          userId: +id!,
-        },
         handleEnding: {
           cb: (data) => {
             const uint8Array = new Uint8Array(data.pictures[0].file.buffer);
@@ -62,6 +69,25 @@ export const UserProfile = () => {
     },
   });
 
+  useQuery({
+    queryKey: ['tags', id],
+    queryFn: async () => {
+      return await axiosFetch({
+        method: 'GET',
+        url: getUrl('api-tags', {
+          type: 'user',
+          id: +id!,
+        }),
+        schemas: getUserTagsSchemas,
+        handleEnding: {
+          cb: (data) => {
+            setTags(data.tags);
+          },
+        },
+      });
+    },
+  });
+
   return (
     <Layout>
       <LayoutHeader>
@@ -77,7 +103,9 @@ export const UserProfile = () => {
               {userQuery.data?.user.name} {userQuery.data?.user.lastName}
             </Typography>
             <div className="flex gap-2">
-              <Badge>TODO</Badge>
+              {tags.map((tag) => (
+                <Badge key={tag.id}>{tag.name}</Badge>
+              ))}
             </div>
             <Typography variant="muted">
               {userQuery.data?.user.biography}
@@ -100,6 +128,7 @@ export const UserProfile = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
             {pictures.map((picture) => (
               <ImageContainer
+                key={picture.name}
                 imageSrc={URL.createObjectURL(picture)}
                 altImage="Profile picture"
               />

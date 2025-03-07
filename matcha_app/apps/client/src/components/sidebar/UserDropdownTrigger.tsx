@@ -1,5 +1,5 @@
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
-import { getPicturesSchemas, getUrl, TUser } from '@matcha/common';
+import { getProfilePictureSchemas, getUrl, TUser } from '@matcha/common';
 import { useQuery } from '@tanstack/react-query';
 import { ChevronsUpDown } from 'lucide-react';
 import { useState } from 'react';
@@ -17,26 +17,25 @@ export const UserDropdownTrigger: React.FC<{
     queryKey: ['images-profile', 'dropdown'],
     queryFn: async () => {
       return await axiosFetch({
-        method: 'POST',
-        schemas: getPicturesSchemas,
-        url: getUrl('api-picture'),
-        data: {
-          userId: user.id,
-        },
+        method: 'GET',
+        schemas: getProfilePictureSchemas,
+        url: getUrl('api-picture', {
+          type: 'user-pp',
+          id: user.id,
+        }),
         handleEnding: {
           cb: (data) => {
-            if (data.pictures.length > 0) {
-              const uint8Array = new Uint8Array(data.pictures[0].file.buffer);
-              const file = new File([uint8Array], data.pictures[0].file.name, {
-                type: data.pictures[0].file.type,
-              });
-              setFile(file);
-            }
+            const uint8Array = new Uint8Array(data.picture.file.buffer);
+            const file = new File([uint8Array], data.picture.file.name, {
+              type: data.picture.file.type,
+            });
+            setFile(file);
           },
         },
       });
     },
   });
+
   return (
     <UserDropdown>
       <SidebarMenuButton
