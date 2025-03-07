@@ -1,5 +1,6 @@
 import pg from 'pg';
 import GlobalLocationRepository from './repositories/GlobalLocationRepository.js';
+import ImageRepository from './repositories/ImageRepository.js';
 import LikeRepository from './repositories/LikeRepository.js';
 import LocationRepository from './repositories/LocationRepository.js';
 import MessageRepository from './repositories/MessageRepository.js';
@@ -18,6 +19,7 @@ class Database {
   userLocation: UserLocationRepository;
   like: LikeRepository;
   message: MessageRepository;
+  image: ImageRepository;
 
   constructor() {
     this.pool = new pg.Pool({
@@ -37,6 +39,7 @@ class Database {
     this.userLocation = new UserLocationRepository(this.pool);
     this.like = new LikeRepository(this.pool);
     this.message = new MessageRepository(this.pool);
+    this.image = new ImageRepository(this.pool);
   }
 }
 

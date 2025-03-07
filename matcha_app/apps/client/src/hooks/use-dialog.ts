@@ -2,6 +2,7 @@ import { create } from 'zustand';
 
 type TDialogDataMap = {
   'create-tag': undefined;
+  'upload-picture': undefined;
 };
 
 export type TDialogType = keyof TDialogDataMap;
@@ -45,7 +46,7 @@ export const closeGlobalDialog = () => {
 };
 
 export const assertDialogData = <T extends TDialogType>(
-  dialogType: T,
+  _dialogType: T,
   data: TDialogDataMap[T] | undefined
 ): data is TDialogDataMap[T] => {
   return data !== undefined;

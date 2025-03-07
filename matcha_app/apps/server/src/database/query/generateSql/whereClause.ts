@@ -1,4 +1,4 @@
-import { containsUpperCase } from '@matcha/common';
+import { quoteUppercase } from '@matcha/common';
 import type { WhereClause } from '../type.js';
 
 type TReturnType = {
@@ -22,7 +22,7 @@ export const generateWhereClauseSql = <T>(
       if (!value) {
         continue;
       }
-      parentKey = containsUpperCase(parentKey!) ? `"${parentKey}"` : parentKey;
+      parentKey = quoteUppercase(parentKey!);
       switch (key) {
         case '$gt':
           sql.push(`${parentKey} > $${indexCounter}`);
@@ -56,9 +56,7 @@ export const generateWhereClauseSql = <T>(
           );
           break;
         default:
-          sql.push(
-            `${containsUpperCase(key) ? `"${key}"` : key} = $${indexCounter}`
-          );
+          sql.push(`${quoteUppercase(key)} = $${indexCounter}`);
           break;
       }
       if (value && Array.isArray(value) && value.length > 0) {
@@ -66,7 +64,11 @@ export const generateWhereClauseSql = <T>(
         indexCounter += value.length;
       }
       if (value && !Array.isArray(value)) {
-        values.push(value);
+        if (typeof value === 'boolean') {
+          values.push(value ? 'TRUE' : 'FALSE');
+        } else {
+          values.push(value);
+        }
         indexCounter++;
       }
     } else if (value) {

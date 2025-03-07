@@ -36,7 +36,9 @@ export const CreateTagForm: React.FC<
     mutationFn: async (data: TForm) => {
       return await axiosFetch({
         method: 'POST',
-        url: getUrl('api-tags'),
+        url: getUrl('api-tags', {
+          type: 'new',
+        }),
         data,
         schemas: createTagSchemas,
         form,

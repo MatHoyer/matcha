@@ -1,6 +1,5 @@
 import { getUrl, TUser, TUserWithNames } from '@matcha/common';
 import {
-  ChevronsUpDown,
   Crosshair,
   Heart,
   Home,
@@ -13,14 +12,8 @@ import { ChatContainer } from './components/chat/ChatContainer';
 import { Logo } from './components/images/Logo';
 import { NavItemDropdown, NavItems } from './components/sidebar/NavComp';
 import { NavigationWrapper } from './components/sidebar/NavigationWrapper';
-import UserDropdown from './components/sidebar/UserDropdown';
-import { Avatar, AvatarImage } from './components/ui/avatar';
-import {
-  SidebarGroup,
-  SidebarMenu,
-  SidebarMenuButton,
-} from './components/ui/sidebar';
-import { Typography } from './components/ui/typography';
+import { UserDropdownTrigger } from './components/sidebar/UserDropdownTrigger';
+import { SidebarGroup, SidebarMenu } from './components/ui/sidebar';
 import { useSession } from './hooks/useSession';
 import { useUsers } from './hooks/useUsers';
 import { Pages } from './pages/Pages';
@@ -101,29 +94,7 @@ const App = () => {
         )
       }
       sidebarFooter={
-        session.user && (
-          <UserDropdown>
-            <SidebarMenuButton
-              size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground cursor-pointer"
-            >
-              <div className="flex size-full items-center gap-2">
-                <Avatar>
-                  <AvatarImage src="https://github.com/MatHoyer.png" alt="Pp" />
-                </Avatar>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <Typography variant="large" className="truncate">
-                    {session.user?.name}
-                  </Typography>
-                  <Typography variant="muted" className="truncate text-xs">
-                    {session.user?.email}
-                  </Typography>
-                </div>
-              </div>
-              <ChevronsUpDown className="ml-auto size-4" />
-            </SidebarMenuButton>
-          </UserDropdown>
-        )
+        session.user && <UserDropdownTrigger user={session.user as TUser} />
       }
     >
       <Pages />

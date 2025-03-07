@@ -11,7 +11,7 @@ export const SubmitButtonDialog: React.FC<
   return (
     <DialogFooter className="flex flex-col gap-2 md:flex-row">
       <DialogClose asChild>
-        <Button variant="outline">Annuler</Button>
+        <Button variant="outline">Cancel</Button>
       </DialogClose>
       <LoadingButton type="submit" loading={isLoading}>
         {children}

@@ -51,3 +51,23 @@ export const createTag = async (req: Request, res: Response) => {
     },
   });
 };
+
+export const getUserTags = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const userTags = await db.userTag.findMany({
+    where: {
+      userId: +id,
+    },
+  });
+
+  const tags = await db.tag.findMany({
+    where: {
+      id: {
+        $in: userTags.map((tag) => tag.tagId),
+      },
+    },
+  });
+
+  res.status(200).json({ tags });
+};

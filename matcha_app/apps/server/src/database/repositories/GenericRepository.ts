@@ -77,7 +77,12 @@ class GenericRepository<T, I> {
     const columns = Object.keys(data)
       .map((column) => quoteUppercase(column))
       .join(', ');
-    const values = Object.values(data);
+    const values = Object.values(data).map((value) => {
+      if (typeof value === 'boolean') {
+        return value ? 'TRUE' : 'FALSE';
+      }
+      return value;
+    });
     const rows = await this.#query(
       `INSERT INTO ${this.tableName} (${columns}) VALUES (${values
         .map((_, index) => `$${index + 1}`)
@@ -92,7 +97,7 @@ class GenericRepository<T, I> {
     const { whereClause, values } = generateWhereClauseSql(where);
     if (!whereClause) throw new Error('No where clause provided');
     const rows = await this.#query(
-      `DELETE FROM ${this.tableName} ${whereClause}`,
+      `DELETE FROM ${this.tableName} ${whereClause} RETURNING *`,
       values
     );
     return rows ? rows[0] : null;
@@ -123,11 +128,19 @@ class GenericRepository<T, I> {
     if (!whereClause) throw new Error('No where clause provided');
     const columns = Object.keys(data)
       .filter((column) => !['id', 'age'].includes(column))
-      .map((column, index) => `${quoteUppercase(column)} = $${index + 2}`)
+      .map(
+        (column, index) =>
+          `${quoteUppercase(column)} = $${index + values.length + 1}`
+      )
       .join(', ');
-    const dataValues = Object.values(data);
+    const dataValues = Object.values(data).map((value) => {
+      if (typeof value === 'boolean') {
+        return value ? 'TRUE' : 'FALSE';
+      }
+      return value;
+    });
     const rows = await this.#query(
-      `UPDATE ${this.tableName} SET ${columns} ${whereClause} RETURNING *;`,
+      `UPDATE ${this.tableName} SET ${columns} ${whereClause} RETURNING *`,
       [...values, ...dataValues]
     );
     return rows ? rows[0] : null;
