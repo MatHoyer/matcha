@@ -10,7 +10,8 @@ type TReturnType = {
 export const generateWhereClauseSql = <T>(
   where?: WhereClause<T>,
   parentKey?: string,
-  index?: number
+  index?: number,
+  isNot?: boolean
 ): TReturnType => {
   if (!where) return { whereClause: '', values: [] };
   const sql: string[] = [];
@@ -25,19 +26,19 @@ export const generateWhereClauseSql = <T>(
       parentKey = quoteUppercase(parentKey!);
       switch (key) {
         case '$gt':
-          sql.push(`${parentKey} > $${indexCounter}`);
+          sql.push(`${parentKey} ${isNot ? 'NOT' : ''} > $${indexCounter}`);
           break;
         case '$lt':
-          sql.push(`${parentKey} < $${indexCounter}`);
+          sql.push(`${parentKey} ${isNot ? 'NOT' : ''} < $${indexCounter}`);
           break;
         case '$gte':
-          sql.push(`${parentKey} >= $${indexCounter}`);
+          sql.push(`${parentKey} ${isNot ? 'NOT' : ''} >= $${indexCounter}`);
           break;
         case '$lte':
-          sql.push(`${parentKey} <= $${indexCounter}`);
+          sql.push(`${parentKey} ${isNot ? 'NOT' : ''} <= $${indexCounter}`);
           break;
         case '$not':
-          sql.push(`${parentKey} <> $${indexCounter}`);
+          sql.push(`${parentKey} ${isNot ? 'NOT' : ''} <> $${indexCounter}`);
           break;
         case '$in':
           if (!Array.isArray(value)) {
@@ -48,7 +49,7 @@ export const generateWhereClauseSql = <T>(
             break;
           }
           sql.push(
-            `${parentKey} IN (${(value as unknown[])
+            `${parentKey} ${isNot ? 'NOT' : ''} IN (${(value as unknown[])
               .map((_, i) => {
                 return `$${indexCounter + i}`;
               })
@@ -56,7 +57,9 @@ export const generateWhereClauseSql = <T>(
           );
           break;
         default:
-          sql.push(`${quoteUppercase(key)} = $${indexCounter}`);
+          sql.push(
+            `${quoteUppercase(key)} ${isNot ? 'NOT' : ''} = $${indexCounter}`
+          );
           break;
       }
       if (value && Array.isArray(value) && value.length > 0) {
@@ -73,7 +76,12 @@ export const generateWhereClauseSql = <T>(
       }
     } else if (value) {
       const { whereClause: query, values: resultValues } =
-        generateWhereClauseSql(value, key, indexCounter);
+        generateWhereClauseSql(
+          value,
+          key,
+          indexCounter,
+          isNot || parentKey === 'NOT'
+        );
       if (query && resultValues.every((v) => v)) {
         sql.push(query);
         values.push(...resultValues);

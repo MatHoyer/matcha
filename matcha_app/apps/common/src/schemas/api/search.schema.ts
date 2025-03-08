@@ -27,9 +27,15 @@ export type TAdvancedSearchSchema = {
   response: {
     users: {
       user: Infer<typeof userSchema>;
-      location: Infer<typeof advancedSearchSchema.requirements>['location'];
-      tags: Infer<typeof tagSchema>[];
-      fame: Infer<typeof advancedSearchSchema.requirements>['fame'];
+      location: Infer<
+        typeof advancedSearchSchema.response
+      >['users'][number]['location'];
+      tags: Infer<
+        typeof advancedSearchSchema.response
+      >['users'][number]['tags'];
+      fame: Infer<
+        typeof advancedSearchSchema.response
+      >['users'][number]['fame'];
     }[];
   };
 };

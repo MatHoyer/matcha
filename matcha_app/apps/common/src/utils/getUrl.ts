@@ -38,6 +38,9 @@ export type TApiRouteDataRequirements = {
     id?: number;
     type?: 'new' | 'user-pp' | 'user';
   };
+  'api-likes': {
+    type: 'new' | 'delete' | 'is-liked';
+  };
 };
 
 type TRouteDataRequirements = TClientRouteDataRequirements &
@@ -83,6 +86,7 @@ const routes: {
   },
   'api-notifications': ({ id }) =>
     id ? `/api/notifications/${id}` : '/api/notifications',
+  'api-likes': ({ type }) => (type ? `/api/likes/${type}` : '/api/likes'),
 };
 
 type TUrlParams =
