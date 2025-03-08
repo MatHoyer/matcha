@@ -8,6 +8,7 @@ import { env, envSchema } from './env.js';
 import { default as authRouter } from './routes/auth.route.js';
 import globalLocationRouter from './routes/globalLocation.route.js';
 import likeRouter from './routes/like.route.js';
+import locationRouter from './routes/location.route.js';
 import messagesRouter from './routes/messages.route.js';
 import notificationsRouter from './routes/notifications.route.js';
 import pictureRouter from './routes/picture.route.js';
@@ -51,6 +52,7 @@ app.use(getUrl('api-messages'), messagesRouter);
 app.use(getUrl('api-picture'), pictureRouter);
 app.use(getUrl('api-notifications'), notificationsRouter);
 app.use(getUrl('api-likes'), likeRouter);
+app.use(getUrl('api-location'), locationRouter);
 
 if (env.NODE_ENV === 'PROD') {
   app.use(express.static(path.join(__dirname, '../../../public/dist')));
@@ -59,7 +61,7 @@ if (env.NODE_ENV === 'PROD') {
   });
 }
 
-const server = app.listen(env.SERVER_PORT, () => {
+const server = app.listen(env.SERVER_PORT, '0.0.0.0', () => {
   console.log(`Server started at http://localhost:${env.SERVER_PORT}`);
 });
 
