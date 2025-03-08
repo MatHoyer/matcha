@@ -187,6 +187,22 @@ INSERT INTO "View" ("userId", "viewerId") VALUES
 (3, 4), -- Emma viewed Michael
 (4, 3); -- Michael viewed Emma
 
+INSERT INTO "Location" ("latitude", "longitude") 
+VALUES 
+(48.8566, 2.3522), -- Paris, France
+(40.7128, -74.0060), -- New York, USA
+(35.6895, 139.6917), -- Tokyo, Japan
+(51.5074, -0.1278), -- Londres, Royaume-Uni
+(40.7128, -74.0060); -- New York, USA
+
+INSERT INTO "UserLocation" ("userId", "locationId") 
+VALUES 
+(1, 1), -- Alice -> Paris
+(2, 2), -- David -> New York
+(3, 3), -- Emma -> Tokyo
+(4, 4), -- Michael -> Paris
+(5, 5); -- Sophia -> New York
+
 INSERT INTO "GlobalLocation" ("name", "latitude", "longitude") 
 VALUES ('Paris', 48.8566, 2.3522),
 ('London', 51.5074, 0.1278),
@@ -238,28 +254,6 @@ VALUES ('Paris', 48.8566, 2.3522),
 ('Lille', 50.6292, 3.0573),
 ('Rennes', 48.1173, -1.6778);
 
-INSERT INTO "Location" ("latitude", "longitude") 
-VALUES 
-(48.8566, 2.3522), -- Paris, France
-(40.7128, -74.0060), -- New York, USA
-(35.6895, 139.6917), -- Tokyo, Japan
-(51.5074, -0.1278), -- Londres, Royaume-Uni
-(40.7128, -74.0060), -- New York, USA
-(48.5734, 7.7521),
-(43.6119, 3.8772),
-(44.8378, -0.5792),
-(50.6292, 3.0573),
-(48.1173, -1.6778);
-
-
-INSERT INTO "UserLocation" ("userId", "locationId") 
-VALUES 
-(1, 1), -- Alice -> Paris
-(2, 2), -- David -> New York
-(3, 3), -- Emma -> Tokyo
-(4, 4), -- Michael -> Paris
-(5, 5); -- Sophia -> New York
-
 INSERT INTO "User" ("name", "lastName", "email", "password", "birthDate", "gender", "preference", "biography") 
 VALUES  ('Willey', 'Bridie', 'wbridie0@yellowbook.com', '094513168d4401c9dc5d693b3fbb9382ce68e54bafbd180f990bdf193f7c0948', '1989-01-24', 'Female', 'Heterosexual', 'Nunc purus.'),
 ('Carlynne', 'Stockill', 'cstockill1@tamu.edu', '094513168d4401c9dc5d693b3fbb9382ce68e54bafbd180f990bdf193f7c0948', '1964-05-30', 'Female', 'Homosexual', null),
@@ -297,39 +291,77 @@ VALUES  ('Willey', 'Bridie', 'wbridie0@yellowbook.com', '094513168d4401c9dc5d693
 ('Margie', 'Reinmar', 'mreinmarx@washingtonpost.com', '094513168d4401c9dc5d693b3fbb9382ce68e54bafbd180f990bdf193f7c0948', '2002-03-18', 'Male', 'Homosexual', 'In eleifend quam a odio.'),
 ('Raddie', 'Varran', 'rvarrany@123-reg.co.uk', '094513168d4401c9dc5d693b3fbb9382ce68e54bafbd180f990bdf193f7c0948', '1968-04-29', 'Male', 'Bisexual', 'Suspendisse potenti.');
 
+INSERT INTO "Location" ("latitude", "longitude")
+VALUES (48.5734, 7.7521),
+(43.6119, 3.8772),
+(44.8378, -0.5792),
+(50.6292, 3.0573),
+(48.1173, -1.6778),
+(48.5734, 7.7521),
+(43.6119, 3.8772),
+(44.8378, -0.5792),
+(50.6292, 3.0573),
+(48.1173, -1.6778),
+(48.5734, 7.7521),
+(43.6119, 3.8772),
+(44.8378, -0.5792),
+(50.6292, 3.0573),
+(48.1173, -1.6778),
+(48.5734, 7.7521),
+(43.6119, 3.8772),
+(44.8378, -0.5792),
+(50.6292, 3.0573),
+(48.1173, -1.6778),
+(48.5734, 7.7521),
+(43.6119, 3.8772),
+(44.8378, -0.5792),
+(50.6292, 3.0573),
+(48.1173, -1.6778),
+(48.5734, 7.7521),
+(43.6119, 3.8772),
+(44.8378, -0.5792),
+(50.6292, 3.0573),
+(48.1173, -1.6778),
+(48.5734, 7.7521),
+(43.6119, 3.8772),
+(44.8378, -0.5792),
+(50.6292, 3.0573),
+(48.1173, -1.6778);
+
+
 INSERT INTO "UserLocation" ("userId", "locationId")
-VALUES (6, 2),
-(7, 4),
+VALUES (6, 6),
+(7, 7),
 (8, 8),
-(9, 3),
-(10, 6),
-(11, 5),
-(12, 8),
-(13, 8),
-(14, 10),
-(15, 9),
-(16, 10),
-(17, 5),
-(18, 1),
-(19, 4),
-(20, 10),
-(21, 2),
-(22, 1),
-(23, 10),
-(24, 5),
-(25, 6),
-(26, 1),
-(27, 7),
-(28, 4),
-(29, 8),
-(30, 6),
-(31, 6),
-(32, 7),
-(33, 6),
-(34, 8),
-(35, 8),
-(36, 3),
-(37, 2),
-(38, 7),
-(39, 8),
-(40, 7);
+(9, 9),
+(10, 10),
+(11, 11),
+(12, 12),
+(13, 13),
+(14, 14),
+(15, 15),
+(16, 16),
+(17, 17),
+(18, 18),
+(19, 19),
+(20, 20),
+(21, 21),
+(22, 22),
+(23, 23),
+(24, 24),
+(25, 25),
+(26, 26),
+(27, 27),
+(28, 28),
+(29, 29),
+(30, 30),
+(31, 31),
+(32, 32),
+(33, 33),
+(34, 34),
+(35, 35),
+(36, 36),
+(37, 37),
+(38, 38),
+(39, 39),
+(40, 40);
