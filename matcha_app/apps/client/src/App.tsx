@@ -7,7 +7,7 @@ import {
   Search,
 } from 'lucide-react';
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ChatContainer } from './components/chat/ChatContainer';
 import { Logo } from './components/images/Logo';
 import { NavItemDropdown, NavItems } from './components/sidebar/NavComp';
@@ -20,6 +20,7 @@ import { Pages } from './pages/Pages';
 
 const App = () => {
   const session = useSession();
+  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { users } = useUsers();
   const usersAllButAuthUser = users.filter(
