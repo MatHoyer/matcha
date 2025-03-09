@@ -1,8 +1,7 @@
 import type { Request, Response } from 'express';
 import db from '../database/Database';
 import { defaultResponse } from '../utils/defaultResponse';
-import { Infer } from '@matcha/common/';
-import { notificationsSchemas } from '@matcha/common';
+import { batchPromises } from '../../../common/src/utils/utils';
 
 export const getNotifications = async (req: Request, res: Response) => {
   try {
@@ -12,10 +11,21 @@ export const getNotifications = async (req: Request, res: Response) => {
         userId: userId,
       },
     });
-    console.log('notif :', notifications);
-    res
-      .status(200)
-      .json({ notifications } as Infer<typeof notificationsSchemas.response>);
+    const notificationsWithUser = await batchPromises(
+      notifications.map(async (notification) => {
+        let otherUser = null;
+        if (notification.otherUserId) {
+          otherUser = await db.user.findFirst({
+            where: {
+              id: notification.otherUserId,
+            },
+          });
+        }
+        return { ...notification, otherUser };
+      })
+    );
+    console.log('notif :', notificationsWithUser);
+    res.status(200).json({ notificationsWithUser });
   } catch (error) {
     console.error('Error fetching messages:', error);
     defaultResponse({

@@ -19,6 +19,7 @@ import { useNavigate } from 'react-router-dom';
 import { getUrl } from '../../../../common/src/utils/getUrl';
 import { useSession } from '../../hooks/useSession';
 import { axiosFetch } from '../../lib/fetch-utils/axiosFetch';
+import { TNotificationsOtherUserSchema } from '@matcha/common/src/schemas/api/notifications.schema';
 
 const NotificationsList: React.FC = () => {
   const [notifications, setNotifications] = useState<TNotification[]>([]);
@@ -37,7 +38,7 @@ const NotificationsList: React.FC = () => {
           handleEnding: {
             cb: (data) => {
               console.log('Notifications:', JSON.stringify(data, null, 2));
-              const formattedNotifications = data.notifications.map(
+              const formattedNotifications = data.notificationsWithUser.map(
                 (notification: TNotification) => ({
                   ...notification,
                   dateTime: new Date(notification.date),
@@ -72,7 +73,7 @@ const NotificationsList: React.FC = () => {
     return null;
   };
 
-  const getNotificationLink = (notification: TNotification) => {
+  const getNotificationLink = (notification: TNotificationsOtherUserSchema) => {
     if (notification.message.includes('message')) {
       return `/chat/${notification.userId}`;
     }
@@ -87,8 +88,8 @@ const NotificationsList: React.FC = () => {
 
   const groupedNotifications = notifications.reduce(
     (
-      acc: Record<string, TNotification & { count: number }>,
-      notification: TNotification
+      acc: Record<string, TNotificationsOtherUserSchema & { count: number }>,
+      notification: TNotificationsOtherUserSchema
     ) => {
       const key = `${notification.userId}-${notification.message}`;
       if (!acc[key]) {
@@ -100,6 +101,39 @@ const NotificationsList: React.FC = () => {
     },
     {}
   );
+
+  const getMessageNotification = (
+    notification: TNotificationsOtherUserSchema
+  ) => {
+    const userName = notification.otherUser?.name ?? 'unknown user';
+
+    if (notification.message.includes('message')) {
+      return (
+        <>
+          {notification.message}{' '}
+          <em>
+            {' '}
+            <a href={`/profile/${notification.otherUser?.id}`}>{userName}</a>
+          </em>
+        </>
+      );
+    }
+
+    if (
+      notification.message.includes('liked') ||
+      notification.message.includes('viewed')
+    ) {
+      return (
+        <>
+          <em>
+            {' '}
+            <a href={`/profile/${notification.otherUser?.id}`}>{userName}</a>
+          </em>{' '}
+          {notification.message}
+        </>
+      );
+    }
+  };
 
   const formattedNotifications = Object.values(groupedNotifications);
 
@@ -124,12 +158,15 @@ const NotificationsList: React.FC = () => {
 
               <div className="flex flex-col text-left">
                 <span>
-                  {notification.count > 1
+                  {/* {notification.count > 1
                     ? notification.message.replace(
                         'a new message',
                         `${notification.count} new messages`
-                      )
-                    : notification.message}
+                      ) +
+                      ' ' +
+                      notification.otherUser?.name
+                    : notification.message + ' ' + notification.otherUser?.name} */}
+                  {getMessageNotification(notification)}
                 </span>
                 <CardDescription>
                   {getNearDate(notification.date)}

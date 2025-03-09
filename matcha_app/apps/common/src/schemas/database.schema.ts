@@ -69,7 +69,7 @@ export type TLike = Infer<typeof likeSchema>;
 export const notificationSchema = z.object({
   id: z.number(),
   userId: userSchema.pick(['id']).shape.id,
-  otherId: userSchema.pick(['id']).shape.id.optional(),
+  otherUserId: userSchema.pick(['id']).shape.id.optional(),
   message: z.string(),
   date: z.date(),
   read: z.boolean(),

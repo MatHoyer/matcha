@@ -102,8 +102,8 @@ export const socketHandler = (io: Server) => {
         await db.notification.create({
           data: {
             userId: receiverId,
-            otherId: senderId,
-            message: 'You have a new message from ' + sender.name,
+            otherUserId: senderId,
+            message: 'You have a new message from',
             date: new Date(),
             read: false,
           },
@@ -111,7 +111,7 @@ export const socketHandler = (io: Server) => {
 
         receiver.socket.emit(`pv-${receiver.id}-${sender.id}`, { message });
         receiver.socket.emit(`notification-${receiver.id}`, {
-          message: 'You have a new message from ' + sender.name,
+          message: 'You have a new message from',
         });
         console.log('send-notif-bubble from back');
         receiver.socket.emit(`notification-bubble`);
