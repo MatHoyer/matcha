@@ -1,7 +1,7 @@
 import { Infer, z } from '../../validator/validator';
 import { notificationSchema, userSchema } from '../database.schema';
 
-const notificationsOtherUserSchema = z.object({
+export const notificationsOtherUserSchema = z.object({
   id: z.number(),
   userId: userSchema.pick(['id']).shape.id,
   otherUserId: userSchema.pick(['id']).shape.id.optional(),
@@ -10,7 +10,9 @@ const notificationsOtherUserSchema = z.object({
   date: z.date(),
   read: z.boolean(),
 });
-type TNotificationsOtherUserSchema = Infer<typeof notificationsOtherUserSchema>;
+export type TNotificationsOtherUserSchema = Infer<
+  typeof notificationsOtherUserSchema
+>;
 
 export const notificationsSchemas = {
   requirements: z.object({
