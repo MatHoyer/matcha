@@ -291,7 +291,7 @@ VALUES  ('Willey', 'Bridie', 'wbridie0@yellowbook.com', '094513168d4401c9dc5d693
 ('Margie', 'Reinmar', 'mreinmarx@washingtonpost.com', '094513168d4401c9dc5d693b3fbb9382ce68e54bafbd180f990bdf193f7c0948', '2002-03-18', 'Male', 'Homosexual', 'In eleifend quam a odio.'),
 ('Raddie', 'Varran', 'rvarrany@123-reg.co.uk', '094513168d4401c9dc5d693b3fbb9382ce68e54bafbd180f990bdf193f7c0948', '1968-04-29', 'Male', 'Bisexual', 'Suspendisse potenti.');
 
-INSERT INTO "Location" ("latitude", "longitude")
+INSERT INTO "Location" ("latitude", "longitude") 
 VALUES (48.5734, 7.7521),
 (43.6119, 3.8772),
 (44.8378, -0.5792),
@@ -329,7 +329,7 @@ VALUES (48.5734, 7.7521),
 (48.1173, -1.6778);
 
 
-INSERT INTO "UserLocation" ("userId", "locationId")
+INSERT INTO "UserLocation" ("userId", "locationId") 
 VALUES (6, 6),
 (7, 7),
 (8, 8),

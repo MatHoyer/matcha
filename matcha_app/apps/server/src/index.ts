@@ -4,7 +4,7 @@ import cors from 'cors';
 import express from 'express';
 import path from 'path';
 import { Server } from 'socket.io';
-import { env, envSchema } from './env.js';
+import { env } from './env.js';
 import { default as authRouter } from './routes/auth.route.js';
 import globalLocationRouter from './routes/globalLocation.route.js';
 import likeRouter from './routes/like.route.js';
@@ -16,20 +16,12 @@ import searchRouter from './routes/search.route.js';
 import tagRouter from './routes/tag.route.js';
 import userRouter from './routes/user.route.js';
 import { socketHandler } from './sockets/sockets.js';
-
-try {
-  envSchema.parse(env);
-} catch (error) {
-  console.error('Error: Bad environment variables: ' + error);
-  process.exit(1);
-}
-
 const app = express();
 
 app.use(
   express.json({
     limit: '4mb',
-  })
+  }),
 );
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
@@ -37,7 +29,7 @@ app.use(
   cors({
     origin: `http://localhost:${env.CLIENT_PORT}`,
     credentials: true,
-  })
+  }),
 );
 
 app.get('/api/health', (_req, res) => {

@@ -74,7 +74,11 @@ const SignupForm: React.FC<TFormProps<TForm, TSignupSchemas['response']>> = ({
           cb: (data) => {
             if (modal) closeGlobalDialog();
             getData?.(data);
-            navigate('/');
+            navigate(
+              getUrl('client-auth', {
+                type: 'confirm',
+              })
+            );
           },
         },
       });

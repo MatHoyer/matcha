@@ -46,12 +46,14 @@ export { SOCKETS_EVENTS } from './sockets/sockets';
 
 //-----------------------Schemas-----------------------
 export {
+  confirmSchemas,
   loginSchemas,
   logoutSchemas,
   sessionSchemas,
   signupSchemas,
 } from './schemas/api/auth.schema';
 export type {
+  TConfirmSchemas,
   TLoginSchemas,
   TLogoutSchemas,
   TSessionSchemas,

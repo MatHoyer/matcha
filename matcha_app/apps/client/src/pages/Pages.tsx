@@ -1,7 +1,9 @@
 import { useSession } from '@/hooks/useSession';
 import { getUrl } from '@matcha/common';
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
+import ConfirmPage from './auth/Confirm';
 import LoginPage from './auth/Login';
+import { MagikLink } from './auth/MagikLink';
 import SignupPage from './auth/Signup';
 import { Home } from './Home';
 import { NotFound } from './NotFound';
@@ -50,6 +52,18 @@ export const Pages = () => {
             type: 'login',
           })}
           element={<LoginPage />}
+        />
+        <Route
+          path={getUrl('client-auth', {
+            type: 'confirm',
+          })}
+          element={<ConfirmPage />}
+        />
+        <Route
+          path={`${getUrl('client-auth', {
+            type: 'confirm',
+          })}/:token`}
+          element={<MagikLink />}
         />
       </Route>
       <Route element={<PrivateRoute />}>

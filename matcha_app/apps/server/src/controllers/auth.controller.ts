@@ -7,10 +7,14 @@ import {
   TOrientation,
   TSignupSchemas,
   wait,
+  z,
 } from '@matcha/common';
 import type { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import db from '../database/Database.js';
+import { LoginMail } from '../emails/patterns/LoginMail/LoginMail.js';
+import { SignupMail } from '../emails/patterns/SignupMail/SignupMail.js';
+import { sendEmail } from '../emails/sendEmail.js';
 import { env } from '../env.js';
 import { hashPassword } from '../services/auth.service.js';
 import { defaultResponse } from '../utils/defaultResponse.js';
@@ -18,6 +22,29 @@ import { defaultResponse } from '../utils/defaultResponse.js';
 export const signup = async (req: Request, res: Response) => {
   const { password, gender, preference, ...userData } =
     req.body as TSignupSchemas['requirements'];
+
+  const passwordSchema = z
+    .string()
+    .regex(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+    );
+  if (!passwordSchema.safeParse(password).success) {
+    return defaultResponse({
+      res,
+      status: 400,
+      json: {
+        message: 'Invalid password',
+        fields: [
+          {
+            field: 'password',
+            message:
+              'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number and one special character',
+          },
+        ],
+      },
+    });
+  }
+
   const hashedPassword = hashPassword(password, env.AUTH_SECRET);
 
   let user = await db.user.findFirst({
@@ -55,24 +82,23 @@ export const signup = async (req: Request, res: Response) => {
   }
 
   const token = jwt.sign({ id: user.id }, env.JWT_SECRET, {
-    expiresIn: 30 * 24 * 60 * 60,
+    expiresIn: '1h',
+  });
+
+  await sendEmail({
+    to: user.email,
+    subject: 'Welcome to Matcha',
+    html: SignupMail({
+      linkText: 'Confirm my signup',
+      link: `${env.NODE_ENV === 'DEV' ? `http://localhost:${env.CLIENT_PORT}` : env.SERVER_URL}/auth/confirm/${token}`,
+    }),
   });
 
   return defaultResponse({
     res,
     status: 201,
-    cookie: {
-      name: AUTH_COOKIE_NAME,
-      val: token,
-      options: {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'strict',
-        maxAge: 30 * 24 * 60 * 60 * 1000,
-      },
-    },
     json: {
-      message: 'Signed in',
+      message: 'Successfully signed up',
     },
   });
 };
@@ -99,6 +125,48 @@ export const login = async (req: Request, res: Response) => {
   }
 
   const token = jwt.sign({ id: user.id }, env.JWT_SECRET, {
+    expiresIn: '1h',
+  });
+
+  await sendEmail({
+    to: user.email,
+    subject: 'Login to Matcha',
+    html: LoginMail({
+      linkText: 'Log me in',
+      link: `${env.NODE_ENV === 'DEV' ? `http://localhost:${env.CLIENT_PORT}` : env.SERVER_URL}/auth/confirm/${token}`,
+    }),
+  });
+
+  return defaultResponse({
+    res,
+    status: 200,
+    json: {
+      message: 'Successfully logged in',
+    },
+  });
+};
+
+export const confirm = async (req: Request, res: Response) => {
+  const { token } = req.params;
+  const decoded = jwt.verify(token, env.JWT_SECRET) as {
+    id: number;
+  };
+
+  const user = await db.user.findFirst({
+    where: {
+      id: decoded.id,
+    },
+  });
+  if (!user) {
+    return defaultResponse({
+      res,
+      status: 401,
+      json: { message: 'Unauthorized' },
+    });
+  }
+  console.log(user);
+
+  const newToken = jwt.sign({ id: decoded.id }, env.JWT_SECRET, {
     expiresIn: 30 * 24 * 60 * 60,
   });
 
@@ -107,7 +175,7 @@ export const login = async (req: Request, res: Response) => {
     status: 200,
     cookie: {
       name: AUTH_COOKIE_NAME,
-      val: token,
+      val: newToken,
       options: {
         httpOnly: true,
         secure: true,

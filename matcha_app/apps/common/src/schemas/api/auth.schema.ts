@@ -31,6 +31,15 @@ export type TLoginSchemas = {
   response: Infer<typeof loginSchemas.response>;
 };
 
+export const confirmSchemas = {
+  response: z.object({
+    message: z.string(),
+  }),
+};
+export type TConfirmSchemas = {
+  response: Infer<typeof confirmSchemas.response>;
+};
+
 export const logoutSchemas = {
   response: z.object({
     message: z.string(),

@@ -55,7 +55,11 @@ const LoginForm: React.FC<TFormProps<TForm, TLoginSchemas['response']>> = ({
           cb: (data) => {
             if (modal) closeGlobalDialog();
             getData?.(data);
-            navigate('/');
+            navigate(
+              getUrl('client-auth', {
+                type: 'confirm',
+              })
+            );
           },
         },
       });
