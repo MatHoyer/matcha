@@ -42,7 +42,9 @@ export type TApiRouteDataRequirements = {
     id?: number;
     type?: 'new' | 'is-liked';
   };
-  'api-location': undefined;
+  'api-location': {
+    type?: 'is-need-update';
+  };
 };
 
 type TRouteDataRequirements = TClientRouteDataRequirements &
@@ -97,7 +99,8 @@ const routes: {
     }
     return id ? `/api/likes/${id}` : '/api/likes';
   },
-  'api-location': () => '/api/location',
+  'api-location': ({ type }) =>
+    type ? `/api/location/${type}` : '/api/location',
 };
 
 type TUrlParams =

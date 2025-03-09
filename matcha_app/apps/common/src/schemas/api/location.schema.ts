@@ -13,3 +13,13 @@ export type TUpdateLocationSchemas = {
   requirements: Infer<typeof updateLocationSchemas.requirements>;
   response: Infer<typeof updateLocationSchemas.response>;
 };
+
+export const isNeedUpdateLocationSchemas = {
+  response: z.object({
+    message: z.string(),
+    isNeedUpdate: z.boolean(),
+  }),
+};
+export type TIsNeedUpdateLocationSchemas = {
+  response: Infer<typeof isNeedUpdateLocationSchemas.response>;
+};

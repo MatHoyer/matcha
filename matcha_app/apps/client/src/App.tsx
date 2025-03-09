@@ -4,7 +4,7 @@ import {
   TUserWithNames,
   updateLocationSchemas,
 } from '@matcha/common';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import {
   Crosshair,
   Heart,
@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { isNeedUpdateLocationSchemas } from '../../common/src/schemas/api/location.schema';
 import { ChatContainer } from './components/chat/ChatContainer';
 import { Logo } from './components/images/Logo';
 import { NavItemDropdown, NavItems } from './components/sidebar/NavComp';
@@ -49,7 +50,7 @@ const App = () => {
     });
   };
 
-  const locationMutation = useMutation({
+  const updateLocationMutation = useMutation({
     mutationFn: async ({
       latitude,
       longitude,
@@ -69,37 +70,59 @@ const App = () => {
     },
   });
 
+  const isNeedUpdateLocationQuery = useQuery({
+    queryKey: ['isNeedUpdateLocation'],
+    queryFn: async () => {
+      return await axiosFetch({
+        url: getUrl('api-location', { type: 'is-need-update' }),
+        method: 'GET',
+        schemas: isNeedUpdateLocationSchemas,
+      });
+    },
+  });
+
+  const fetchLocationAPI = async () => {
+    const locationData = await (await fetch('http://ipapi.co/json/')).json();
+    console.log(
+      `API fetched: Latitude: ${locationData.latitude}, Longitude: ${locationData.longitude}`
+    );
+    updateLocationMutation.mutate({
+      latitude: locationData.latitude,
+      longitude: locationData.longitude,
+    });
+  };
+
   useEffect(() => {
-    if (navigator.geolocation) {
+    if (isNeedUpdateLocationQuery.data?.isNeedUpdate) {
       navigator.geolocation.getCurrentPosition(
         function (position) {
           const latitude = position.coords.latitude;
           const longitude = position.coords.longitude;
-          console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
-          locationMutation.mutate({
+          console.log(
+            `Geolocation: Latitude: ${latitude}, Longitude: ${longitude}`
+          );
+          updateLocationMutation.mutate({
             latitude,
             longitude,
           });
         },
-        async function (error) {
+        function (error) {
           if (error.code === error.PERMISSION_DENIED) {
-            const locationData = await (
-              await fetch('http://ipapi.co/json/')
-            ).json();
-            console.log(locationData);
-            locationMutation.mutate({
-              latitude: locationData.latitude,
-              longitude: locationData.longitude,
-            });
+            try {
+              fetchLocationAPI();
+            } catch (fetchError) {
+              console.error(
+                'Erreur lors de la récupération de l’IP:',
+                fetchError
+              );
+            }
           } else {
             console.error('Erreur de géolocalisation inconnue:', error);
           }
         }
       );
-    } else {
-      console.log("La géolocalisation n'est pas supportée par ce navigateur.");
     }
-  }, []);
+  }, [isNeedUpdateLocationQuery.data]);
 
   return (
     <NavigationWrapper
