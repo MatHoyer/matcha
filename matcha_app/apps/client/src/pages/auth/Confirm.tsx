@@ -8,11 +8,12 @@ import { useEffect, useState } from 'react';
 
 const ConfirmPage: React.FC = () => {
   const [isDisabled, setIsDisabled] = useState(true);
+  const duration = 10;
 
   useEffect(() => {
     const timeout = setTimeout(() => {
       setIsDisabled(false);
-    }, 10000);
+    }, duration * 1000);
 
     return () => clearTimeout(timeout);
   }, []);
@@ -42,7 +43,7 @@ const ConfirmPage: React.FC = () => {
                   initial={{ left: '-100%' }}
                   animate={{ left: '0%' }}
                   transition={{
-                    duration: 10,
+                    duration: duration,
                     ease: 'linear',
                   }}
                 />

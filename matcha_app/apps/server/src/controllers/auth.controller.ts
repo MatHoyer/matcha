@@ -26,7 +26,7 @@ export const signup = async (req: Request, res: Response) => {
   const passwordSchema = z
     .string()
     .regex(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
     );
   if (!passwordSchema.safeParse(password).success) {
     return defaultResponse({
@@ -82,7 +82,7 @@ export const signup = async (req: Request, res: Response) => {
   }
 
   const token = jwt.sign({ id: user.id }, env.JWT_SECRET, {
-    expiresIn: '1h',
+    expiresIn: '5m',
   });
 
   await sendEmail({
@@ -90,7 +90,11 @@ export const signup = async (req: Request, res: Response) => {
     subject: 'Welcome to Matcha',
     html: SignupMail({
       linkText: 'Confirm my signup',
-      link: `${env.NODE_ENV === 'DEV' ? `http://localhost:${env.CLIENT_PORT}` : env.SERVER_URL}/auth/confirm/${token}`,
+      link: `${
+        env.NODE_ENV === 'DEV'
+          ? `http://localhost:${env.CLIENT_PORT}`
+          : env.SERVER_URL
+      }/auth/confirm/${token}`,
     }),
   });
 
@@ -125,7 +129,7 @@ export const login = async (req: Request, res: Response) => {
   }
 
   const token = jwt.sign({ id: user.id }, env.JWT_SECRET, {
-    expiresIn: '1h',
+    expiresIn: '5m',
   });
 
   await sendEmail({
@@ -133,7 +137,11 @@ export const login = async (req: Request, res: Response) => {
     subject: 'Login to Matcha',
     html: LoginMail({
       linkText: 'Log me in',
-      link: `${env.NODE_ENV === 'DEV' ? `http://localhost:${env.CLIENT_PORT}` : env.SERVER_URL}/auth/confirm/${token}`,
+      link: `${
+        env.NODE_ENV === 'DEV'
+          ? `http://localhost:${env.CLIENT_PORT}`
+          : env.SERVER_URL
+      }/auth/confirm/${token}`,
     }),
   });
 
@@ -148,47 +156,54 @@ export const login = async (req: Request, res: Response) => {
 
 export const confirm = async (req: Request, res: Response) => {
   const { token } = req.params;
-  const decoded = jwt.verify(token, env.JWT_SECRET) as {
-    id: number;
-  };
+  try {
+    const decoded = jwt.verify(token, env.JWT_SECRET) as {
+      id: number;
+    };
 
-  const user = await db.user.findFirst({
-    where: {
-      id: decoded.id,
-    },
-  });
-  if (!user) {
+    const user = await db.user.findFirst({
+      where: {
+        id: decoded.id,
+      },
+    });
+    if (!user) {
+      return defaultResponse({
+        res,
+        status: 401,
+        json: { message: 'Unauthorized' },
+      });
+    }
+    console.log(user);
+
+    const newToken = jwt.sign({ id: decoded.id }, env.JWT_SECRET, {
+      expiresIn: 30 * 24 * 60 * 60,
+    });
+
+    return defaultResponse({
+      res,
+      status: 200,
+      cookie: {
+        name: AUTH_COOKIE_NAME,
+        val: newToken,
+        options: {
+          httpOnly: true,
+          secure: true,
+          sameSite: 'strict',
+          maxAge: 30 * 24 * 60 * 60 * 1000,
+        },
+      },
+      json: {
+        message: 'Logged in',
+      },
+    });
+  } catch (_error) {
     return defaultResponse({
       res,
       status: 401,
       json: { message: 'Unauthorized' },
     });
   }
-  console.log(user);
-
-  const newToken = jwt.sign({ id: decoded.id }, env.JWT_SECRET, {
-    expiresIn: 30 * 24 * 60 * 60,
-  });
-
-  return defaultResponse({
-    res,
-    status: 200,
-    cookie: {
-      name: AUTH_COOKIE_NAME,
-      val: newToken,
-      options: {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'strict',
-        maxAge: 30 * 24 * 60 * 60 * 1000,
-      },
-    },
-    json: {
-      message: 'Logged in',
-    },
-  });
 };
-
 export const logout = async (_req: Request, res: Response) => {
   return defaultResponse({
     res,
