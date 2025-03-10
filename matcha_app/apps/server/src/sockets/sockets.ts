@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import { Server, Socket } from 'socket.io';
 import db from '../database/Database';
 import { env } from '../env';
+import { nanoid } from 'nanoid';
 
 type Events = typeof events;
 type InferEvent<T extends keyof Events> = Infer<Events[T]>;
@@ -98,7 +99,6 @@ export const socketHandler = (io: Server) => {
         const receiver = connectedUsers.find((u) => u.id === receiverId);
         if (!receiver) return;
 
-        // Add notification to the db
         await db.notification.create({
           data: {
             userId: receiverId,
@@ -108,12 +108,22 @@ export const socketHandler = (io: Server) => {
             read: false,
           },
         });
+        const otherUser = await db.user.findFirst({
+          where: {
+            id: senderId,
+          },
+        });
 
         receiver.socket.emit(`pv-${receiver.id}-${sender.id}`, { message });
         receiver.socket.emit(`notification-${receiver.id}`, {
+          id: nanoid(),
+          userId: receiverId,
+          otherUserId: senderId,
+          otherUser: otherUser,
           message: 'You have a new message from',
+          date: new Date(),
+          read: false,
         });
-        console.log('send-notif-bubble from back');
         receiver.socket.emit(`notification-bubble`);
       },
       'send-feedback': (args) => {

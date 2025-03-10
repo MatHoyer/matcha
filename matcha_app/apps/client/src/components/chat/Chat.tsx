@@ -12,6 +12,7 @@ import {
   TMessage,
   TSendMessageSchema,
   TUser,
+  // readMessageNotificationSchemas,
 } from '@matcha/common';
 import { Minus, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
@@ -146,8 +147,26 @@ export const Chat: React.FC<PrivateChatProps> = ({
     });
   };
 
+  // set all the messages to read=true
+  // useEffect(() => {
+  //   const setReadMessageNotif = async () => {
+  //     try {
+  //       await axiosFetch({
+  //         method: 'POST',
+  //         url: getUrl('api-readMessageNotif'),
+  //         schemas: ,
+  //         data: { userId: session.user!.id, otherUserId: otherUser.id },
+  //       });
+  //     } catch (error) {
+  //       console.error(`Error while marking messages as read: ${error}`);
+  //     }
+  //   };
+
+  //   setReadMessageNotif();
+  // }, []);
+
   return (
-    <Card className="p-3 w-80 h-fit">
+    <Card className="p-3 w-80 h-fit ">
       <div className="flex items-center justify-between">
         <Typography variant="small">
           Chat with {otherUser.name} {otherUser.id}

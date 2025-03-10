@@ -26,3 +26,11 @@ export type TNotificationsSchemas = {
   requirements: Infer<typeof notificationsSchemas.requirements>;
   response: Infer<typeof notificationsSchemas.response>;
 };
+
+export const readMessageNotificationSchemas = {
+  requirements: z.object({
+    userId: userSchema.pick(['id']).shape.id,
+    otherUserId: userSchema.pick(['id']).shape.id,
+  }),
+  response: {},
+};

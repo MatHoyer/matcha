@@ -69,11 +69,12 @@ DROP TABLE IF EXISTS "Notification";
 CREATE TABLE "Notification" (
   "id" SERIAL PRIMARY KEY,
   "userId" INT NOT NULL,
-  "otherId" INT,
+  "otherUserId" INT,
   "message" VARCHAR(1000) NOT NULL,
   "date" TIMESTAMP NOT NULL DEFAULT NOW(),
   "read" BOOLEAN NOT NULL DEFAULT FALSE,
-  FOREIGN KEY ("userId") REFERENCES "User" ("id")  ON DELETE CASCADE
+  FOREIGN KEY ("userId") REFERENCES "User" ("id")  ON DELETE CASCADE,
+  FOREIGN KEY ("otherUserId") REFERENCES "User" ("id") ON DELETE CASCADE
 );
 
 DROP TABLE IF EXISTS "Block";
@@ -164,16 +165,16 @@ INSERT INTO "Like" ("userId", "likedId") VALUES
 (3, 4), -- Emma aime Michael
 (4, 3); -- Michael aime Emma
 
-INSERT INTO "Notification" ("userId", "otherId", "message") VALUES
-(2, 1, 'Alice viewed your profile'),
-(2, 1, 'Alice liked your profile'),
-(1, 2, 'David viewed your profile'),
-(1, 2, 'David liked your profile'),
-(1, 2, 'You have a new message from David'),
-(3, 4, 'Michael viewed your profile'),
-(3, 4, 'Michael liked your profile'),
-(4, 3, 'Emma viewed your profile'),
-(4, 3, 'Emma liked your profile');
+INSERT INTO "Notification" ("userId", "otherUserId", "message") VALUES
+(2, 1, 'viewed your profile'),
+(2, 1, 'liked your profile'),
+(1, 2, 'viewed your profile'),
+(1, 2, 'liked your profile'),
+(1, 2, 'You have a new message from'),
+(3, 4, 'viewed your profile'),
+(3, 4, 'liked your profile'),
+(4, 3, 'viewed your profile'),
+(4, 3, 'liked your profile');
 
 INSERT INTO "Block" ("userId", "blockedId") VALUES
 (4, 3); -- Michael blocked Emma

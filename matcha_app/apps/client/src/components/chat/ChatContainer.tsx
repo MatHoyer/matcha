@@ -1,44 +1,27 @@
 import { Chat } from '@/components/chat/Chat';
 import { TUser } from '@matcha/common';
 import React from 'react';
+import { useChatStore } from '@/hooks/use-chat';
 
 export const ChatContainer: React.FC<{
   openedChats: { id: string; otherUser: TUser; status: 'full' | 'collapse' }[];
-  setOpenChats: React.Dispatch<
-    React.SetStateAction<
-      {
-        id: string;
-        otherUser: TUser;
-        status: 'full' | 'collapse';
-      }[]
-    >
-  >;
-}> = ({ openedChats, setOpenChats }) => {
+  removeChatWindow: (id: string) => void;
+}> = ({ openedChats, removeChatWindow }) => {
+  const { setChatStatus } = useChatStore();
   return (
-    <div className="flex flex-row-reverse gap-2 absolute right-2 bottom-2 items-end">
+    <div className="flex flex-row-reverse gap-2 fixed right-4 bottom-2 items-end">
       {openedChats.map((chatWindow) => (
         <Chat
           key={chatWindow.id}
           status={chatWindow.status}
           otherUser={chatWindow.otherUser}
           toggleChat={() => {
-            setOpenChats((prevChats) =>
-              prevChats.map((prevChat) => {
-                if (prevChat.id === chatWindow.id) {
-                  return {
-                    ...prevChat,
-                    status: prevChat.status === 'full' ? 'collapse' : 'full',
-                  };
-                }
-                return prevChat;
-              })
+            setChatStatus(
+              chatWindow.id,
+              chatWindow.status === 'full' ? 'collapse' : 'full'
             );
           }}
-          closeChat={() =>
-            setOpenChats((prevChats) =>
-              prevChats.filter((prevChat) => prevChat.id !== chatWindow.id)
-            )
-          }
+          closeChat={() => removeChatWindow(chatWindow.id)}
         />
       ))}
     </div>
