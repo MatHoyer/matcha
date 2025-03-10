@@ -57,7 +57,10 @@ const LoginForm: React.FC<TFormProps<TForm, TLoginSchemas['response']>> = ({
             getData?.(data);
             navigate(
               getUrl('client-auth', {
-                type: 'confirm',
+                type: 'wait-confirm',
+                urlParams: {
+                  token: data.resendToken,
+                },
               })
             );
           },

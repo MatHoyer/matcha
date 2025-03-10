@@ -49,6 +49,7 @@ export {
   confirmSchemas,
   loginSchemas,
   logoutSchemas,
+  resendConfirmSchemas,
   sessionSchemas,
   signupSchemas,
 } from './schemas/api/auth.schema';
@@ -56,6 +57,7 @@ export type {
   TConfirmSchemas,
   TLoginSchemas,
   TLogoutSchemas,
+  TResendConfirmSchemas,
   TSessionSchemas,
   TSignupSchemas,
 } from './schemas/api/auth.schema';

@@ -2,7 +2,7 @@ import { getServerUrl } from './getServer';
 
 export type TClientRouteDataRequirements = {
   'client-auth': {
-    type: 'signup' | 'login' | 'confirm';
+    type: 'signup' | 'login' | 'confirm' | 'wait-confirm';
   };
   'client-home': undefined;
   'client-search': {
@@ -15,7 +15,14 @@ export type TClientRouteDataRequirements = {
 };
 export type TApiRouteDataRequirements = {
   'api-auth': {
-    type: 'signup' | 'login' | 'logout' | 'session' | 'confirm' | undefined;
+    type:
+      | 'signup'
+      | 'login'
+      | 'logout'
+      | 'session'
+      | 'confirm'
+      | 'resend-confirm'
+      | undefined;
   };
   'api-tags': {
     id?: number;

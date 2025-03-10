@@ -4,6 +4,7 @@ import {
   confirm,
   login,
   logout,
+  resend,
   session,
   signup,
 } from '../controllers/auth.controller.js';
@@ -14,7 +15,16 @@ const authRouter = Router();
 
 authRouter.post('/signup', bodyParser(signupSchemas.requirements), signup);
 authRouter.post('/login', bodyParser(loginSchemas.requirements), login);
-authRouter.get('/confirm/:token', paramsParser(z.object({ token: z.string() })), confirm);
+authRouter.get(
+  '/resend-confirm/:token',
+  paramsParser(z.object({ token: z.string() })),
+  resend
+);
+authRouter.get(
+  '/confirm/:token',
+  paramsParser(z.object({ token: z.string() })),
+  confirm
+);
 authRouter.get('/logout', logout);
 authRouter.get('/session', session);
 

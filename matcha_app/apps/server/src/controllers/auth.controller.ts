@@ -98,12 +98,13 @@ export const signup = async (req: Request, res: Response) => {
     }),
   });
 
-  return defaultResponse({
-    res,
-    status: 201,
-    json: {
-      message: 'Successfully signed up',
-    },
+  const resendToken = jwt.sign({ id: user.id }, env.JWT_SECRET, {
+    expiresIn: '5m',
+  });
+
+  res.status(201).json({
+    message: 'Successfully signed up',
+    resendToken,
   });
 };
 
@@ -145,15 +146,66 @@ export const login = async (req: Request, res: Response) => {
     }),
   });
 
-  return defaultResponse({
-    res,
-    status: 200,
-    json: {
-      message: 'Successfully logged in',
-    },
+  const resendToken = jwt.sign({ id: user.id }, env.JWT_SECRET, {
+    expiresIn: '5m',
+  });
+
+  res.status(200).json({
+    message: 'Successfully logged in',
+    resendToken,
   });
 };
 
+export const resend = async (req: Request, res: Response) => {
+  const { token } = req.params;
+  try {
+    const decoded = jwt.verify(token, env.JWT_SECRET) as {
+      id: number;
+    };
+
+    const user = await db.user.findFirst({
+      where: {
+        id: decoded.id,
+      },
+    });
+    if (!user) {
+      return defaultResponse({
+        res,
+        status: 401,
+        json: { message: 'Unauthorized' },
+      });
+    }
+
+    const newToken = jwt.sign({ id: user.id }, env.JWT_SECRET, {
+      expiresIn: '5m',
+    });
+
+    await sendEmail({
+      to: user.email,
+      subject: 'Re: Login to Matcha',
+      html: LoginMail({
+        linkText: 'Log me in',
+        link: `${
+          env.NODE_ENV === 'DEV'
+            ? `http://localhost:${env.CLIENT_PORT}`
+            : env.SERVER_URL
+        }/auth/confirm/${newToken}`,
+      }),
+    });
+
+    return defaultResponse({
+      res,
+      status: 200,
+      json: { message: 'Successfully resended confirmation email' },
+    });
+  } catch (_error) {
+    return defaultResponse({
+      res,
+      status: 401,
+      json: { message: 'Unauthorized' },
+    });
+  }
+};
 export const confirm = async (req: Request, res: Response) => {
   const { token } = req.params;
   try {
@@ -173,7 +225,6 @@ export const confirm = async (req: Request, res: Response) => {
         json: { message: 'Unauthorized' },
       });
     }
-    console.log(user);
 
     const newToken = jwt.sign({ id: decoded.id }, env.JWT_SECRET, {
       expiresIn: 30 * 24 * 60 * 60,
@@ -204,6 +255,7 @@ export const confirm = async (req: Request, res: Response) => {
     });
   }
 };
+
 export const logout = async (_req: Request, res: Response) => {
   return defaultResponse({
     res,

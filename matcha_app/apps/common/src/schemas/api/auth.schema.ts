@@ -13,6 +13,7 @@ export const signupSchemas = {
   ]),
   response: z.object({
     message: z.string(),
+    resendToken: z.string(),
   }),
 };
 export type TSignupSchemas = {
@@ -24,11 +25,21 @@ export const loginSchemas = {
   requirements: userSchema.pick(['email', 'password']),
   response: z.object({
     message: z.string(),
+    resendToken: z.string(),
   }),
 };
 export type TLoginSchemas = {
   requirements: Infer<typeof loginSchemas.requirements>;
   response: Infer<typeof loginSchemas.response>;
+};
+
+export const resendConfirmSchemas = {
+  response: z.object({
+    message: z.string(),
+  }),
+};
+export type TResendConfirmSchemas = {
+  response: Infer<typeof resendConfirmSchemas.response>;
 };
 
 export const confirmSchemas = {

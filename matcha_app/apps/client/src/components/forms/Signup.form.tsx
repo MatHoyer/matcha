@@ -76,7 +76,10 @@ const SignupForm: React.FC<TFormProps<TForm, TSignupSchemas['response']>> = ({
             getData?.(data);
             navigate(
               getUrl('client-auth', {
-                type: 'confirm',
+                type: 'wait-confirm',
+                urlParams: {
+                  token: data.resendToken,
+                },
               })
             );
           },
