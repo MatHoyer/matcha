@@ -13,10 +13,16 @@ import { paramsParser } from '../middlewares/paramsParser.middleware';
 const userRouter = Router();
 
 userRouter.get('/', isLogged, getUsers);
-userRouter.get('/:id', isLogged, getUser);
+userRouter.get(
+  '/:id',
+  isLogged,
+  paramsParser(z.object({ id: z.number() })),
+  getUser
+);
 userRouter.put(
   '/:id',
   isLogged,
+  paramsParser(z.object({ id: z.number() })),
   bodyParser(updateUserSchemas.requirements),
   updateUser
 );

@@ -40,10 +40,6 @@ export const getUsers = async (_req: Request, res: Response) => {
 export const getUser = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    const paramsSchema = z.object({
-      id: z.number(),
-    });
-    paramsSchema.parse({ id: +id });
     const user = await db.user.findFirst({
       where: {
         id: +id,
@@ -71,18 +67,6 @@ export const getUser = async (req: Request, res: Response) => {
 
 export const updateUser = async (req: Request, res: Response) => {
   const { id } = req.params;
-  try {
-    const paramsSchema = z.object({
-      id: z.number(),
-    });
-    paramsSchema.parse({ id: +id });
-  } catch (_error) {
-    defaultResponse({
-      res,
-      status: 400,
-      json: { message: 'Invalid request' },
-    });
-  }
 
   const user = await db.user.findFirst({
     where: {
@@ -105,13 +89,51 @@ export const updateUser = async (req: Request, res: Response) => {
     });
   }
 
-  const { name, lastName, email, gender, preference, birthDate } =
+  const userTags = await db.userTag.findMany({
+    where: {
+      userId: +id,
+    },
+  });
+  const tagIds = userTags.map((userTag) => userTag.tagId);
+  const tags = await db.tag.findMany({
+    where: {
+      id: { $in: tagIds },
+    },
+  });
+  const allTags = await db.tag.findMany({});
+
+  const { tags: newTags } = req.body as TUpdateUserSchemas['requirements'];
+  const tagsToRemove = tags.filter((tag) => !newTags.includes(tag.name));
+  const tagsToAdd = newTags
+    .filter((tag) => !tags.map((t) => t.name).includes(tag))
+    .map((tag) => allTags.find((t) => t.name === tag))
+    .filter((tag) => tag !== undefined);
+
+  console.log(tagsToRemove, tagsToAdd);
+  for (const tag of tagsToRemove) {
+    await db.userTag.remove({
+      where: {
+        userId: +id,
+        tagId: tag.id,
+      },
+    });
+  }
+  for (const tag of tagsToAdd) {
+    await db.userTag.create({
+      data: {
+        userId: +id,
+        tagId: tag.id,
+      },
+    });
+  }
+
+  const { name, lastName, email, gender, preference, birthDate, biography } =
     req.body as TUpdateUserSchemas['requirements'];
   await db.user.update({
     where: {
       id: +id,
     },
-    data: { name, lastName, email, gender, preference, birthDate },
+    data: { name, lastName, email, gender, preference, birthDate, biography },
   });
   const { password: _, ...userWithoutPassword } = user;
   const token = jwt.sign({ ...userWithoutPassword }, env.JWT_SECRET, {

@@ -1,5 +1,5 @@
 import { Infer, z } from '../../validator/validator';
-import { userSchema } from '../database.schema';
+import { tagSchema, userSchema } from '../database.schema';
 
 export const getUsersSchemas = {
   response: z.object({
@@ -51,7 +51,9 @@ export const updateUserSchemas = {
       'gender',
       'preference',
       'birthDate',
+      'biography',
     ]).shape,
+    tags: z.array(tagSchema.pick(['name']).shape.name),
   }),
   response: z.object({
     message: z.string(),
