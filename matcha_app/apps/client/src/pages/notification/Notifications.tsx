@@ -7,12 +7,16 @@ import {
 } from '@/components/pagination/Layout';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardDescription } from '@/components/ui/card';
+import { useChatStore } from '@/hooks/use-chat';
+import { useSetNotification } from '@/hooks/use-notification';
+import { socket } from '@/lib/socket';
 import { cn } from '@/lib/utils';
 import {
   getNearDate,
   NOTIF_TYPES,
   NOTIF_TYPES_MESSAGES,
   notificationsSchemas,
+  TNotificationsOtherUserSchema,
   TUser,
 } from '@matcha/common';
 import {
@@ -28,11 +32,6 @@ import { useNavigate } from 'react-router-dom';
 import { getUrl } from '../../../../common/src/utils/getUrl';
 import { useSession } from '../../hooks/useSession';
 import { axiosFetch } from '../../lib/fetch-utils/axiosFetch';
-import { TNotificationsOtherUserSchema } from '@matcha/common/src/schemas/api/notifications.schema';
-import { socket } from '@/lib/socket';
-import { set } from 'date-fns';
-import { useChatStore } from '@/hooks/use-chat';
-import { useSetNotification } from '@/hooks/use-notification';
 
 const NotificationsList: React.FC = () => {
   const { notifications, setNotifications } = useSetNotification();

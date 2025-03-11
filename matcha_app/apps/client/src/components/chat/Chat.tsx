@@ -15,10 +15,8 @@ import {
   TUser,
   updateNotificationSchemas,
 } from '@matcha/common';
-import { TNotificationsOtherUserSchema } from '@matcha/common/src/schemas/api/notifications.schema';
 import { Minus, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 interface PrivateChatProps {
   otherUser: TUser;

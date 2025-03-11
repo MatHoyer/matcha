@@ -1,5 +1,4 @@
-import { TNotificationsOtherUserSchema } from '@matcha/common/src/schemas/api/notifications.schema';
-import { createContext, useState, useContext, ReactNode } from 'react';
+import { createContext, ReactNode, useContext, useState } from 'react';
 
 // context for showing notification bubble
 type NotificationContextType = {
