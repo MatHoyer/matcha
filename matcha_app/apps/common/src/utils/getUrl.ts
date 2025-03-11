@@ -32,10 +32,7 @@ export type TApiRouteDataRequirements = {
     id?: number;
   };
   'api-notifications': {
-    id?: number;
-  };
-  'api-readMessageNotif': {
-    id?: number;
+    type: 'get' | 'update';
   };
   'api-picture': {
     id?: number;
@@ -84,10 +81,8 @@ const routes: {
     }
     return id ? `/api/picture/${id}` : '/api/picture';
   },
-  'api-notifications': ({ id }) =>
-    id ? `/api/notifications/${id}` : '/api/notifications',
-  'api-readMessageNotif': ({ id }) =>
-    id ? `/api/readMessageNotif/${id}` : '/api/readMessageNotif',
+  'api-notifications': ({ type }) =>
+    type ? `/api/notifications/${type}` : '/api/notifications',
 };
 
 type TUrlParams =

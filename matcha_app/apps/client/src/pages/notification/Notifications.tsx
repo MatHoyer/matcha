@@ -8,8 +8,21 @@ import {
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardDescription } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { getNearDate, notificationsSchemas, TUser } from '@matcha/common';
-import { Eye, Heart, MessageCircle } from 'lucide-react';
+import {
+  getNearDate,
+  NOTIF_TYPES,
+  NOTIF_TYPES_MESSAGES,
+  notificationsSchemas,
+  TUser,
+} from '@matcha/common';
+import {
+  Eye,
+  Heart,
+  HeartOff,
+  MessageCircle,
+  MessageCircleHeart,
+  Rows4,
+} from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getUrl } from '../../../../common/src/utils/getUrl';
@@ -19,11 +32,10 @@ import { TNotificationsOtherUserSchema } from '@matcha/common/src/schemas/api/no
 import { socket } from '@/lib/socket';
 import { set } from 'date-fns';
 import { useChatStore } from '@/hooks/use-chat';
+import { useSetNotification } from '@/hooks/use-notification';
 
 const NotificationsList: React.FC = () => {
-  const [notifications, setNotifications] = useState<
-    TNotificationsOtherUserSchema[]
-  >([]);
+  const { notifications, setNotifications } = useSetNotification();
   const [loading, setLoading] = useState<boolean>(true);
   const session = useSession();
   const navigate = useNavigate();
@@ -37,7 +49,7 @@ const NotificationsList: React.FC = () => {
       try {
         await axiosFetch({
           method: 'POST',
-          url: getUrl('api-notifications'),
+          url: getUrl('api-notifications', { type: 'get' }),
           schemas: notificationsSchemas,
           data: { userId: session.user!.id },
           handleEnding: {
@@ -65,56 +77,62 @@ const NotificationsList: React.FC = () => {
     fetchNotifications();
   }, []);
 
-  const getIcon = (message: string) => {
-    if (message.includes('message')) {
+  const getIcon = (type: string) => {
+    if (type === 'All') {
+      return <Rows4 className="w-4 h-4" />;
+    }
+    if (type === 'Message') {
       return <MessageCircle className="w-4 h-4" />;
     }
-    if (message.includes('liked')) {
+    if (type === 'Like') {
       return <Heart className="w-4 h-4" />;
     }
-    if (message.includes('viewed')) {
+    if (type === 'View') {
       return <Eye className="w-4 h-4" />;
+    }
+    if (type === 'Match') {
+      return <MessageCircleHeart className="w-4 h-4" />;
+    }
+    if (type === 'Unlike') {
+      return <HeartOff className="w-4 h-4" />;
     }
     return null;
   };
 
   const getNotificationLink = (notification: TNotificationsOtherUserSchema) => {
-    if (notification.message.includes('message')) {
+    if (notification.type === 'Message') {
       return `/chat/${notification.userId}`;
     }
-    if (
-      notification.message.includes('liked') ||
-      notification.message.includes('viewed')
-    ) {
+    if (notification.type === 'Like' || notification.type === 'View') {
       return `/profile/${notification.userId}`;
     }
     return '#';
   };
 
-  const groupedNotifications = notifications.reduce(
-    (
-      acc: Record<string, TNotificationsOtherUserSchema & { count: number }>,
-      notification: TNotificationsOtherUserSchema
-    ) => {
-      const key = `${notification.userId}-${notification.message}`;
-      if (!acc[key]) {
-        acc[key] = { ...notification, count: 1 };
-      } else {
-        acc[key].count += 1;
-      }
-      return acc;
-    },
-    {}
-  );
+  // const groupedNotifications = notifications.reduce(
+  //   (
+  //     acc: Record<string, TNotificationsOtherUserSchema & { count: number }>,
+  //     notification: TNotificationsOtherUserSchema
+  //   ) => {
+  //     const key = `${notification.userId}-${notification.message}`;
+  //     if (!acc[key]) {
+  //       acc[key] = { ...notification, count: 1 };
+  //     } else {
+  //       acc[key].count += 1;
+  //     }
+  //     return acc;
+  //   },
+  //   {}
+  // );
 
   const getMessageNotification = (
     notification: TNotificationsOtherUserSchema
   ) => {
     const userName = notification.otherUser?.name ?? 'unknown user';
-    if (notification.message.includes('message')) {
+    if (notification.type === 'Message') {
       return (
         <>
-          {notification.message}{' '}
+          {NOTIF_TYPES_MESSAGES[notification.type]}{' '}
           <a
             href={`/profile/${notification.otherUser?.id}`}
             onClick={(e) => e.stopPropagation()}
@@ -126,10 +144,7 @@ const NotificationsList: React.FC = () => {
       );
     }
 
-    if (
-      notification.message.includes('liked') ||
-      notification.message.includes('viewed')
-    ) {
+    if (notification.type === 'Like' || notification.type === 'View') {
       return (
         <>
           {' '}
@@ -140,7 +155,7 @@ const NotificationsList: React.FC = () => {
           >
             {userName}
           </a>{' '}
-          {notification.message}
+          {NOTIF_TYPES_MESSAGES[notification.type]}
         </>
       );
     }
@@ -162,28 +177,51 @@ const NotificationsList: React.FC = () => {
   // const formattedNotifications = Object.values(groupedNotifications);
   const formattedNotifications = notifications;
 
+  const [selectedType, setSelectedType] = useState('All');
+  const filteredNotifications =
+    selectedType && selectedType !== 'All'
+      ? formattedNotifications.filter(
+          (notification) => notification.type === selectedType
+        )
+      : formattedNotifications;
+  const typeNotif = ['All', ...NOTIF_TYPES];
+
   return (
     <LayoutContent className="flex flex-col gap-2">
-      {formattedNotifications.map((notification) => (
+      <div className="flex gap-2 mb-4">
+        {typeNotif.map((type) => (
+          <button
+            key={type}
+            className={`px-4 py-2 border rounded-2xl ${
+              selectedType === type ? '' : 'opacity-50'
+            }`}
+            onClick={() => setSelectedType(type)}
+          >
+            <div className=""></div>
+
+            <span className="flex items-center gap-2">
+              {getIcon(type)}
+              {type}
+            </span>
+          </button>
+        ))}
+      </div>
+
+      {filteredNotifications.map((notification) => (
         <Card
           key={notification.id}
           className={cn(
             'p-4 cursor-pointer',
             notification.read && 'opacity-50'
           )}
-          onClick={
-            () => {
-              if (notification.message.includes('message'))
-                handleChatClick(
-                  notification.otherUser as TUser,
-                  notification.userId as number
-                );
-              else navigate(getNotificationLink(notification));
-            }
-
-            // navigate(getNotificationLink(notification));
-            // onClick: () => handleChatClick(otherUser as TUser),
-          }
+          onClick={() => {
+            if (notification.type === 'Message')
+              handleChatClick(
+                notification.otherUser as TUser,
+                notification.userId as number
+              );
+            else navigate(getNotificationLink(notification));
+          }}
         >
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-4">
@@ -210,7 +248,7 @@ const NotificationsList: React.FC = () => {
             </div>
 
             <div className="flex items-center">
-              {getIcon(notification.message)}
+              {getIcon(notification.type)}
             </div>
           </div>
         </Card>

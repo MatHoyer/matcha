@@ -103,7 +103,7 @@ export const socketHandler = (io: Server) => {
           data: {
             userId: receiverId,
             otherUserId: senderId,
-            message: 'You have a new message from',
+            type: 'Message',
             date: new Date(),
             read: false,
           },
@@ -120,7 +120,7 @@ export const socketHandler = (io: Server) => {
           userId: receiverId,
           otherUserId: senderId,
           otherUser: otherUser,
-          message: 'You have a new message from',
+          type: 'Message',
           date: new Date(),
           read: false,
         });

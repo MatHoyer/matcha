@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Typography } from '@/components/ui/typography';
+import { useSetNotification } from '@/hooks/use-notification';
 import { useSession } from '@/hooks/useSession';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import { socket } from '@/lib/socket';
@@ -12,10 +13,12 @@ import {
   TMessage,
   TSendMessageSchema,
   TUser,
-  // readMessageNotificationSchemas,
+  updateNotificationSchemas,
 } from '@matcha/common';
+import { TNotificationsOtherUserSchema } from '@matcha/common/src/schemas/api/notifications.schema';
 import { Minus, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface PrivateChatProps {
   otherUser: TUser;
@@ -36,8 +39,8 @@ export const Chat: React.FC<PrivateChatProps> = ({
   >([]);
   const [message, setMessage] = useState<string>('');
   const [feedback, setFeedback] = useState('');
-
   const [loading, setLoading] = useState(true);
+  const { notifications, setNotifications } = useSetNotification();
 
   useEffect(() => {
     const fetchMessages = async () => {
@@ -148,22 +151,32 @@ export const Chat: React.FC<PrivateChatProps> = ({
   };
 
   // set all the messages to read=true
-  // useEffect(() => {
-  //   const setReadMessageNotif = async () => {
-  //     try {
-  //       await axiosFetch({
-  //         method: 'POST',
-  //         url: getUrl('api-readMessageNotif'),
-  //         schemas: ,
-  //         data: { userId: session.user!.id, otherUserId: otherUser.id },
-  //       });
-  //     } catch (error) {
-  //       console.error(`Error while marking messages as read: ${error}`);
-  //     }
-  //   };
+  useEffect(() => {
+    const setReadMessageNotif = async () => {
+      try {
+        await axiosFetch({
+          method: 'POST',
+          url: getUrl('api-notifications', { type: 'update' }),
+          schemas: updateNotificationSchemas,
+          data: {
+            userId: session.user!.id,
+            otherUserId: otherUser.id,
+            type: 'Message',
+            read: true,
+          },
+          handleEnding: {
+            cb: (data) => {
+              // update the notification read status in real time
+            },
+          },
+        });
+      } catch (error) {
+        console.error(`Error while marking messages as read: ${error}`);
+      }
+    };
 
-  //   setReadMessageNotif();
-  // }, []);
+    setReadMessageNotif();
+  }, []);
 
   return (
     <Card className="p-3 w-80 h-fit ">

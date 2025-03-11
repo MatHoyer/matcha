@@ -1,6 +1,6 @@
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import { socket } from '@/lib/socket';
-import { useNotification } from '@/pages/notification/Notificationcontext';
+import { useNotification } from '@/pages/notification/Notification-context';
 import { getProfilePictureSchemas, getUrl, TUser } from '@matcha/common';
 import { useQuery } from '@tanstack/react-query';
 import { ChevronsUpDown } from 'lucide-react';

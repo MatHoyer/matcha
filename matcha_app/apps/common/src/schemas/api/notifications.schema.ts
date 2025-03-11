@@ -6,7 +6,8 @@ export const notificationsOtherUserSchema = z.object({
   userId: userSchema.pick(['id']).shape.id,
   otherUserId: userSchema.pick(['id']).shape.id.optional(),
   otherUser: userSchema.optional(),
-  message: z.string(),
+  // message: z.string(),
+  type: notificationSchema.pick(['type']).shape.type,
   date: z.date(),
   read: z.boolean(),
 });
@@ -27,10 +28,14 @@ export type TNotificationsSchemas = {
   response: Infer<typeof notificationsSchemas.response>;
 };
 
-export const readMessageNotificationSchemas = {
+export const updateNotificationSchemas = {
   requirements: z.object({
     userId: userSchema.pick(['id']).shape.id,
     otherUserId: userSchema.pick(['id']).shape.id,
+    type: z.string(),
+    read: z.boolean(),
   }),
-  response: {},
+  response: z.object({
+    notificationsWithUser: z.array(notificationsOtherUserSchema),
+  }),
 };

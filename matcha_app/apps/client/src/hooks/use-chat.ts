@@ -1,6 +1,5 @@
 import { TUser } from '@matcha/common';
 import { create } from 'zustand';
-import { useSession } from './useSession';
 
 type TChatWindow = {
   id: string;

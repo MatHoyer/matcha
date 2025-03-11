@@ -12,7 +12,7 @@ import { Bell, User } from 'lucide-react';
 import { PropsWithChildren } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { LogoutButton } from '../ui/LogoutButton';
-import { useNotification } from '../../pages/notification/Notificationcontext';
+import { useNotification } from '../../pages/notification/Notification-context';
 
 const UserDropdown: React.FC<PropsWithChildren> = ({ children }) => {
   const navigate = useNavigate();
