@@ -22,6 +22,7 @@ import {
   userTagSchema,
   viewSchema,
   ZodObject,
+  TUser,
 } from '@matcha/common';
 
 export type UserIncludes = {
@@ -34,6 +35,10 @@ export type UserIncludes = {
   userLocation?: TUserLocation;
   view?: TView;
   image?: TImage;
+};
+
+export type NotificationIncludes = {
+  otherUser?: TUser;
 };
 
 export const tableAlias: Record<string, string> = {

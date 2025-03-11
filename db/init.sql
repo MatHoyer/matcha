@@ -65,15 +65,19 @@ CREATE TABLE "Like" (
   FOREIGN KEY ("likedId") REFERENCES "User" ("id")  ON DELETE CASCADE
 );
 
+DROP TYPE IF EXISTS "Type" CASCADE;
+CREATE TYPE "Type" AS ENUM ('Message', 'Like', 'View', 'Match', 'Unlike');
+
 DROP TABLE IF EXISTS "Notification";
 CREATE TABLE "Notification" (
   "id" SERIAL PRIMARY KEY,
   "userId" INT NOT NULL,
-  "otherId" INT,
-  "message" VARCHAR(1000) NOT NULL,
+  "otherUserId" INT,
+  "type" "Type" NOT NULL,
   "date" TIMESTAMP NOT NULL DEFAULT NOW(),
   "read" BOOLEAN NOT NULL DEFAULT FALSE,
-  FOREIGN KEY ("userId") REFERENCES "User" ("id")  ON DELETE CASCADE
+  FOREIGN KEY ("userId") REFERENCES "User" ("id")  ON DELETE CASCADE,
+  FOREIGN KEY ("otherUserId") REFERENCES "User" ("id") ON DELETE CASCADE
 );
 
 DROP TABLE IF EXISTS "Block";
@@ -164,16 +168,16 @@ INSERT INTO "Like" ("userId", "likedId") VALUES
 (3, 4), -- Emma aime Michael
 (4, 3); -- Michael aime Emma
 
-INSERT INTO "Notification" ("userId", "otherId", "message") VALUES
-(2, 1, 'Alice viewed your profile'),
-(2, 1, 'Alice liked your profile'),
-(1, 2, 'David viewed your profile'),
-(1, 2, 'David liked your profile'),
-(1, 2, 'You have a new message from David'),
-(3, 4, 'Michael viewed your profile'),
-(3, 4, 'Michael liked your profile'),
-(4, 3, 'Emma viewed your profile'),
-(4, 3, 'Emma liked your profile');
+INSERT INTO "Notification" ("userId", "otherUserId", "type") VALUES
+(2, 1, 'View'),
+(2, 1, 'Like'),
+(1, 2, 'View'),
+(1, 2, 'Like'),
+(1, 2, 'Message'),
+(3, 4, 'View'),
+(3, 4, 'Like'),
+(4, 3, 'View'),
+(4, 3, 'Like');
 
 INSERT INTO "Block" ("userId", "blockedId") VALUES
 (4, 3); -- Michael blocked Emma

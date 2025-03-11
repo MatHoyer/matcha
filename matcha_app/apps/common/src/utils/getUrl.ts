@@ -40,7 +40,7 @@ export type TApiRouteDataRequirements = {
     id?: number;
   };
   'api-notifications': {
-    id?: number;
+    type: 'get' | 'update';
   };
   'api-picture': {
     id?: number;
@@ -104,8 +104,8 @@ const routes: {
     }
     return id ? `/api/picture/${id}` : '/api/picture';
   },
-  'api-notifications': ({ id }) =>
-    id ? `/api/notifications/${id}` : '/api/notifications',
+  'api-notifications': ({ type }) =>
+    type ? `/api/notifications/${type}` : '/api/notifications',
   'api-likes': ({ id, type }) => {
     if (type) {
       if (['is-liked'].includes(type) && id) {

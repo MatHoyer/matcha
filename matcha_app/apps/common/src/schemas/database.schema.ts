@@ -1,5 +1,10 @@
 import { differenceInYears } from 'date-fns';
-import { GENDERS, ORIENTATIONS } from '../utils/datas';
+import {
+  GENDERS,
+  NOTIF_TYPES,
+  NOTIF_TYPES_MESSAGES,
+  ORIENTATIONS,
+} from '../utils/datas';
 import { Infer, z } from '../validator/validator';
 
 export const genderSchema = z.enum(GENDERS);
@@ -69,8 +74,8 @@ export type TLike = Infer<typeof likeSchema>;
 export const notificationSchema = z.object({
   id: z.number(),
   userId: userSchema.pick(['id']).shape.id,
-  otherId: userSchema.pick(['id']).shape.id.optional(),
-  message: z.string(),
+  otherUserId: userSchema.pick(['id']).shape.id.optional(),
+  type: z.enum(NOTIF_TYPES),
   date: z.date(),
   read: z.boolean(),
 });

@@ -23,6 +23,8 @@ export {
   ORIENTATIONS,
   PROMISE_BATCH_SIZE,
   THOUSAND_SEPARATOR,
+  NOTIF_TYPES,
+  NOTIF_TYPES_MESSAGES,
 } from './utils/datas';
 export { getDateAsString, getNearDate } from './utils/date';
 export { getServerUrl } from './utils/getServer';
@@ -81,6 +83,7 @@ export { messagesSchemas } from './schemas/api/messages.schema';
 export type { TMessagesSchemas } from './schemas/api/messages.schema';
 export { notificationsSchemas } from './schemas/api/notifications.schema';
 export type { TNotificationsSchemas } from './schemas/api/notifications.schema';
+export { updateNotificationSchemas } from './schemas/api/notifications.schema';
 export {
   createPictureSchemas,
   deletePictureSchemas,

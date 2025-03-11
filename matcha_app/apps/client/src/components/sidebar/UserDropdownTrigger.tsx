@@ -1,6 +1,6 @@
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import { socket } from '@/lib/socket';
-import { useNotification } from '@/pages/notification/Notificationcontext';
+import { useNotification } from '@/pages/notification/Notification-context';
 import { getProfilePictureSchemas, getUrl, TUser } from '@matcha/common';
 import { useQuery } from '@tanstack/react-query';
 import { ChevronsUpDown } from 'lucide-react';
@@ -45,9 +45,9 @@ export const UserDropdownTrigger: React.FC<{
       localStorage.setItem('showBubble', JSON.stringify(true));
     };
     socket.on(`notification-bubble`, notificationBubbleHandler);
-    console.log('notif bubble received');
+    // console.log('notif bubble received');
     return () => {
-      console.log('bye');
+      // console.log('bye');
       socket.off(`notification-bubble`, notificationBubbleHandler);
     };
   }, []);

@@ -25,6 +25,7 @@ import { useSession } from './hooks/useSession';
 import { useUsers } from './hooks/useUsers';
 import { axiosFetch } from './lib/fetch-utils/axiosFetch';
 import { Pages } from './pages/Pages';
+import { useChatStore } from './hooks/use-chat';
 
 const App = () => {
   const session = useSession();
@@ -33,21 +34,11 @@ const App = () => {
   const usersAllButAuthUser = users.filter(
     (user: TUserWithNames) => user.id !== session.user?.id
   );
-  const [openedChats, setOpenChats] = useState<
-    { id: string; otherUser: TUser; status: 'full' | 'collapse' }[]
-  >([]);
+
+  const { openedChats, addChatWindow, removeChatWindow } = useChatStore();
 
   const handleChatClick = (otherUser: TUser) => {
-    const sortedUserIds = [session.user!.id, otherUser.id].sort();
-    const chatRoomName = `chat-${sortedUserIds[0]}-${sortedUserIds[1]}`;
-
-    const windowRoom = { id: chatRoomName };
-    setOpenChats((prev) => {
-      if (!prev.some((chatWindow) => chatWindow.id === windowRoom.id)) {
-        return [...prev, { otherUser, id: windowRoom.id, status: 'full' }];
-      }
-      return prev;
-    });
+    addChatWindow(otherUser, session.user!.id);
   };
 
   const updateLocationMutation = useMutation({
@@ -182,7 +173,10 @@ const App = () => {
       }
     >
       <Pages />
-      <ChatContainer openedChats={openedChats} setOpenChats={setOpenChats} />
+      <ChatContainer
+        openedChats={openedChats}
+        removeChatWindow={removeChatWindow}
+      />
     </NavigationWrapper>
   );
 };
