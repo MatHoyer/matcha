@@ -21,7 +21,7 @@ const app = express();
 app.use(
   express.json({
     limit: '4mb',
-  }),
+  })
 );
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
@@ -29,7 +29,7 @@ app.use(
   cors({
     origin: `http://localhost:${env.CLIENT_PORT}`,
     credentials: true,
-  }),
+  })
 );
 
 app.get('/api/health', (_req, res) => {
@@ -53,7 +53,7 @@ if (env.NODE_ENV === 'PROD') {
   });
 }
 
-const server = app.listen(env.SERVER_PORT, '0.0.0.0', () => {
+const server = app.listen(env.SERVER_PORT, () => {
   console.log(`Server started at http://localhost:${env.SERVER_PORT}`);
 });
 

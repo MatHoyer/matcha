@@ -32,6 +32,7 @@ import { useNavigate } from 'react-router-dom';
 import { getUrl } from '../../../../common/src/utils/getUrl';
 import { useSession } from '../../hooks/useSession';
 import { axiosFetch } from '../../lib/fetch-utils/axiosFetch';
+import { Button } from 'react-day-picker';
 
 const NotificationsList: React.FC = () => {
   const { notifications, setNotifications } = useSetNotification();
@@ -132,13 +133,12 @@ const NotificationsList: React.FC = () => {
       return (
         <>
           {NOTIF_TYPES_MESSAGES[notification.type]}{' '}
-          <a
-            href={`/profile/${notification.otherUser?.id}`}
-            onClick={(e) => e.stopPropagation()}
-            className="hover:underline"
+          <div
+            className="hover:inline-block"
+            onClick={() => navigate(`/profile/${notification.otherUser?.id}`)}
           >
             {userName}
-          </a>
+          </div>
         </>
       );
     }
@@ -147,13 +147,17 @@ const NotificationsList: React.FC = () => {
       return (
         <>
           {' '}
-          <a
+          {/* <a
             href={`/profile/${notification.otherUser?.id}`}
             onClick={(e) => e.stopPropagation()}
             className="hover:underline"
+          > */}
+          <div
+            className="hover:inline-block"
+            onClick={() => navigate(`/profile/${notification.otherUser?.id}`)}
           >
             {userName}
-          </a>{' '}
+          </div>{' '}
           {NOTIF_TYPES_MESSAGES[notification.type]}
         </>
       );
@@ -189,7 +193,7 @@ const NotificationsList: React.FC = () => {
     <LayoutContent className="flex flex-col gap-2">
       <div className="flex gap-2 mb-4">
         {typeNotif.map((type) => (
-          <button
+          <Button
             key={type}
             className={`px-4 py-2 border rounded-2xl ${
               selectedType === type ? '' : 'opacity-50'
@@ -202,7 +206,7 @@ const NotificationsList: React.FC = () => {
               {getIcon(type)}
               {type}
             </span>
-          </button>
+          </Button>
         ))}
       </div>
 
