@@ -2,17 +2,25 @@ import { Infer, z } from '../../validator/validator';
 import { userSchema } from '../database.schema';
 
 export const signupSchemas = {
-  requirements: userSchema.pick([
-    'name',
-    'lastName',
-    'email',
-    'password',
-    'birthDate',
-    'gender',
-    'preference',
-  ]),
+  requirements: z.object({
+    ...userSchema.pick([
+      'name',
+      'lastName',
+      'email',
+      'birthDate',
+      'gender',
+      'preference',
+    ]).shape,
+    password: z
+      .string()
+      .regex(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+        'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number and one special character'
+      ),
+  }),
   response: z.object({
     message: z.string(),
+    resendToken: z.string(),
   }),
 };
 export type TSignupSchemas = {
@@ -24,11 +32,30 @@ export const loginSchemas = {
   requirements: userSchema.pick(['email', 'password']),
   response: z.object({
     message: z.string(),
+    resendToken: z.string(),
   }),
 };
 export type TLoginSchemas = {
   requirements: Infer<typeof loginSchemas.requirements>;
   response: Infer<typeof loginSchemas.response>;
+};
+
+export const resendConfirmSchemas = {
+  response: z.object({
+    message: z.string(),
+  }),
+};
+export type TResendConfirmSchemas = {
+  response: Infer<typeof resendConfirmSchemas.response>;
+};
+
+export const confirmSchemas = {
+  response: z.object({
+    message: z.string(),
+  }),
+};
+export type TConfirmSchemas = {
+  response: Infer<typeof confirmSchemas.response>;
 };
 
 export const logoutSchemas = {

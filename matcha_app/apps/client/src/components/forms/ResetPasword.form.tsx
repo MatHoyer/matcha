@@ -6,36 +6,35 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 import PasswordInput from '@/components/ui/password-input';
 import { closeGlobalDialog } from '@/hooks/use-dialog';
 import { useZodForm } from '@/hooks/useZodForm';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import { defaultHandleSubmit } from '@/lib/fetch-utils/defaultHandleSubmit';
-import { getUrl, loginSchemas, TLoginSchemas } from '@matcha/common';
+import {
+  getUrl,
+  resetPasswordSchemas,
+  TResetPasswordSchemas,
+} from '@matcha/common';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { SubmitButtonForm } from './components/SubmitButton.form';
 import { TFormProps } from './types.form';
 
 type TForm = {
-  email: string;
   password: string;
 };
 
-const LoginForm: React.FC<TFormProps<TForm, TLoginSchemas['response']>> = ({
-  defaultValues,
-  modal = false,
-  getData,
-  setIsLoading,
-}) => {
+const ResetPasswordForm: React.FC<
+  TFormProps<TForm, TResetPasswordSchemas['response']>
+> = ({ defaultValues, modal = false, getData, setIsLoading }) => {
   const navigate = useNavigate();
+  const { token } = useParams();
 
   const form = useZodForm<TForm>({
-    schema: loginSchemas.requirements,
+    schema: resetPasswordSchemas.requirements,
     defaultValues: {
-      email: '',
       password: '',
       ...defaultValues,
     },
@@ -45,24 +44,17 @@ const LoginForm: React.FC<TFormProps<TForm, TLoginSchemas['response']>> = ({
     mutationFn: async (data: TForm) => {
       return await axiosFetch({
         method: 'POST',
-        url: getUrl('api-auth', { type: 'login' }),
+        url: `${getUrl('api-users', { type: 'reset-password' })}/${token}`,
         data,
-        schemas: loginSchemas,
+        schemas: resetPasswordSchemas,
         form,
         handleEnding: {
-          successMessage: 'Login successful',
-          errorMessage: 'Login failed',
+          successMessage: 'Password changed',
+          errorMessage: 'Password change failed',
           cb: (data) => {
             if (modal) closeGlobalDialog();
             getData?.(data);
-            navigate(
-              getUrl('client-auth', {
-                type: 'wait-confirm',
-                urlParams: {
-                  token: data.resendToken,
-                },
-              })
-            );
+            navigate(getUrl('client-home'));
           },
         },
       });
@@ -83,28 +75,10 @@ const LoginForm: React.FC<TFormProps<TForm, TLoginSchemas['response']>> = ({
     >
       <FormField
         control={form.control}
-        name="email"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Email</FormLabel>
-            <FormControl>
-              <Input
-                {...field}
-                type="email"
-                placeholder="example@domain.com"
-                autoComplete="email"
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={form.control}
         name="password"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Password</FormLabel>
+            <FormLabel>New password</FormLabel>
             <FormControl>
               <PasswordInput {...field} autoComplete="current-password" />
             </FormControl>
@@ -114,10 +88,10 @@ const LoginForm: React.FC<TFormProps<TForm, TLoginSchemas['response']>> = ({
       />
       <FormMessage>{form.formState.errors.root?.message}</FormMessage>
       <SubmitButtonForm modal={modal} isLoading={mutation.isPending}>
-        Login
+        Change password
       </SubmitButtonForm>
     </Form>
   );
 };
 
-export default LoginForm;
+export default ResetPasswordForm;

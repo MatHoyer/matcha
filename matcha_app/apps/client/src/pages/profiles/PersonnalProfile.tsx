@@ -14,6 +14,7 @@ import { openGlobalDialog } from '@/hooks/use-dialog';
 import { useSession } from '@/hooks/useSession';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import {
+  askResetPasswordSchemas,
   deletePictureSchemas,
   getPicturesSchemas,
   getUrl,
@@ -137,6 +138,22 @@ export const PersonnalProfile = () => {
     },
   });
 
+  const resetPasswordMutation = useMutation({
+    mutationFn: async () => {
+      return await axiosFetch({
+        method: 'GET',
+        url: getUrl('api-users', {
+          type: 'reset-password',
+        }),
+        schemas: askResetPasswordSchemas,
+        handleEnding: {
+          successMessage: 'Reset password email sent',
+          errorMessage: 'Failed to send reset password email',
+        },
+      });
+    },
+  });
+
   return (
     <Layout size="lg">
       <LayoutHeader>
@@ -177,6 +194,12 @@ export const PersonnalProfile = () => {
         <div className="flex flex-col gap-2">
           <Typography variant="large">Informations</Typography>
           <ProfileForm />
+          <Button
+            variant="destructive"
+            onClick={() => resetPasswordMutation.mutate()}
+          >
+            Reset password
+          </Button>
         </div>
         <Separator />
         <div className="w-full">

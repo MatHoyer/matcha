@@ -2,13 +2,17 @@ import {
   AUTH_COOKIE_NAME,
   getUsersSchemas,
   Infer,
+  TResetPasswordSchemas,
   TUpdateUserSchemas,
   z,
 } from '@matcha/common';
 import type { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import db from '../database/Database';
+import { ResetPasswordMail } from '../emails/patterns/ResetPasswordMail';
+import { sendEmail } from '../emails/sendEmail';
 import { env } from '../env';
+import { hashPassword } from '../services/auth.service';
 import { defaultResponse } from '../utils/defaultResponse';
 
 export const getUsers = async (_req: Request, res: Response) => {
@@ -36,10 +40,6 @@ export const getUsers = async (_req: Request, res: Response) => {
 export const getUser = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
-    const paramsSchema = z.object({
-      id: z.number(),
-    });
-    paramsSchema.parse({ id: +id });
     const user = await db.user.findFirst({
       where: {
         id: +id,
@@ -67,18 +67,6 @@ export const getUser = async (req: Request, res: Response) => {
 
 export const updateUser = async (req: Request, res: Response) => {
   const { id } = req.params;
-  try {
-    const paramsSchema = z.object({
-      id: z.number(),
-    });
-    paramsSchema.parse({ id: +id });
-  } catch (_error) {
-    defaultResponse({
-      res,
-      status: 400,
-      json: { message: 'Invalid request' },
-    });
-  }
 
   const user = await db.user.findFirst({
     where: {
@@ -101,13 +89,51 @@ export const updateUser = async (req: Request, res: Response) => {
     });
   }
 
-  const { name, lastName, email, gender, preference, birthDate } =
+  const userTags = await db.userTag.findMany({
+    where: {
+      userId: +id,
+    },
+  });
+  const tagIds = userTags.map((userTag) => userTag.tagId);
+  const tags = await db.tag.findMany({
+    where: {
+      id: { $in: tagIds },
+    },
+  });
+  const allTags = await db.tag.findMany({});
+
+  const { tags: newTags } = req.body as TUpdateUserSchemas['requirements'];
+  const tagsToRemove = tags.filter((tag) => !newTags.includes(tag.name));
+  const tagsToAdd = newTags
+    .filter((tag) => !tags.map((t) => t.name).includes(tag))
+    .map((tag) => allTags.find((t) => t.name === tag))
+    .filter((tag) => tag !== undefined);
+
+  console.log(tagsToRemove, tagsToAdd);
+  for (const tag of tagsToRemove) {
+    await db.userTag.remove({
+      where: {
+        userId: +id,
+        tagId: tag.id,
+      },
+    });
+  }
+  for (const tag of tagsToAdd) {
+    await db.userTag.create({
+      data: {
+        userId: +id,
+        tagId: tag.id,
+      },
+    });
+  }
+
+  const { name, lastName, email, gender, preference, birthDate, biography } =
     req.body as TUpdateUserSchemas['requirements'];
   await db.user.update({
     where: {
       id: +id,
     },
-    data: { name, lastName, email, gender, preference, birthDate },
+    data: { name, lastName, email, gender, preference, birthDate, biography },
   });
   const { password: _, ...userWithoutPassword } = user;
   const token = jwt.sign({ ...userWithoutPassword }, env.JWT_SECRET, {
@@ -130,5 +156,86 @@ export const updateUser = async (req: Request, res: Response) => {
     json: {
       message: 'User updated',
     },
+  });
+};
+
+export const askResetPassword = async (req: Request, res: Response) => {
+  console.log(req.user);
+
+  const user = await db.user.findFirst({
+    where: {
+      id: req.user.id,
+    },
+  });
+  if (!user) {
+    return defaultResponse({
+      res,
+      status: 404,
+      json: { message: 'User not found' },
+    });
+  }
+
+  const token = jwt.sign({ ...user }, env.JWT_SECRET, {
+    expiresIn: 30 * 24 * 60 * 60,
+  });
+
+  await sendEmail({
+    to: user.email,
+    subject: 'Reset password',
+    html: ResetPasswordMail({
+      link: `${
+        env.NODE_ENV === 'DEV'
+          ? `http://localhost:${env.CLIENT_PORT}`
+          : env.SERVER_URL
+      }reset-password/${token}`,
+      linkText: 'Reset password',
+    }),
+  });
+
+  return defaultResponse({
+    res,
+    status: 200,
+    json: { message: 'Reset password token sent to email' },
+  });
+};
+
+export const resetPassword = async (req: Request, res: Response) => {
+  const { password } = req.body as TResetPasswordSchemas['requirements'];
+
+  const passwordSchema = z
+    .string()
+    .regex(
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+    );
+  if (!passwordSchema.safeParse(password).success) {
+    return defaultResponse({
+      res,
+      status: 400,
+      json: {
+        message: 'Invalid password',
+        fields: [
+          {
+            field: 'password',
+            message:
+              'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number and one special character',
+          },
+        ],
+      },
+    });
+  }
+
+  const hashedPassword = hashPassword(password, env.AUTH_SECRET);
+
+  await db.user.update({
+    where: {
+      id: req.user.id,
+    },
+    data: { password: hashedPassword },
+  });
+
+  return defaultResponse({
+    res,
+    status: 200,
+    json: { message: 'Password reset successfully' },
   });
 };

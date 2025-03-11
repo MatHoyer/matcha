@@ -46,14 +46,18 @@ export { SOCKETS_EVENTS } from './sockets/sockets';
 
 //-----------------------Schemas-----------------------
 export {
+  confirmSchemas,
   loginSchemas,
   logoutSchemas,
+  resendConfirmSchemas,
   sessionSchemas,
   signupSchemas,
 } from './schemas/api/auth.schema';
 export type {
+  TConfirmSchemas,
   TLoginSchemas,
   TLogoutSchemas,
+  TResendConfirmSchemas,
   TSessionSchemas,
   TSignupSchemas,
 } from './schemas/api/auth.schema';
@@ -61,6 +65,18 @@ export { errorSchema } from './schemas/api/error.schema';
 export type { TErrorSchema } from './schemas/api/error.schema';
 export { getGlobalLocationsSchemas } from './schemas/api/globalLocations.schema';
 export type { TGlobalLocationsSchemas } from './schemas/api/globalLocations.schema';
+export {
+  createLikeSchemas,
+  deleteLikeSchemas,
+  isLikedSchemas,
+} from './schemas/api/like.schema';
+export type {
+  TCreateLikeSchemas,
+  TDeleteLikeSchemas,
+  TIsLikedSchemas,
+} from './schemas/api/like.schema';
+export { updateLocationSchemas } from './schemas/api/location.schema';
+export type { TUpdateLocationSchemas } from './schemas/api/location.schema';
 export { messagesSchemas } from './schemas/api/messages.schema';
 export type { TMessagesSchemas } from './schemas/api/messages.schema';
 export { notificationsSchemas } from './schemas/api/notifications.schema';
@@ -94,13 +110,17 @@ export type {
   TTagSchemas,
 } from './schemas/api/tags.schema';
 export {
+  askResetPasswordSchemas,
   getUserSchemas,
   getUsersSchemas,
+  resetPasswordSchemas,
   updateUserSchemas,
 } from './schemas/api/users.schema';
 export type {
+  TAskResetPasswordSchemas,
   TGetUserSchemas,
   TGetUsersSchemas,
+  TResetPasswordSchemas,
   TUpdateUserSchemas,
 } from './schemas/api/users.schema';
 export {

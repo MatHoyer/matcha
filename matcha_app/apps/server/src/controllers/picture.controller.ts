@@ -7,7 +7,12 @@ import sharp from 'sharp';
 import db from '../database/Database';
 import { defaultResponse } from '../utils/defaultResponse';
 
-const PICTURES_DIR = path.join(__dirname, '../../private/pictures');
+const PICTURES_DIR = path.join(
+  __dirname,
+  process.env.NODE_ENV === 'PROD'
+    ? '../../../../private/pictures'
+    : '../../private/pictures'
+);
 
 export const getPicture = async (req: Request, res: Response) => {
   const { id } = req.params;

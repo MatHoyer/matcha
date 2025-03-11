@@ -2,7 +2,7 @@ import { getServerUrl } from './getServer';
 
 export type TClientRouteDataRequirements = {
   'client-auth': {
-    type: 'signup' | 'login';
+    type: 'signup' | 'login' | 'confirm' | 'wait-confirm';
   };
   'client-home': undefined;
   'client-search': {
@@ -15,7 +15,14 @@ export type TClientRouteDataRequirements = {
 };
 export type TApiRouteDataRequirements = {
   'api-auth': {
-    type: 'signup' | 'login' | 'logout' | 'session' | undefined;
+    type:
+      | 'signup'
+      | 'login'
+      | 'logout'
+      | 'session'
+      | 'confirm'
+      | 'resend-confirm'
+      | undefined;
   };
   'api-tags': {
     id?: number;
@@ -26,7 +33,8 @@ export type TApiRouteDataRequirements = {
     type: 'advancedSearch' | 'forYou';
   };
   'api-users': {
-    id?: number | undefined;
+    id?: number;
+    type?: 'reset-password';
   };
   'api-messages': {
     id?: number;
@@ -37,6 +45,13 @@ export type TApiRouteDataRequirements = {
   'api-picture': {
     id?: number;
     type?: 'new' | 'user-pp' | 'user';
+  };
+  'api-likes': {
+    id?: number;
+    type?: 'new' | 'is-liked';
+  };
+  'api-location': {
+    type?: 'is-need-update';
   };
 };
 
@@ -70,7 +85,15 @@ const routes: {
   },
   'api-globalLocations': () => '/api/globalLocations',
   'api-search': ({ type }) => (type ? `/api/search/${type}` : '/api/search'),
-  'api-users': ({ id }) => (id ? `/api/users/${id}` : '/api/users'),
+  'api-users': ({ id, type }) => {
+    if (type) {
+      if (['reset-password'].includes(type)) {
+        return `/api/users/password/${type}`;
+      }
+      return `/api/users/${type}/${id}`;
+    }
+    return id ? `/api/users/${id}` : '/api/users';
+  },
   'api-messages': ({ id }) => (id ? `/api/messages/${id}` : '/api/messages'),
   'api-picture': ({ id, type }) => {
     if (type) {
@@ -83,6 +106,17 @@ const routes: {
   },
   'api-notifications': ({ id }) =>
     id ? `/api/notifications/${id}` : '/api/notifications',
+  'api-likes': ({ id, type }) => {
+    if (type) {
+      if (['is-liked'].includes(type) && id) {
+        return `/api/likes/${type}/${id}`;
+      }
+      return `/api/likes/${type}`;
+    }
+    return id ? `/api/likes/${id}` : '/api/likes';
+  },
+  'api-location': ({ type }) =>
+    type ? `/api/location/${type}` : '/api/location',
 };
 
 type TUrlParams =

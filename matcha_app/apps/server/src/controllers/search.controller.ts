@@ -77,12 +77,24 @@ export const advancedSearch = async (req: Request, res: Response) => {
     return fameResult ? fameResult >= fame : false;
   });
 
+  const likedUsers = await db.like.findMany({
+    where: {
+      userId: req.user.id,
+    },
+  });
+
   const users = await db.user.findMany({
     where: {
       id: {
-        $not: req.user.id,
         $in: ids,
       },
+      NOT: [
+        {
+          id: {
+            $in: [req.user.id, ...likedUsers.map((l) => l.likedId)],
+          },
+        },
+      ],
       age: {
         $gte: ages.min,
         $lte: ages.max,

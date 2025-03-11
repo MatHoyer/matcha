@@ -5,6 +5,7 @@ import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import { defaultHandleSubmit } from '@/lib/fetch-utils/defaultHandleSubmit';
 import {
   GENDERS,
+  getTagsSchemas,
   getUrl,
   ORIENTATIONS,
   TGender,
@@ -12,8 +13,9 @@ import {
   TUpdateUserSchemas,
   updateUserSchemas,
 } from '@matcha/common';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
+import MultiTagCombobox from '../comboxes/Tag.combobox';
 import { DatePicker } from '../ui/date-time-picker';
 import {
   Form,
@@ -25,6 +27,7 @@ import {
 } from '../ui/form';
 import { Input } from '../ui/input';
 import Selector from '../ui/selector';
+import { Textarea } from '../ui/textarea';
 import { SubmitButtonForm } from './components/SubmitButton.form';
 import { TFormProps } from './types.form';
 
@@ -35,17 +38,45 @@ type TForm = {
   gender: TGender;
   preference: TOrientation;
   birthDate: Date;
+  biography: string | null | undefined;
+  tags: string[];
 };
 
 export const ProfileForm: React.FC<
   TFormProps<TForm, TUpdateUserSchemas['response']>
-> = ({ defaultValues: _, modal, getData, setIsLoading }) => {
+> = ({ defaultValues, modal, getData, setIsLoading }) => {
   const session = useSession();
+
   const form = useZodForm<TForm>({
     schema: updateUserSchemas.requirements,
     defaultValues: {
       ...session!.user,
+      biography: session!.user!.biography || '',
+      tags: [],
+      ...defaultValues,
     },
+  });
+
+  useQuery({
+    queryKey: ['tags', session!.user!.id],
+    queryFn: () =>
+      axiosFetch({
+        method: 'GET',
+        url: getUrl('api-tags', {
+          type: 'user',
+          id: session!.user!.id,
+        }),
+        schemas: getTagsSchemas,
+        handleEnding: {
+          cb: (data) => {
+            console.log(data);
+            form.setValue(
+              'tags',
+              data.tags.map((tag) => tag.name)
+            );
+          },
+        },
+      }),
   });
 
   const mutation = useMutation({
@@ -173,6 +204,35 @@ export const ProfileForm: React.FC<
           )}
         />
       </div>
+      <FormField
+        control={form.control}
+        name="tags"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Tags</FormLabel>
+            <FormControl>
+              <MultiTagCombobox {...field} modal={modal} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="biography"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Biography</FormLabel>
+            <FormControl>
+              <Textarea
+                value={field.value || ''}
+                onChange={(e) => field.onChange(e.target.value)}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
       <FormMessage>{form.formState.errors.root?.message}</FormMessage>
       <SubmitButtonForm modal={modal} isLoading={mutation.isPending}>
         Update profile

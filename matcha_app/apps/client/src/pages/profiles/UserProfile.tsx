@@ -9,22 +9,27 @@ import { Button } from '@/components/ui/button';
 import { Typography } from '@/components/ui/typography';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import {
+  createLikeSchemas,
+  deleteLikeSchemas,
   getPicturesSchemas,
   getUrl,
   getUserSchemas,
   getUserTagsSchemas,
+  isLikedSchemas,
   TTag,
 } from '@matcha/common';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Heart, MessageCircle } from 'lucide-react';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 export const UserProfile = () => {
   const { id } = useParams();
+  const queryClient = useQueryClient();
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [pictures, setPictures] = useState<File[]>([]);
   const [tags, setTags] = useState<TTag[]>([]);
+  const [isLiked, setIsLiked] = useState(false);
 
   const userQuery = useQuery({
     queryKey: ['user', id],
@@ -88,6 +93,49 @@ export const UserProfile = () => {
     },
   });
 
+  useQuery({
+    queryKey: ['liked', id],
+    queryFn: async () => {
+      return await axiosFetch({
+        method: 'GET',
+        url: getUrl('api-likes', {
+          type: 'is-liked',
+          id: +id!,
+        }),
+        schemas: isLikedSchemas,
+        handleEnding: {
+          cb: (data) => {
+            setIsLiked(data.isLiked);
+          },
+        },
+      });
+    },
+  });
+
+  const likeMutation = useMutation({
+    mutationFn: async () => {
+      return await axiosFetch({
+        method: isLiked ? 'DELETE' : 'POST',
+        url: getUrl('api-likes', {
+          type: isLiked ? undefined : 'new',
+        }),
+        schemas: isLiked ? deleteLikeSchemas : createLikeSchemas,
+        data: {
+          likedId: +id!,
+        },
+        handleEnding: {
+          successMessage: isLiked ? 'Unliked' : 'Liked',
+          errorMessage: isLiked ? 'Error unliking' : 'Error liking',
+          cb: () => {
+            queryClient.invalidateQueries({
+              queryKey: ['liked', id],
+            });
+          },
+        },
+      });
+    },
+  });
+
   return (
     <Layout>
       <LayoutHeader>
@@ -113,8 +161,12 @@ export const UserProfile = () => {
           </div>
           <div className="flex-1" />
           <div className="flex items-center gap-2">
-            <Button size="icon" className="rounded-full">
-              <Heart />
+            <Button
+              size="icon"
+              className="rounded-full"
+              onClick={() => likeMutation.mutate()}
+            >
+              <Heart fill={isLiked ? 'red' : 'none'} />
             </Button>
             <Button size="icon" className="rounded-full">
               <MessageCircle />

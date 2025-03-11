@@ -1,14 +1,17 @@
 import { useSession } from '@/hooks/useSession';
 import { getUrl } from '@matcha/common';
 import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
+import { ConfirmPage } from './auth/Confirm';
 import LoginPage from './auth/Login';
 import SignupPage from './auth/Signup';
+import { WaitConfirmPage } from './auth/WaitConfirm';
 import { Home } from './Home';
 import { NotFound } from './NotFound';
 import { Notifications } from './notification/Notifications';
 import { PersonnalProfile } from './profiles/PersonnalProfile';
 import { UserProfile } from './profiles/UserProfile';
 import { AdvancedSearch } from './research/AdvancedSearch';
+import ResetPasswordPage from './ResetPassword';
 
 const AuthRoute = () => {
   const { user, loading } = useSession();
@@ -51,6 +54,18 @@ export const Pages = () => {
           })}
           element={<LoginPage />}
         />
+        <Route
+          path={getUrl('client-auth', {
+            type: 'wait-confirm',
+          })}
+          element={<WaitConfirmPage />}
+        />
+        <Route
+          path={`${getUrl('client-auth', {
+            type: 'confirm',
+          })}/:token`}
+          element={<ConfirmPage />}
+        />
       </Route>
       <Route element={<PrivateRoute />}>
         <Route path="/" element={<Home />} />
@@ -61,6 +76,10 @@ export const Pages = () => {
         <Route
           path={`${getUrl('client-profile')}`}
           element={<PersonnalProfile />}
+        />
+        <Route
+          path={`/reset-password/:token`}
+          element={<ResetPasswordPage />}
         />
         <Route
           path={`${getUrl('client-profile')}/:id`}

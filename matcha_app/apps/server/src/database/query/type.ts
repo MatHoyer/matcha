@@ -107,6 +107,7 @@ type WhereClauseObject<T> = {
 export type WhereClause<T> = {
   AND?: WhereClause<T>[];
   OR?: WhereClause<T>[];
+  NOT?: WhereClause<T>[];
 } & WhereClauseObject<T>;
 
 export type CommonOptions<T, I> = {
