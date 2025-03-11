@@ -2,9 +2,12 @@ import { getDateAsString } from '@matcha/common';
 import fs from 'fs';
 import path from 'path';
 
-const template = fs.readFileSync(path.join(__dirname, 'mail.html'), 'utf-8');
+const template = fs.readFileSync(
+  path.join(__dirname, 'default-email.html'),
+  'utf-8'
+);
 
-export const SignupMail = ({
+export const ResetPasswordMail = ({
   link,
   linkText,
 }: {
@@ -12,6 +15,11 @@ export const SignupMail = ({
   linkText: string;
 }) => {
   return template
+    .replace('{{title}}', 'Reset password')
+    .replace(
+      '{{content}}',
+      'To reset your password, please click on the button below'
+    )
     .replace('{{link}}', link)
     .replace('{{linkText}}', linkText)
     .replace(
@@ -19,6 +27,6 @@ export const SignupMail = ({
       getDateAsString({
         date: new Date(),
         type: 'YEAR',
-      }),
+      })
     );
 };

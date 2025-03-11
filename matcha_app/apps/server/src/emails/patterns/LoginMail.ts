@@ -2,7 +2,10 @@ import { getDateAsString } from '@matcha/common';
 import fs from 'fs';
 import path from 'path';
 
-const template = fs.readFileSync(path.join(__dirname, 'mail.html'), 'utf-8');
+const template = fs.readFileSync(
+  path.join(__dirname, 'default-email.html'),
+  'utf-8'
+);
 
 export const LoginMail = ({
   link,
@@ -12,6 +15,11 @@ export const LoginMail = ({
   linkText: string;
 }) => {
   return template
+    .replace('{{title}}', 'Login to Matcha')
+    .replace(
+      '{{content}}',
+      'To confirm your login, please click on the button below'
+    )
     .replace('{{link}}', link)
     .replace('{{linkText}}', linkText)
     .replace(
@@ -19,6 +27,6 @@ export const LoginMail = ({
       getDateAsString({
         date: new Date(),
         type: 'YEAR',
-      }),
+      })
     );
 };

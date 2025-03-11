@@ -61,3 +61,30 @@ export type TUpdateUserSchemas = {
   requirements: Infer<typeof updateUserSchemas.requirements>;
   response: Infer<typeof updateUserSchemas.response>;
 };
+
+export const askResetPasswordSchemas = {
+  response: z.object({
+    message: z.string(),
+  }),
+};
+export type TAskResetPasswordSchemas = {
+  response: Infer<typeof askResetPasswordSchemas.response>;
+};
+
+export const resetPasswordSchemas = {
+  requirements: z.object({
+    password: z
+      .string()
+      .regex(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+        'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number and one special character'
+      ),
+  }),
+  response: z.object({
+    message: z.string(),
+  }),
+};
+export type TResetPasswordSchemas = {
+  requirements: Infer<typeof resetPasswordSchemas.requirements>;
+  response: Infer<typeof resetPasswordSchemas.response>;
+};

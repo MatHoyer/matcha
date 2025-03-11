@@ -33,7 +33,8 @@ export type TApiRouteDataRequirements = {
     type: 'advancedSearch' | 'forYou';
   };
   'api-users': {
-    id?: number | undefined;
+    id?: number;
+    type?: 'reset-password';
   };
   'api-messages': {
     id?: number;
@@ -84,7 +85,15 @@ const routes: {
   },
   'api-globalLocations': () => '/api/globalLocations',
   'api-search': ({ type }) => (type ? `/api/search/${type}` : '/api/search'),
-  'api-users': ({ id }) => (id ? `/api/users/${id}` : '/api/users'),
+  'api-users': ({ id, type }) => {
+    if (type) {
+      if (['reset-password'].includes(type)) {
+        return `/api/users/password/${type}`;
+      }
+      return `/api/users/${type}/${id}`;
+    }
+    return id ? `/api/users/${id}` : '/api/users';
+  },
   'api-messages': ({ id }) => (id ? `/api/messages/${id}` : '/api/messages'),
   'api-picture': ({ id, type }) => {
     if (type) {

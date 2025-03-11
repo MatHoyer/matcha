@@ -7,13 +7,12 @@ import {
   TOrientation,
   TSignupSchemas,
   wait,
-  z,
 } from '@matcha/common';
 import type { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import db from '../database/Database.js';
-import { LoginMail } from '../emails/patterns/LoginMail/LoginMail.js';
-import { SignupMail } from '../emails/patterns/SignupMail/SignupMail.js';
+import { LoginMail } from '../emails/patterns/LoginMail.js';
+import { SignupMail } from '../emails/patterns/SignupMail.js';
 import { sendEmail } from '../emails/sendEmail.js';
 import { env } from '../env.js';
 import { hashPassword } from '../services/auth.service.js';
@@ -22,28 +21,6 @@ import { defaultResponse } from '../utils/defaultResponse.js';
 export const signup = async (req: Request, res: Response) => {
   const { password, gender, preference, ...userData } =
     req.body as TSignupSchemas['requirements'];
-
-  const passwordSchema = z
-    .string()
-    .regex(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
-    );
-  if (!passwordSchema.safeParse(password).success) {
-    return defaultResponse({
-      res,
-      status: 400,
-      json: {
-        message: 'Invalid password',
-        fields: [
-          {
-            field: 'password',
-            message:
-              'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number and one special character',
-          },
-        ],
-      },
-    });
-  }
 
   const hashedPassword = hashPassword(password, env.AUTH_SECRET);
 

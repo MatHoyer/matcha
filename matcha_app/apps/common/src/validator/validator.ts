@@ -113,10 +113,10 @@ export class ZodString extends ZodType<string> {
       `Must be at most ${maxLength} characters long`
     ) as ZodString;
   }
-  regex(regex: RegExp) {
+  regex(regex: RegExp, message?: string) {
     return this.refine(
       (data) => regex.test(data),
-      'Invalid input'
+      message ?? 'Invalid input'
     ) as ZodString;
   }
   url() {

@@ -2,15 +2,22 @@ import { Infer, z } from '../../validator/validator';
 import { userSchema } from '../database.schema';
 
 export const signupSchemas = {
-  requirements: userSchema.pick([
-    'name',
-    'lastName',
-    'email',
-    'password',
-    'birthDate',
-    'gender',
-    'preference',
-  ]),
+  requirements: z.object({
+    ...userSchema.pick([
+      'name',
+      'lastName',
+      'email',
+      'birthDate',
+      'gender',
+      'preference',
+    ]).shape,
+    password: z
+      .string()
+      .regex(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+        'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number and one special character'
+      ),
+  }),
   response: z.object({
     message: z.string(),
     resendToken: z.string(),

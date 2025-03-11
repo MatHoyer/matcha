@@ -110,13 +110,17 @@ export type {
   TTagSchemas,
 } from './schemas/api/tags.schema';
 export {
+  askResetPasswordSchemas,
   getUserSchemas,
   getUsersSchemas,
+  resetPasswordSchemas,
   updateUserSchemas,
 } from './schemas/api/users.schema';
 export type {
+  TAskResetPasswordSchemas,
   TGetUserSchemas,
   TGetUsersSchemas,
+  TResetPasswordSchemas,
   TUpdateUserSchemas,
 } from './schemas/api/users.schema';
 export {
