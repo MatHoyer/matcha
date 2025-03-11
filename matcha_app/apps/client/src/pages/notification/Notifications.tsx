@@ -6,6 +6,7 @@ import {
   LayoutTitle,
 } from '@/components/pagination/Layout';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
 import { Card, CardDescription } from '@/components/ui/card';
 import { useChatStore } from '@/hooks/use-chat';
 import { useSetNotification } from '@/hooks/use-notification';
@@ -32,11 +33,10 @@ import { useNavigate } from 'react-router-dom';
 import { getUrl } from '../../../../common/src/utils/getUrl';
 import { useSession } from '../../hooks/useSession';
 import { axiosFetch } from '../../lib/fetch-utils/axiosFetch';
-import { Button } from 'react-day-picker';
 
 const NotificationsList: React.FC = () => {
   const { notifications, setNotifications } = useSetNotification();
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
   const session = useSession();
   const navigate = useNavigate();
   const { addChatWindow } = useChatStore();
@@ -195,17 +195,13 @@ const NotificationsList: React.FC = () => {
         {typeNotif.map((type) => (
           <Button
             key={type}
-            className={`px-4 py-2 border rounded-2xl ${
-              selectedType === type ? '' : 'opacity-50'
-            }`}
+            className={cn(selectedType === type ? '' : 'opacity-50')}
             onClick={() => setSelectedType(type)}
           >
-            <div className=""></div>
-
-            <span className="flex items-center gap-2">
+            <div className="flex items-center justify-around gap-2">
               {getIcon(type)}
               {type}
-            </span>
+            </div>
           </Button>
         ))}
       </div>
