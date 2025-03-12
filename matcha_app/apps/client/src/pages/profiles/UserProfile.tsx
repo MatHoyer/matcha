@@ -22,6 +22,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Heart, MessageCircle } from 'lucide-react';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { socket } from '../../lib/socket';
+import { useSession } from '../../hooks/useSession';
 
 export const UserProfile = () => {
   const { id } = useParams();
@@ -30,6 +32,7 @@ export const UserProfile = () => {
   const [pictures, setPictures] = useState<File[]>([]);
   const [tags, setTags] = useState<TTag[]>([]);
   const [isLiked, setIsLiked] = useState(false);
+  const session = useSession();
 
   const userQuery = useQuery({
     queryKey: ['user', id],
@@ -129,6 +132,10 @@ export const UserProfile = () => {
           cb: () => {
             queryClient.invalidateQueries({
               queryKey: ['liked', id],
+            });
+            socket.emit('send-like-unlike', {
+              senderLikeId: session.user?.id,
+              receiverLikeId: id,
             });
           },
         },

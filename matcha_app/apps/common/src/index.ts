@@ -168,8 +168,8 @@ export type {
   TView,
 } from './schemas/database.schema';
 export { events } from './schemas/socket/events.schema';
-export { sendMessageSchema } from './schemas/socket/send-message.schema';
-export type { TSendMessageSchema } from './schemas/socket/send-message.schema';
+export { sendMessageSchema } from './schemas/socket/events.schema';
+export type { TSendMessageSchema } from './schemas/socket/events.schema';
 
 //-----------------------Errors-----------------------
 export { SchemaError } from './errors/schema.error';

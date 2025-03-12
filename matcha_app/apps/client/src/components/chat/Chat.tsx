@@ -17,6 +17,7 @@ import {
 } from '@matcha/common';
 import { Minus, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 interface PrivateChatProps {
   otherUser: TUser;
@@ -39,48 +40,64 @@ export const Chat: React.FC<PrivateChatProps> = ({
   const [feedback, setFeedback] = useState('');
   const [loading, setLoading] = useState(true);
   const { notifications, setNotifications } = useSetNotification();
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    const fetchMessages = async () => {
-      try {
-        await axiosFetch({
-          method: 'POST',
-          url: getUrl('api-messages'),
-          schemas: messagesSchemas,
-          data: { userId: session.user!.id },
-          handleEnding: {
-            cb: (data) => {
-              const filteredMessages = data.messages.filter(
-                (msg: TMessage) =>
-                  (msg.userId === session.user!.id &&
-                    msg.receiverId === otherUser.id) ||
-                  (msg.userId === otherUser.id &&
-                    msg.receiverId === session.user!.id)
-              );
-              const formattedMessages = filteredMessages.map(
-                (msg: TMessage) => ({
-                  name:
-                    msg.userId === session.user!.id
-                      ? session.user!.name
-                      : otherUser.name,
-                  message: msg.message,
-                  dateTime: msg.date,
-                  isOwnMessage: msg.userId === session.user!.id,
-                })
-              );
-              setMessages(formattedMessages);
-            },
+  useQuery({
+    queryKey: ['messages', session.user!.id],
+    queryFn: async () => {
+      return await axiosFetch({
+        method: 'POST',
+        url: getUrl('api-messages'),
+        schemas: messagesSchemas,
+        data: { userId: session.user!.id },
+        handleEnding: {
+          cb: (data) => {
+            const filteredMessages = data.messages.filter(
+              (msg: TMessage) =>
+                (msg.userId === session.user!.id &&
+                  msg.receiverId === otherUser.id) ||
+                (msg.userId === otherUser.id &&
+                  msg.receiverId === session.user!.id)
+            );
+            const formattedMessages = filteredMessages.map((msg: TMessage) => ({
+              name:
+                msg.userId === session.user!.id
+                  ? session.user!.name
+                  : otherUser.name,
+              message: msg.message,
+              dateTime: msg.date,
+              isOwnMessage: msg.userId === session.user!.id,
+            }));
+            setMessages(formattedMessages);
           },
-        });
-      } catch (error) {
-        console.error(`Error while fetching messages: ${error}`);
-      } finally {
-        setLoading(false);
-      }
-    };
+        },
+      });
+    },
+  });
 
-    fetchMessages();
-  }, []);
+  const setReadMessageNotif = useMutation({
+    mutationFn: async () => {
+      return await axiosFetch({
+        method: 'POST',
+        url: getUrl('api-notifications', { type: 'update' }),
+        schemas: updateNotificationSchemas,
+        data: {
+          userId: session.user!.id,
+          otherUserId: otherUser.id,
+          type: 'Message',
+          read: true,
+        },
+        handleEnding: {
+          cb: (data) => {
+            // console.log('invalidate query from setReadMessageNotif mutation');
+            queryClient.invalidateQueries({
+              queryKey: ['notifications'],
+            });
+          },
+        },
+      });
+    },
+  });
 
   useEffect(() => {
     const messageHandler = ({ message }: { message: string }) => {
@@ -99,12 +116,12 @@ export const Chat: React.FC<PrivateChatProps> = ({
       setFeedback(message);
     };
 
-    console.log('pv-', session.user!.id, '-', otherUser.id);
+    // console.log('pv-', session.user!.id, '-', otherUser.id);
     socket.on(`pv-${session.user!.id}-${otherUser.id}`, messageHandler);
     socket.on(`feedback-${session.user!.id}-${otherUser.id}`, feedbackHandler);
 
     return () => {
-      console.log('bye');
+      // console.log('bye');
       socket.off(`pv-${session.user!.id}-${otherUser.id}`, messageHandler);
     };
   }, []);
@@ -113,7 +130,7 @@ export const Chat: React.FC<PrivateChatProps> = ({
     const receiverId = data.receiverId;
     const senderId = data.senderId;
     const message = data.message;
-    console.log(`emitting ${type} with ${senderId}, ${receiverId}, ${message}`);
+    // console.log(`emitting ${type} with ${senderId}, ${receiverId}, ${message}`);
     socket.emit(type, { senderId, receiverId, message });
   };
 
@@ -148,36 +165,11 @@ export const Chat: React.FC<PrivateChatProps> = ({
     });
   };
 
-  // set all the messages to read=true
-  useEffect(() => {
-    const setReadMessageNotif = async () => {
-      try {
-        await axiosFetch({
-          method: 'POST',
-          url: getUrl('api-notifications', { type: 'update' }),
-          schemas: updateNotificationSchemas,
-          data: {
-            userId: session.user!.id,
-            otherUserId: otherUser.id,
-            type: 'Message',
-            read: true,
-          },
-          handleEnding: {
-            cb: (data) => {
-              // update the notification read status in real time
-            },
-          },
-        });
-      } catch (error) {
-        console.error(`Error while marking messages as read: ${error}`);
-      }
-    };
-
-    setReadMessageNotif();
-  }, []);
-
   return (
-    <Card className="p-3 w-80 h-fit ">
+    <Card
+      className="p-3 w-80 h-fit "
+      onClick={() => setReadMessageNotif.mutate()}
+    >
       <div className="flex items-center justify-between">
         <Typography variant="small">
           Chat with {otherUser.name} {otherUser.id}

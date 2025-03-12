@@ -126,7 +126,7 @@ export const socketHandler = (io: Server) => {
         });
         receiver.socket.emit(`notification-bubble`);
       },
-      'send-feedback': (args) => {
+      'send-feedback': async (args) => {
         console.log('send-feedback from back');
         const { senderId, receiverId, message } = args;
 
@@ -139,7 +139,141 @@ export const socketHandler = (io: Server) => {
           message,
         });
       },
-      disconnect: (_args) => {
+      'send-like-unlike': async (args) => {
+        const { senderLikeId, receiverLikeId } = args;
+        const sender = await db.user.findFirst({
+          where: {
+            id: senderLikeId,
+          },
+        });
+        if (!sender) return;
+        const receiver = await db.user.findFirst({
+          where: {
+            id: receiverLikeId,
+          },
+        });
+        if (!receiver) return;
+
+        const like = await db.like.findFirst({
+          where: {
+            userId: senderLikeId,
+            likedId: receiverLikeId,
+          },
+        });
+
+        if (like) {
+          const match = await db.like.findFirst({
+            where: {
+              userId: receiverLikeId,
+              likedId: senderLikeId,
+            },
+          });
+
+          if (match) {
+            // Notif match to both users
+            await db.notification.create({
+              data: {
+                userId: receiverLikeId,
+                otherUserId: senderLikeId,
+                type: 'Match',
+                date: new Date(),
+                read: false,
+              },
+            });
+            await db.notification.create({
+              data: {
+                userId: senderLikeId,
+                otherUserId: receiverLikeId,
+                type: 'Match',
+                date: new Date(),
+                read: false,
+              },
+            });
+            const receiverOnline = connectedUsers.find(
+              (u) => u.id === receiver.id
+            );
+            if (receiverOnline) {
+              receiverOnline.socket.emit(`notification-${receiver.id}`, {
+                id: nanoid(),
+                userId: receiverLikeId,
+                otherUserId: senderLikeId,
+                otherUser: sender,
+                type: 'Match',
+                date: new Date(),
+                read: false,
+              });
+            }
+
+            const senderOnline = connectedUsers.find((u) => u.id === sender.id);
+            if (senderOnline) {
+              senderOnline.socket.emit(`notification-${sender.id}`, {
+                id: nanoid(),
+                userId: senderLikeId,
+                otherUserId: receiverLikeId,
+                otherUser: receiver,
+                type: 'Match',
+                date: new Date(),
+                read: false,
+              });
+            }
+          } else {
+            // No match just a like
+            await db.notification.create({
+              data: {
+                userId: receiverLikeId,
+                otherUserId: senderLikeId,
+                type: 'Like',
+                date: new Date(),
+                read: false,
+              },
+            });
+            const receiverOnline = connectedUsers.find(
+              (u) => u.id === receiver.id
+            );
+            if (receiverOnline) {
+              receiverOnline.socket.emit(`notification-${receiver.id}`, {
+                id: nanoid(),
+                userId: receiverLikeId,
+                otherUserId: senderLikeId,
+                otherUser: sender,
+                type: 'Like',
+                date: new Date(),
+                read: false,
+              });
+            }
+          }
+        } else {
+          // Unlike notif
+          await db.notification.create({
+            data: {
+              userId: receiverLikeId,
+              otherUserId: senderLikeId,
+              type: 'Unlike',
+              date: new Date(),
+              read: false,
+            },
+          });
+          const receiverOnline = connectedUsers.find(
+            (u) => u.id === receiver.id
+          );
+
+          if (receiverOnline) {
+            receiverOnline.socket.emit(`notification-${receiver.id}`, {
+              id: nanoid(),
+              userId: receiverLikeId,
+              otherUserId: senderLikeId,
+              otherUser: sender,
+              type: 'Unlike',
+              date: new Date(),
+              read: false,
+            });
+          }
+        }
+      },
+      // disconnect: (_args) => {
+      //   console.log(`User disconnected: ${socket.id}`);
+      // },
+      disconnect: () => {
         console.log(`User disconnected: ${socket.id}`);
       },
     });

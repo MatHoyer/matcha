@@ -158,7 +158,9 @@ const App = () => {
                   items: usersAllButAuthUser.map((otherUser) => ({
                     title: `${otherUser.name} ${otherUser.lastName} ${otherUser.id}`,
                     url: '',
-                    onClick: () => handleChatClick(otherUser as TUser),
+                    onClick: () => {
+                      handleChatClick(otherUser as TUser);
+                    },
                   })),
                 }}
               />

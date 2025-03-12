@@ -8,7 +8,7 @@ import { AlertDialogRenderer } from './components/dialogs/alert-dialog/AlertDial
 import { GlobalDialog } from './components/dialogs/components/GlobalDialog';
 import { ThemeProvider } from './components/theme/ThemeProvider';
 import './index.css';
-import { NotificationProvider } from './pages/notification/Notification-context';
+import { NotificationProvider } from './pages/notification/Notifications-context';
 
 const queryClient = new QueryClient();
 
