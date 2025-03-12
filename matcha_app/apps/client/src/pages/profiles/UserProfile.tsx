@@ -7,6 +7,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { FameRating } from '@/components/ui/FameRating';
+import { Separator } from '@/components/ui/separator';
 import { Typography } from '@/components/ui/typography';
 import { useChatStore } from '@/hooks/use-chat';
 import { useSession } from '@/hooks/useSession';
@@ -195,7 +196,7 @@ export const UserProfile = () => {
             <Typography variant="muted">
               {userQuery.data?.user &&
                 !userQuery.data.user.isOnline &&
-                getNearDate(userQuery.data.user.lastTimeOnline)}
+                `Connected ${getNearDate(userQuery.data.user.lastTimeOnline)}`}
             </Typography>
             {session.user?.id !== +(id || 0) && (
               <div className="flex items-center gap-2">
@@ -222,6 +223,7 @@ export const UserProfile = () => {
         </div>
       </LayoutHeader>
       <LayoutContent className="flex flex-col gap-6">
+        <Separator />
         <Typography variant="large">Pictures</Typography>
         <div className="flex flex-col items-center gap-2">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">

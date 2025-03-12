@@ -1,4 +1,8 @@
-import { batchPromises, TAdvancedSearchSchema } from '@matcha/common';
+import {
+  batchPromises,
+  TAdvancedSearchSchema,
+  TLocation,
+} from '@matcha/common';
 import { Request, Response } from 'express';
 import db from '../database/Database';
 import {
@@ -28,19 +32,23 @@ export const advancedSearch = async (req: Request, res: Response) => {
   }
 
   const { latitude, longitude } = dbLocation;
-  const locationDiff = 0.1;
-  const goodLocations = await db.location.findMany({
-    where: {
-      latitude: {
-        $gte: latitude - locationDiff,
-        $lte: latitude + locationDiff,
+  let locationDiff = 0.1;
+  let goodLocations = [] as TLocation[];
+  while (goodLocations.length === 0 && locationDiff < 0.5) {
+    goodLocations = await db.location.findMany({
+      where: {
+        latitude: {
+          $gte: latitude - locationDiff,
+          $lte: latitude + locationDiff,
+        },
+        longitude: {
+          $gte: longitude - locationDiff,
+          $lte: longitude + locationDiff,
+        },
       },
-      longitude: {
-        $gte: longitude - locationDiff,
-        $lte: longitude + locationDiff,
-      },
-    },
-  });
+    });
+    locationDiff += 0.1;
+  }
   const userLocations = await db.userLocation.findMany({
     where: {
       locationId: {
