@@ -15,7 +15,8 @@ CREATE TABLE "User" (
   "gender" "Gender" NOT NULL,
   "preference" "Orientation" NOT NULL,
   "biography" VARCHAR(1000),
-  "lastTimeOnline" TIMESTAMP NOT NULL DEFAULT NOW()
+  "lastTimeOnline" TIMESTAMP NOT NULL DEFAULT NOW(),
+  "isOnline" BOOLEAN NOT NULL DEFAULT FALSE
 );
 CREATE OR REPLACE VIEW "User_v" AS 
 SELECT *, EXTRACT(YEAR FROM age(CURRENT_DATE, "birthDate"))::INT AS "age" FROM "User";

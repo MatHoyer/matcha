@@ -7,10 +7,13 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Typography } from '@/components/ui/typography';
+import { useChatStore } from '@/hooks/use-chat';
+import { useSession } from '@/hooks/useSession';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import {
   createLikeSchemas,
   deleteLikeSchemas,
+  getNearDate,
   getPicturesSchemas,
   getUrl,
   getUserSchemas,
@@ -25,11 +28,13 @@ import { useParams } from 'react-router-dom';
 
 export const UserProfile = () => {
   const { id } = useParams();
+  const session = useSession();
   const queryClient = useQueryClient();
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [pictures, setPictures] = useState<File[]>([]);
   const [tags, setTags] = useState<TTag[]>([]);
   const [isLiked, setIsLiked] = useState(false);
+  const { addChatWindow } = useChatStore();
 
   const userQuery = useQuery({
     queryKey: ['user', id],
@@ -140,12 +145,19 @@ export const UserProfile = () => {
     <Layout>
       <LayoutHeader>
         <div className="flex gap-5 w-full">
-          <img
-            className="size-40 rounded-full"
-            src={
-              profilePicture ? URL.createObjectURL(profilePicture) : undefined
-            }
-          />
+          <div className="relative">
+            <img
+              className="size-40 rounded-full"
+              src={
+                profilePicture ? URL.createObjectURL(profilePicture) : undefined
+              }
+            />
+            {userQuery.data?.user && userQuery.data.user.isOnline ? (
+              <div className="absolute bottom-2 right-2 w-8 h-8 bg-green-500 rounded-full" />
+            ) : (
+              <div className="absolute bottom-2 right-2 w-8 h-8 border-4 border-gray-500 bg-background rounded-full" />
+            )}
+          </div>
           <div className="flex flex-col gap-2">
             <Typography variant="h2">
               {userQuery.data?.user.name} {userQuery.data?.user.lastName}
@@ -160,17 +172,32 @@ export const UserProfile = () => {
             </Typography>
           </div>
           <div className="flex-1" />
-          <div className="flex items-center gap-2">
-            <Button
-              size="icon"
-              className="rounded-full"
-              onClick={() => likeMutation.mutate()}
-            >
-              <Heart fill={isLiked ? 'red' : 'none'} />
-            </Button>
-            <Button size="icon" className="rounded-full">
-              <MessageCircle />
-            </Button>
+          <div className="flex flex-col gap-10">
+            <Typography variant="muted">
+              {userQuery.data?.user &&
+                !userQuery.data.user.isOnline &&
+                getNearDate(userQuery.data.user.lastTimeOnline)}
+            </Typography>
+            {session.user?.id !== +(id || 0) && (
+              <div className="flex items-center gap-2">
+                <Button
+                  size="icon"
+                  className="rounded-full"
+                  onClick={() => likeMutation.mutate()}
+                >
+                  <Heart fill={isLiked ? 'red' : 'none'} />
+                </Button>
+                <Button
+                  size="icon"
+                  className="rounded-full"
+                  onClick={() => {
+                    addChatWindow(userQuery.data!.user, session.user!.id);
+                  }}
+                >
+                  <MessageCircle />
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </LayoutHeader>

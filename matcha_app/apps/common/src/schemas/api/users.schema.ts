@@ -15,6 +15,7 @@ export const getUsersSchemas = {
         'birthDate',
         'biography',
         'lastTimeOnline',
+        'isOnline',
       ])
     ),
   }),
@@ -35,6 +36,8 @@ export const getUserSchemas = {
       'age',
       'birthDate',
       'biography',
+      'lastTimeOnline',
+      'isOnline',
     ]),
   }),
 };
