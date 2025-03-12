@@ -57,6 +57,7 @@ export const updateUserSchemas = {
       'biography',
     ]).shape,
     tags: z.array(tagSchema.pick(['name']).shape.name),
+    location: z.string(),
   }),
   response: z.object({
     message: z.string(),

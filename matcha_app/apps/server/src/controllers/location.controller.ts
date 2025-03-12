@@ -2,6 +2,7 @@ import { TUpdateLocationSchemas } from '@matcha/common';
 import { differenceInDays } from 'date-fns';
 import { Request, Response } from 'express';
 import db from '../database/Database';
+import { findClosestLocation } from '../services/search.service';
 import { defaultResponse } from '../utils/defaultResponse';
 
 export const updateLocation = async (req: Request, res: Response) => {
@@ -110,5 +111,83 @@ export const isNeedUpdateLocation = async (req: Request, res: Response) => {
   res.status(200).json({
     message: 'Location is up to date',
     isNeedUpdate: false,
+  });
+};
+
+export const getUserNearLocation = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  const userLocation = await db.userLocation.findFirst({
+    where: {
+      userId: +id,
+    },
+  });
+  if (!userLocation) {
+    return defaultResponse({
+      res,
+      status: 400,
+      json: {
+        message: 'User location not found',
+      },
+    });
+  }
+
+  const location = await db.location.findFirst({
+    where: {
+      id: userLocation.locationId,
+    },
+  });
+  if (!location) {
+    return defaultResponse({
+      res,
+      status: 400,
+      json: {
+        message: 'Location not found',
+      },
+    });
+  }
+
+  const globalLocations = await db.globalLocation.findMany({});
+  const globalLocationsNear = findClosestLocation(
+    {
+      latitude: location.latitude,
+      longitude: location.longitude,
+    },
+    globalLocations.map((gl) => ({
+      latitude: gl.latitude,
+      longitude: gl.longitude,
+    }))
+  );
+
+  if (!globalLocationsNear) {
+    return defaultResponse({
+      res,
+      status: 400,
+      json: {
+        message: 'No global locations near',
+      },
+    });
+  }
+
+  const locationName = globalLocations.find(
+    (gl) =>
+      gl.latitude === globalLocationsNear.latitude &&
+      gl.longitude === globalLocationsNear.longitude
+  )?.name;
+
+  if (!locationName) {
+    return defaultResponse({
+      res,
+      status: 400,
+      json: {
+        message: 'Location not found',
+      },
+    });
+  }
+
+  res.status(200).json({
+    location: {
+      name: locationName,
+    },
   });
 };

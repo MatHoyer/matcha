@@ -23,3 +23,14 @@ export const isNeedUpdateLocationSchemas = {
 export type TIsNeedUpdateLocationSchemas = {
   response: Infer<typeof isNeedUpdateLocationSchemas.response>;
 };
+
+export const getUserLocationSchemas = {
+  response: z.object({
+    location: z.object({
+      name: z.string(),
+    }),
+  }),
+};
+export type TGetUserLocationSchemas = {
+  response: Infer<typeof getUserLocationSchemas.response>;
+};

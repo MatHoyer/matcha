@@ -51,7 +51,8 @@ export type TApiRouteDataRequirements = {
     type?: 'new' | 'is-liked';
   };
   'api-location': {
-    type?: 'is-need-update';
+    id?: number;
+    type?: 'is-need-update' | 'near/user';
   };
 };
 
@@ -115,8 +116,15 @@ const routes: {
     }
     return id ? `/api/likes/${id}` : '/api/likes';
   },
-  'api-location': ({ type }) =>
-    type ? `/api/location/${type}` : '/api/location',
+  'api-location': ({ id, type }) => {
+    if (type) {
+      if (['near/user'].includes(type) && id) {
+        return `/api/location/${type}/${id}`;
+      }
+      return `/api/location/${type}`;
+    }
+    return id ? `/api/location/${id}` : '/api/location';
+  },
 };
 
 type TUrlParams =

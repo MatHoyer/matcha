@@ -77,8 +77,16 @@ export type {
   TDeleteLikeSchemas,
   TIsLikedSchemas,
 } from './schemas/api/like.schema';
-export { updateLocationSchemas } from './schemas/api/location.schema';
-export type { TUpdateLocationSchemas } from './schemas/api/location.schema';
+export {
+  getUserLocationSchemas,
+  isNeedUpdateLocationSchemas,
+  updateLocationSchemas,
+} from './schemas/api/location.schema';
+export type {
+  TGetUserLocationSchemas,
+  TIsNeedUpdateLocationSchemas,
+  TUpdateLocationSchemas,
+} from './schemas/api/location.schema';
 export { messagesSchemas } from './schemas/api/messages.schema';
 export type { TMessagesSchemas } from './schemas/api/messages.schema';
 export {

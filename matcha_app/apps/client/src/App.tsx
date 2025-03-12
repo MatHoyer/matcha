@@ -1,5 +1,6 @@
 import {
   getUrl,
+  isNeedUpdateLocationSchemas,
   TUser,
   TUserWithNames,
   updateLocationSchemas,
@@ -14,7 +15,6 @@ import {
 } from 'lucide-react';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { isNeedUpdateLocationSchemas } from '../../common/src/schemas/api/location.schema';
 import { ChatContainer } from './components/chat/ChatContainer';
 import { Logo } from './components/images/Logo';
 import { NavItemDropdown, NavItems } from './components/sidebar/NavComp';
