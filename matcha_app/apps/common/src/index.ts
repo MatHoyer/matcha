@@ -120,6 +120,7 @@ export type {
 } from './schemas/api/tags.schema';
 export {
   askResetPasswordSchemas,
+  getUserFameSchemas,
   getUserSchemas,
   getUsersSchemas,
   resetPasswordSchemas,
@@ -127,6 +128,7 @@ export {
 } from './schemas/api/users.schema';
 export type {
   TAskResetPasswordSchemas,
+  TGetUserFameSchemas,
   TGetUserSchemas,
   TGetUsersSchemas,
   TResetPasswordSchemas,

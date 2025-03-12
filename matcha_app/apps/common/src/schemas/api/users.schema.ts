@@ -67,6 +67,15 @@ export type TUpdateUserSchemas = {
   response: Infer<typeof updateUserSchemas.response>;
 };
 
+export const getUserFameSchemas = {
+  response: z.object({
+    fame: z.number(),
+  }),
+};
+export type TGetUserFameSchemas = {
+  response: Infer<typeof getUserFameSchemas.response>;
+};
+
 export const askResetPasswordSchemas = {
   response: z.object({
     message: z.string(),

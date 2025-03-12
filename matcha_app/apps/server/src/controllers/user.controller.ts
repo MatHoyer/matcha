@@ -13,6 +13,7 @@ import { ResetPasswordMail } from '../emails/patterns/ResetPasswordMail';
 import { sendEmail } from '../emails/sendEmail';
 import { env } from '../env';
 import { hashPassword } from '../services/auth.service';
+import { fameCalculator } from '../services/search.service';
 import { defaultResponse } from '../utils/defaultResponse';
 
 export const getUsers = async (_req: Request, res: Response) => {
@@ -157,6 +158,26 @@ export const updateUser = async (req: Request, res: Response) => {
       message: 'User updated',
     },
   });
+};
+
+export const getUserFame = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const user = await db.user.findFirst({
+    where: {
+      id: +id,
+    },
+  });
+  if (!user) {
+    return defaultResponse({
+      res,
+      status: 404,
+      json: { message: 'User not found' },
+    });
+  }
+
+  const userFame = await fameCalculator(user.id);
+
+  res.status(200).json({ fame: userFame.fame });
 };
 
 export const askResetPassword = async (req: Request, res: Response) => {

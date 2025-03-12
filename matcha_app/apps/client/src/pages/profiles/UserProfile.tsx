@@ -6,6 +6,7 @@ import {
 } from '@/components/pagination/Layout';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { FameRating } from '@/components/ui/FameRating';
 import { Typography } from '@/components/ui/typography';
 import { useChatStore } from '@/hooks/use-chat';
 import { useSession } from '@/hooks/useSession';
@@ -16,6 +17,7 @@ import {
   getNearDate,
   getPicturesSchemas,
   getUrl,
+  getUserFameSchemas,
   getUserSchemas,
   getUserTagsSchemas,
   isLikedSchemas,
@@ -35,6 +37,7 @@ export const UserProfile = () => {
   const [tags, setTags] = useState<TTag[]>([]);
   const [isLiked, setIsLiked] = useState(false);
   const { addChatWindow } = useChatStore();
+  const [fame, setFame] = useState(1);
 
   const userQuery = useQuery({
     queryKey: ['user', id],
@@ -44,6 +47,22 @@ export const UserProfile = () => {
         method: 'GET',
         url: getUrl('api-users', { id: +id }),
         schemas: getUserSchemas,
+      });
+    },
+  });
+
+  useQuery({
+    queryKey: ['fame', id],
+    queryFn: async () => {
+      return await axiosFetch({
+        method: 'GET',
+        url: getUrl('api-users', { id: +id! }),
+        schemas: getUserFameSchemas,
+        handleEnding: {
+          cb: (data) => {
+            setFame(data.fame);
+          },
+        },
       });
     },
   });
@@ -172,7 +191,7 @@ export const UserProfile = () => {
             </Typography>
           </div>
           <div className="flex-1" />
-          <div className="flex flex-col gap-10">
+          <div className="flex flex-col items-end gap-10">
             <Typography variant="muted">
               {userQuery.data?.user &&
                 !userQuery.data.user.isOnline &&
@@ -198,6 +217,7 @@ export const UserProfile = () => {
                 </Button>
               </div>
             )}
+            <FameRating note={fame} />
           </div>
         </div>
       </LayoutHeader>

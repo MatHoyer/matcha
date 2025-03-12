@@ -3,6 +3,7 @@ import { Router } from 'express';
 import {
   askResetPassword,
   getUser,
+  getUserFame,
   getUsers,
   resetPassword,
   updateUser,
@@ -25,6 +26,12 @@ userRouter.put(
   paramsParser(z.object({ id: z.number() })),
   bodyParser(updateUserSchemas.requirements),
   updateUser
+);
+userRouter.get(
+  '/fame/:id',
+  isLogged,
+  paramsParser(z.object({ id: z.number() })),
+  getUserFame
 );
 
 userRouter.get('/password/reset-password', isLogged, askResetPassword);
