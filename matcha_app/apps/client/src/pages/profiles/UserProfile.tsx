@@ -164,40 +164,45 @@ export const UserProfile = () => {
   return (
     <Layout>
       <LayoutHeader>
-        <div className="flex gap-5 w-full">
-          <div className="relative">
-            <img
-              className="size-40 rounded-full"
-              src={
-                profilePicture ? URL.createObjectURL(profilePicture) : undefined
-              }
-            />
-            {userQuery.data?.user && userQuery.data.user.isOnline ? (
-              <div className="absolute bottom-2 right-2 w-8 h-8 bg-green-500 rounded-full" />
-            ) : (
-              <div className="absolute bottom-2 right-2 w-8 h-8 border-4 border-gray-500 bg-background rounded-full" />
-            )}
-          </div>
-          <div className="flex flex-col gap-2">
-            <Typography variant="h2">
-              {userQuery.data?.user.name} {userQuery.data?.user.lastName}
-            </Typography>
-            <div className="flex gap-2">
-              {tags.map((tag) => (
-                <Badge key={tag.id}>{tag.name}</Badge>
-              ))}
+        <div className="flex flex-col md:flex-row gap-5 w-full">
+          <div className="flex flex-row md:flex-col items-center gap-5">
+            <div className="relative">
+              <img
+                className="size-40 rounded-full"
+                src={
+                  profilePicture
+                    ? URL.createObjectURL(profilePicture)
+                    : undefined
+                }
+              />
+              {userQuery.data?.user && userQuery.data.user.isOnline ? (
+                <div className="absolute bottom-2 right-2 w-8 h-8 bg-green-500 rounded-full" />
+              ) : (
+                <div className="absolute bottom-2 right-2 w-8 h-8 border-4 border-gray-500 bg-background rounded-full" />
+              )}
             </div>
-            <Typography variant="muted">
-              {userQuery.data?.user.biography}
-            </Typography>
+            <div className="flex flex-col gap-2">
+              <Typography variant="h2">
+                {userQuery.data?.user.name} {userQuery.data?.user.lastName}
+              </Typography>
+              <div className="flex gap-2">
+                {tags.map((tag) => (
+                  <Badge key={tag.id}>{tag.name}</Badge>
+                ))}
+              </div>
+              <Typography variant="muted">
+                {userQuery.data?.user.biography}
+              </Typography>
+            </div>
           </div>
-          <div className="flex-1" />
-          <div className="flex flex-col items-end gap-10">
-            <Typography variant="muted">
-              {userQuery.data?.user &&
-                !userQuery.data.user.isOnline &&
-                `Connected ${getNearDate(userQuery.data.user.lastTimeOnline)}`}
-            </Typography>
+          <div className="flex-1 hidden md:block" />
+          <div className="flex flex-row md:flex-col items-end gap-10">
+            {userQuery.data?.user && !userQuery.data.user.isOnline && (
+              <Typography variant="muted">
+                {`Connected ${getNearDate(userQuery.data.user.lastTimeOnline)}`}
+              </Typography>
+            )}
+            <FameRating note={fame} />
             {session.user?.id !== +(id || 0) && (
               <div className="flex items-center gap-2">
                 <Button
@@ -218,7 +223,6 @@ export const UserProfile = () => {
                 </Button>
               </div>
             )}
-            <FameRating note={fame} />
           </div>
         </div>
       </LayoutHeader>

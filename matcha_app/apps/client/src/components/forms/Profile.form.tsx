@@ -260,7 +260,7 @@ export const ProfileForm: React.FC<
         name="location"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Location</FormLabel>
+            <FormLabel>Location (update every days)</FormLabel>
             <FormControl>
               <GlobalLocationCombobox {...field} />
             </FormControl>
@@ -268,6 +268,7 @@ export const ProfileForm: React.FC<
           </FormItem>
         )}
       />
+      <div className="mt-4" />
       <FormMessage>{form.formState.errors.root?.message}</FormMessage>
       <SubmitButtonForm modal={modal} isLoading={mutation.isPending}>
         Update profile
