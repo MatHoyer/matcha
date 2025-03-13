@@ -69,13 +69,17 @@ export const advancedSearch = async (req: Request, res: Response) => {
       tagId: {
         $in: goodTags.map((t) => t.id),
       },
+      userId: {
+        $in: userLocations.map((ul) => ul.userId),
+      },
     },
   });
 
   let ids = [
     ...new Set([
-      ...userTags.map((ut) => ut.userId),
-      ...userLocations.map((ul) => ul.userId),
+      ...(tags.length === 0
+        ? userLocations.map((ul) => ul.userId)
+        : userTags.map((ut) => ut.userId)),
     ]),
   ];
 
