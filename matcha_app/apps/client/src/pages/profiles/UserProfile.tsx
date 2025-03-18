@@ -42,6 +42,17 @@ export const UserProfile = () => {
         method: 'GET',
         url: getUrl('api-users', { id: +id }),
         schemas: getUserSchemas,
+        handleEnding: {
+          cb: (data) => {
+            console.log(
+              `about to emit send view ! senderViewId : ${session.user?.id} receiverViewId : ${id}`
+            );
+            socket.emit('send-view', {
+              senderViewId: session.user?.id,
+              receiverViewId: id,
+            });
+          },
+        },
       });
     },
   });

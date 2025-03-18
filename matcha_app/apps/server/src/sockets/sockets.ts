@@ -4,7 +4,6 @@ import jwt from 'jsonwebtoken';
 import { Server, Socket } from 'socket.io';
 import db from '../database/Database';
 import { env } from '../env';
-import { nanoid } from 'nanoid';
 
 type Events = typeof events;
 type InferEvent<T extends keyof Events> = Infer<Events[T]>;
@@ -116,7 +115,6 @@ export const socketHandler = (io: Server) => {
 
         receiver.socket.emit(`pv-${receiver.id}-${sender.id}`, { message });
         receiver.socket.emit(`notification-${receiver.id}`, {
-          id: nanoid(),
           userId: receiverId,
           otherUserId: senderId,
           otherUser: otherUser,
@@ -194,7 +192,6 @@ export const socketHandler = (io: Server) => {
             );
             if (receiverOnline) {
               receiverOnline.socket.emit(`notification-${receiver.id}`, {
-                id: nanoid(),
                 userId: receiverLikeId,
                 otherUserId: senderLikeId,
                 otherUser: sender,
@@ -207,7 +204,6 @@ export const socketHandler = (io: Server) => {
             const senderOnline = connectedUsers.find((u) => u.id === sender.id);
             if (senderOnline) {
               senderOnline.socket.emit(`notification-${sender.id}`, {
-                id: nanoid(),
                 userId: senderLikeId,
                 otherUserId: receiverLikeId,
                 otherUser: receiver,
@@ -232,7 +228,6 @@ export const socketHandler = (io: Server) => {
             );
             if (receiverOnline) {
               receiverOnline.socket.emit(`notification-${receiver.id}`, {
-                id: nanoid(),
                 userId: receiverLikeId,
                 otherUserId: senderLikeId,
                 otherUser: sender,
@@ -259,11 +254,76 @@ export const socketHandler = (io: Server) => {
 
           if (receiverOnline) {
             receiverOnline.socket.emit(`notification-${receiver.id}`, {
-              id: nanoid(),
               userId: receiverLikeId,
               otherUserId: senderLikeId,
               otherUser: sender,
               type: 'Unlike',
+              date: new Date(),
+              read: false,
+            });
+          }
+        }
+      },
+      'send-view': async (args) => {
+        console.log('entering send view');
+        const { senderViewId, receiverViewId } = args;
+        // checking if match exists
+        const senderView = await db.like.findFirst({
+          where: {
+            userId: senderViewId,
+            likedId: receiverViewId,
+          },
+        });
+        const receiverView = await db.like.findFirst({
+          where: {
+            userId: receiverViewId,
+            likedId: senderViewId,
+          },
+        });
+        console.log(`senderView: ${senderView}, receiverLike: ${receiverView}`);
+        if (!senderView || !receiverView) {
+          console.log('about to create view');
+          await db.view.create({
+            data: {
+              userId: receiverViewId,
+              viewerId: senderViewId,
+              date: new Date(),
+            },
+          });
+          console.log('about to create notif view');
+          await db.notification.create({
+            data: {
+              userId: receiverViewId,
+              otherUserId: senderViewId,
+              type: 'View',
+              date: new Date(),
+              read: false,
+            },
+          });
+          console.log(`receiverViewId: ${receiverViewId}`);
+          const receiver = await db.user.findFirst({
+            where: {
+              id: receiverViewId,
+            },
+          });
+          if (!receiver) return;
+          const sender = await db.user.findFirst({
+            where: {
+              id: senderViewId,
+            },
+          });
+          if (!sender) return;
+          const receiverOnline = connectedUsers.find(
+            (u) => u.id === receiver.id
+          );
+
+          if (receiverOnline) {
+            console.log('about to emit notif view');
+            receiverOnline.socket.emit(`notification-${receiverViewId}`, {
+              userId: receiverViewId,
+              otherUserId: senderViewId,
+              otherUser: sender,
+              type: 'View',
               date: new Date(),
               read: false,
             });

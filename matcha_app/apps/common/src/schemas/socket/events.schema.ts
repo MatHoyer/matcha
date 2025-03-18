@@ -1,6 +1,6 @@
 import { z } from '../../validator/validator';
 
-import { likeSchema, userSchema } from '../database.schema';
+import { userSchema } from '../database.schema';
 import { Infer } from '../../../dist/validator/validator';
 
 export const sendMessageSchema = z.object({
@@ -15,9 +15,15 @@ export const likesSchema = z.object({
   senderLikeId: userSchema.pick(['id']).shape.id,
 });
 
+export const viewsSchema = z.object({
+  receiverViewId: userSchema.pick(['id']).shape.id,
+  senderViewId: userSchema.pick(['id']).shape.id,
+});
+
 export const events = {
   'send-message': sendMessageSchema,
   'send-feedback': sendMessageSchema,
   'send-like-unlike': likesSchema,
+  'send-view': viewsSchema,
   disconnect: z.null(),
 };
