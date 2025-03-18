@@ -26,7 +26,6 @@ import { useSession } from '../../hooks/useSession';
 import { axiosFetch } from '../../lib/fetch-utils/axiosFetch';
 import { getIcon } from './Notifications-utils';
 import { getUrl } from '@matcha/common';
-import { getNotifications } from '../../../../server/src/controllers/notifications.controller';
 import { useQuery } from '@tanstack/react-query';
 
 const NotificationsList: React.FC = () => {
@@ -65,13 +64,7 @@ const NotificationsList: React.FC = () => {
   });
 
   const getNotificationLink = (notification: TNotificationsOtherUserSchema) => {
-    if (notification.type === 'Message') {
-      return `/chat/${notification.userId}`;
-    }
-    if (notification.type === 'Like' || notification.type === 'View') {
-      return `/profile/${notification.userId}`;
-    }
-    return '#';
+    return `/profile/${notification.otherUser?.id}`;
   };
 
   const getMessageNotification = (

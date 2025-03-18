@@ -6,6 +6,7 @@ import {
   getUsers,
   resetPassword,
   updateUser,
+  getMatchUser,
 } from '../controllers/user.controller';
 import { bodyParser } from '../middlewares/bodyParser.middleware';
 import { isLogged } from '../middlewares/isLogged.middleware';
@@ -34,6 +35,13 @@ userRouter.post(
   paramsParser(z.object({ token: z.string() })),
   bodyParser(resetPasswordSchemas.requirements),
   resetPassword
+);
+
+userRouter.get(
+  '/match/:id',
+  isLogged,
+  paramsParser(z.object({ id: z.number() })),
+  getMatchUser
 );
 
 export default userRouter;

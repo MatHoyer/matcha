@@ -47,10 +47,12 @@ export const UserProfile = () => {
             console.log(
               `about to emit send view ! senderViewId : ${session.user?.id} receiverViewId : ${id}`
             );
-            socket.emit('send-view', {
-              senderViewId: session.user?.id,
-              receiverViewId: id,
-            });
+            if (session.user?.id !== +id) {
+              socket.emit('send-view', {
+                senderViewId: session.user?.id,
+                receiverViewId: id,
+              });
+            }
           },
         },
       });

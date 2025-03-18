@@ -65,6 +65,43 @@ export const getUser = async (req: Request, res: Response) => {
   }
 };
 
+// get users that both likes each other
+export const getMatchUser = async (req: Request, res: Response) => {
+  console.log('getMatchUser');
+  const { id } = req.params;
+  try {
+    const likes = await db.like.findMany({
+      where: {
+        OR: [{ userId: +id }, { likedId: +id }],
+      },
+    });
+    const matchIds = likes
+      .filter((like) =>
+        likes.find(
+          (l) =>
+            l.userId === like.likedId &&
+            l.likedId === like.userId &&
+            l.userId !== l.likedId
+        )
+      )
+      .map((like) => (like.userId === +id ? like.likedId : like.userId));
+    const users = await db.user.findMany({
+      where: {
+        id: { $in: matchIds },
+      },
+    });
+    console.log(`users matched with user ${id}:`, users);
+    res.status(200).json({ users });
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    defaultResponse({
+      res,
+      status: 500,
+      json: { message: 'Internal Server Error' },
+    });
+  }
+};
+
 export const updateUser = async (req: Request, res: Response) => {
   const { id } = req.params;
 

@@ -1,5 +1,6 @@
 import {
   getUrl,
+  getUsersSchemas,
   TUser,
   TUserWithNames,
   updateLocationSchemas,
@@ -31,9 +32,37 @@ const App = () => {
   const session = useSession();
   const navigate = useNavigate();
   const { users } = useUsers();
+
   const usersAllButAuthUser = users.filter(
     (user: TUserWithNames) => user.id !== session.user?.id
   );
+
+  const matchUsers = useQuery({
+    queryKey: ['matchUsers'],
+    queryFn: async () => {
+      return await axiosFetch({
+        method: 'GET',
+        url: getUrl('api-users', {
+          type: 'match',
+          id: session!.user!.id,
+        }),
+        schemas: getUsersSchemas,
+        handleEnding: {
+          cb: (data) => {
+            if (data) {
+              console.log('Matched users:', data);
+
+              return data;
+            }
+            return [];
+          },
+        },
+      });
+    },
+  });
+
+  console.log(`Matched users data: ${matchUsers}`);
+  console.log(`userAllAuthUser: ${usersAllButAuthUser}`);
 
   const { openedChats, addChatWindow, removeChatWindow } = useChatStore();
 
@@ -155,11 +184,11 @@ const App = () => {
                 item={{
                   title: 'Chat',
                   icon: MessageCircleHeart,
-                  items: usersAllButAuthUser.map((otherUser) => ({
-                    title: `${otherUser.name} ${otherUser.lastName} ${otherUser.id}`,
+                  items: usersAllButAuthUser.map((user) => ({
+                    title: `${user.name} ${user.lastName} ${user.id}`,
                     url: '',
                     onClick: () => {
-                      handleChatClick(otherUser as TUser);
+                      handleChatClick(user as TUser);
                     },
                   })),
                 }}
