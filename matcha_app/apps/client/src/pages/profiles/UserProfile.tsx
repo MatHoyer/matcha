@@ -150,6 +150,9 @@ export const UserProfile = () => {
               senderLikeId: session.user?.id,
               receiverLikeId: id,
             });
+            queryClient.invalidateQueries({
+              queryKey: ['matchUsers'],
+            });
           },
         },
       });

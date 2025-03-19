@@ -19,14 +19,16 @@ import {
   notificationsSchemas,
   TNotificationsOtherUserSchema,
   TUser,
+  updateNotificationSchemas,
 } from '@matcha/common';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSession } from '../../hooks/useSession';
 import { axiosFetch } from '../../lib/fetch-utils/axiosFetch';
-import { getIcon } from './Notifications-utils';
+import { getIcon, useSetReadNotif } from './Notifications-utils';
 import { getUrl } from '@matcha/common';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { NavigationProvider } from 'react-day-picker';
 
 const NotificationsList: React.FC = () => {
   const { notifications, setNotifications } = useSetNotification();
@@ -36,6 +38,16 @@ const NotificationsList: React.FC = () => {
   const handleChatClick = (otherUser: TUser, userId: number) => {
     addChatWindow(otherUser, userId);
   };
+  const queryClient = useQueryClient();
+  const formattedNotifications = notifications;
+  const [selectedType, setSelectedType] = useState('All');
+  const filteredNotifications =
+    selectedType && selectedType !== 'All'
+      ? formattedNotifications.filter(
+          (notification) => notification.type === selectedType
+        )
+      : formattedNotifications;
+  const typeNotif = ['All', ...NOTIF_TYPES];
 
   useQuery({
     queryKey: ['notifications'],
@@ -57,6 +69,7 @@ const NotificationsList: React.FC = () => {
               (a, b) => b.dateTime.getTime() - a.dateTime.getTime()
             );
             setNotifications(formattedNotifications);
+            console.log('formattedNotifications : ', formattedNotifications);
           },
         },
       });
@@ -109,31 +122,50 @@ const NotificationsList: React.FC = () => {
     }
   };
 
+  // const setReadNotif = useMutation({
+  //     mutationFn: async () => {
+  //       return await axiosFetch({
+  //         method: 'POST',
+  //         url: getUrl('api-notifications', { type: 'update' }),
+  //         schemas: updateNotificationSchemas,
+  //         data: {
+  //           userId: session.user!.id,
+  //           otherUserId: otherUserId,
+  //           type: 'Like',
+  //           read: true,
+  //         },
+  //         handleEnding: {
+  //           cb: (data) => {
+  //             // console.log('invalidate query from setReadMessageNotif mutation');
+  //             queryClient.invalidateQueries({
+  //               queryKey: ['notifications'],
+  //             });
+  //           },
+  //         },
+  //       });
+  //     },
+  //   });
+
   useEffect(() => {
     const notificationHandler = (
       newNotification: TNotificationsOtherUserSchema
     ) => {
-      console.log('newNotification about to be set : ', newNotification);
+      if (
+        newNotification.type === 'Unlike' ||
+        newNotification.type === 'Match'
+      ) {
+        queryClient.invalidateQueries({
+          queryKey: ['matchUsers'],
+        });
+      }
       setNotifications((prev) => [newNotification, ...prev]);
     };
 
     socket.on(`notification-${session.user!.id}`, notificationHandler);
-    console.log(`after socket on notification-${session.user!.id}`);
     return () => {
       socket.off(`notification-${session.user!.id}`, notificationHandler);
     };
   }, []);
-
-  const formattedNotifications = notifications;
-
-  const [selectedType, setSelectedType] = useState('All');
-  const filteredNotifications =
-    selectedType && selectedType !== 'All'
-      ? formattedNotifications.filter(
-          (notification) => notification.type === selectedType
-        )
-      : formattedNotifications;
-  const typeNotif = ['All', ...NOTIF_TYPES];
 
   return (
     <LayoutContent className="flex flex-col gap-2">
@@ -165,7 +197,9 @@ const NotificationsList: React.FC = () => {
                 notification.otherUser as TUser,
                 notification.userId as number
               );
-            else navigate(getNotificationLink(notification));
+            else {
+              navigate(getNotificationLink(notification));
+            }
           }}
         >
           <div className="flex items-center justify-between gap-4">

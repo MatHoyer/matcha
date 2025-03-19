@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import { Server, Socket } from 'socket.io';
 import db from '../database/Database';
 import { env } from '../env';
+import { nanoid } from 'nanoid';
 
 type Events = typeof events;
 type InferEvent<T extends keyof Events> = Infer<Events[T]>;
@@ -115,6 +116,7 @@ export const socketHandler = (io: Server) => {
 
         receiver.socket.emit(`pv-${receiver.id}-${sender.id}`, { message });
         receiver.socket.emit(`notification-${receiver.id}`, {
+          id: nanoid(),
           userId: receiverId,
           otherUserId: senderId,
           otherUser: otherUser,
@@ -192,6 +194,7 @@ export const socketHandler = (io: Server) => {
             );
             if (receiverOnline) {
               receiverOnline.socket.emit(`notification-${receiver.id}`, {
+                id: nanoid(),
                 userId: receiverLikeId,
                 otherUserId: senderLikeId,
                 otherUser: sender,
@@ -199,11 +202,13 @@ export const socketHandler = (io: Server) => {
                 date: new Date(),
                 read: false,
               });
+              receiverOnline.socket.emit(`notification-bubble`);
             }
 
             const senderOnline = connectedUsers.find((u) => u.id === sender.id);
             if (senderOnline) {
               senderOnline.socket.emit(`notification-${sender.id}`, {
+                id: nanoid(),
                 userId: senderLikeId,
                 otherUserId: receiverLikeId,
                 otherUser: receiver,
@@ -211,6 +216,7 @@ export const socketHandler = (io: Server) => {
                 date: new Date(),
                 read: false,
               });
+              senderOnline.socket.emit(`notification-bubble`);
             }
           } else {
             // No match just a like
@@ -228,6 +234,7 @@ export const socketHandler = (io: Server) => {
             );
             if (receiverOnline) {
               receiverOnline.socket.emit(`notification-${receiver.id}`, {
+                id: nanoid(),
                 userId: receiverLikeId,
                 otherUserId: senderLikeId,
                 otherUser: sender,
@@ -254,6 +261,7 @@ export const socketHandler = (io: Server) => {
 
           if (receiverOnline) {
             receiverOnline.socket.emit(`notification-${receiver.id}`, {
+              id: nanoid(),
               userId: receiverLikeId,
               otherUserId: senderLikeId,
               otherUser: sender,
@@ -261,7 +269,21 @@ export const socketHandler = (io: Server) => {
               date: new Date(),
               read: false,
             });
+            receiverOnline.socket.emit(`notification-bubble`);
           }
+
+          // const senderOnline = connectedUsers.find((u) => u.id === sender.id);
+          // if (senderOnline) {
+          //   senderOnline.socket.emit(`notification-${sender.id}`, {
+          //     id: nanoid(),
+          //     userId: senderLikeId,
+          //     otherUserId: receiverLikeId,
+          //     otherUser: receiver,
+          //     type: 'Unlike',
+          //     date: new Date(),
+          //     read: false,
+          //   });
+          // }
         }
       },
       'send-view': async (args) => {
