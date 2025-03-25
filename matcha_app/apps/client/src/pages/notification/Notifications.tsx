@@ -25,7 +25,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSession } from '../../hooks/useSession';
 import { axiosFetch } from '../../lib/fetch-utils/axiosFetch';
-import { getIcon, useSetReadNotif } from './Notifications-utils';
+import { getIcon } from './Notifications-utils';
 import { getUrl } from '@matcha/common';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { NavigationProvider } from 'react-day-picker';
@@ -122,29 +122,29 @@ const NotificationsList: React.FC = () => {
     }
   };
 
-  // const setReadNotif = useMutation({
-  //     mutationFn: async () => {
-  //       return await axiosFetch({
-  //         method: 'POST',
-  //         url: getUrl('api-notifications', { type: 'update' }),
-  //         schemas: updateNotificationSchemas,
-  //         data: {
-  //           userId: session.user!.id,
-  //           otherUserId: otherUserId,
-  //           type: 'Like',
-  //           read: true,
-  //         },
-  //         handleEnding: {
-  //           cb: (data) => {
-  //             // console.log('invalidate query from setReadMessageNotif mutation');
-  //             queryClient.invalidateQueries({
-  //               queryKey: ['notifications'],
-  //             });
-  //           },
-  //         },
-  //       });
-  //     },
-  //   });
+  const setReadNotif = useMutation({
+    mutationFn: async (params: { otherUserId: number; type: string }) => {
+      return await axiosFetch({
+        method: 'POST',
+        url: getUrl('api-notifications', { type: 'update' }),
+        schemas: updateNotificationSchemas,
+        data: {
+          userId: session.user!.id,
+          otherUserId: params.otherUserId,
+          type: params.type,
+          read: true,
+        },
+        handleEnding: {
+          cb: (data) => {
+            // console.log('invalidate query from setReadMessageNotif mutation');
+            queryClient.invalidateQueries({
+              queryKey: ['notifications'],
+            });
+          },
+        },
+      });
+    },
+  });
 
   useEffect(() => {
     const notificationHandler = (
@@ -198,6 +198,10 @@ const NotificationsList: React.FC = () => {
                 notification.userId as number
               );
             else {
+              setReadNotif.mutate({
+                otherUserId: notification.otherUserId as number,
+                type: notification.type,
+              });
               navigate(getNotificationLink(notification));
             }
           }}
