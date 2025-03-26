@@ -15,6 +15,7 @@ export const getUsersSchemas = {
         'birthDate',
         'biography',
         'lastTimeOnline',
+        'isOnline',
       ])
     ),
   }),
@@ -35,6 +36,8 @@ export const getUserSchemas = {
       'age',
       'birthDate',
       'biography',
+      'lastTimeOnline',
+      'isOnline',
     ]),
   }),
 };
@@ -54,6 +57,7 @@ export const updateUserSchemas = {
       'biography',
     ]).shape,
     tags: z.array(tagSchema.pick(['name']).shape.name),
+    location: z.string(),
   }),
   response: z.object({
     message: z.string(),
@@ -62,6 +66,15 @@ export const updateUserSchemas = {
 export type TUpdateUserSchemas = {
   requirements: Infer<typeof updateUserSchemas.requirements>;
   response: Infer<typeof updateUserSchemas.response>;
+};
+
+export const getUserFameSchemas = {
+  response: z.object({
+    fame: z.number(),
+  }),
+};
+export type TGetUserFameSchemas = {
+  response: Infer<typeof getUserFameSchemas.response>;
 };
 
 export const askResetPasswordSchemas = {

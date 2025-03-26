@@ -77,8 +77,16 @@ export type {
   TDeleteLikeSchemas,
   TIsLikedSchemas,
 } from './schemas/api/like.schema';
-export { updateLocationSchemas } from './schemas/api/location.schema';
-export type { TUpdateLocationSchemas } from './schemas/api/location.schema';
+export {
+  getUserLocationSchemas,
+  isNeedUpdateLocationSchemas,
+  updateLocationSchemas,
+} from './schemas/api/location.schema';
+export type {
+  TGetUserLocationSchemas,
+  TIsNeedUpdateLocationSchemas,
+  TUpdateLocationSchemas,
+} from './schemas/api/location.schema';
 export { messagesSchemas } from './schemas/api/messages.schema';
 export type { TMessagesSchemas } from './schemas/api/messages.schema';
 export {
@@ -120,6 +128,7 @@ export type {
 } from './schemas/api/tags.schema';
 export {
   askResetPasswordSchemas,
+  getUserFameSchemas,
   getUserSchemas,
   getUsersSchemas,
   resetPasswordSchemas,
@@ -127,6 +136,7 @@ export {
 } from './schemas/api/users.schema';
 export type {
   TAskResetPasswordSchemas,
+  TGetUserFameSchemas,
   TGetUserSchemas,
   TGetUsersSchemas,
   TResetPasswordSchemas,

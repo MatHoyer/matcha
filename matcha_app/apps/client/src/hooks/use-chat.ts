@@ -3,14 +3,14 @@ import { create } from 'zustand';
 
 type TChatWindow = {
   id: string;
-  otherUser: TUser;
+  otherUser: Omit<TUser, 'password'>;
   status: 'full' | 'collapse';
 };
 
 type TChatStore = {
   openedChats: TChatWindow[];
   setChatStatus: (id: string, status: TChatWindow['status']) => void;
-  addChatWindow: (otherUser: TUser, userId: Number) => void;
+  addChatWindow: (otherUser: Omit<TUser, 'password'>, userId: number) => void;
   removeChatWindow: (id: string) => void;
 };
 

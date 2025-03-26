@@ -1,5 +1,6 @@
 import {
   getUrl,
+  isNeedUpdateLocationSchemas,
   TUser,
   TUserWithNames,
   updateLocationSchemas,
@@ -12,20 +13,19 @@ import {
   MessageCircleHeart,
   Search,
 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { isNeedUpdateLocationSchemas } from '../../common/src/schemas/api/location.schema';
 import { ChatContainer } from './components/chat/ChatContainer';
 import { Logo } from './components/images/Logo';
 import { NavItemDropdown, NavItems } from './components/sidebar/NavComp';
 import { NavigationWrapper } from './components/sidebar/NavigationWrapper';
 import { UserDropdownTrigger } from './components/sidebar/UserDropdownTrigger';
 import { SidebarGroup, SidebarMenu } from './components/ui/sidebar';
+import { useChatStore } from './hooks/use-chat';
 import { useSession } from './hooks/useSession';
 import { useUsers } from './hooks/useUsers';
 import { axiosFetch } from './lib/fetch-utils/axiosFetch';
 import { Pages } from './pages/Pages';
-import { useChatStore } from './hooks/use-chat';
 
 const App = () => {
   const session = useSession();

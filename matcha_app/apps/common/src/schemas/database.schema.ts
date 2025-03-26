@@ -1,10 +1,5 @@
 import { differenceInYears } from 'date-fns';
-import {
-  GENDERS,
-  NOTIF_TYPES,
-  NOTIF_TYPES_MESSAGES,
-  ORIENTATIONS,
-} from '../utils/datas';
+import { GENDERS, NOTIF_TYPES, ORIENTATIONS } from '../utils/datas';
 import { Infer, z } from '../validator/validator';
 
 export const genderSchema = z.enum(GENDERS);
@@ -30,6 +25,7 @@ export const userSchema = z.object({
   preference: orientationSchema,
   biography: z.string().optional().nullable(),
   lastTimeOnline: z.date(),
+  isOnline: z.boolean().optional(),
 });
 export type TUser = Infer<typeof userSchema>;
 export type TUserWithNames = Pick<TUser, 'id' | 'name' | 'lastName'>;

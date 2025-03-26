@@ -7,6 +7,7 @@ import {
   GENDERS,
   getTagsSchemas,
   getUrl,
+  getUserLocationSchemas,
   ORIENTATIONS,
   TGender,
   TOrientation,
@@ -15,6 +16,7 @@ import {
 } from '@matcha/common';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect } from 'react';
+import GlobalLocationCombobox from '../comboxes/GlobalLocation.combobox';
 import MultiTagCombobox from '../comboxes/Tag.combobox';
 import { DatePicker } from '../ui/date-time-picker';
 import {
@@ -40,6 +42,7 @@ type TForm = {
   birthDate: Date;
   biography: string | null | undefined;
   tags: string[];
+  location: string;
 };
 
 export const ProfileForm: React.FC<
@@ -53,6 +56,7 @@ export const ProfileForm: React.FC<
       ...session!.user,
       biography: session!.user!.biography || '',
       tags: [],
+      location: '',
       ...defaultValues,
     },
   });
@@ -74,6 +78,24 @@ export const ProfileForm: React.FC<
               'tags',
               data.tags.map((tag) => tag.name)
             );
+          },
+        },
+      }),
+  });
+
+  useQuery({
+    queryKey: ['location', session!.user!.id],
+    queryFn: () =>
+      axiosFetch({
+        method: 'GET',
+        url: getUrl('api-location', {
+          type: 'near/user',
+          id: session!.user!.id,
+        }),
+        schemas: getUserLocationSchemas,
+        handleEnding: {
+          cb: (data) => {
+            form.setValue('location', data.location.name);
           },
         },
       }),
@@ -233,6 +255,20 @@ export const ProfileForm: React.FC<
           </FormItem>
         )}
       />
+      <FormField
+        control={form.control}
+        name="location"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Location (update every days)</FormLabel>
+            <FormControl>
+              <GlobalLocationCombobox {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <div className="mt-4" />
       <FormMessage>{form.formState.errors.root?.message}</FormMessage>
       <SubmitButtonForm modal={modal} isLoading={mutation.isPending}>
         Update profile

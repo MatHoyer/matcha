@@ -13,6 +13,7 @@ import { ResetPasswordMail } from '../emails/patterns/ResetPasswordMail';
 import { sendEmail } from '../emails/sendEmail';
 import { env } from '../env';
 import { hashPassword } from '../services/auth.service';
+import { fameCalculator } from '../services/search.service';
 import { defaultResponse } from '../utils/defaultResponse';
 
 export const getUsers = async (_req: Request, res: Response) => {
@@ -127,6 +128,47 @@ export const updateUser = async (req: Request, res: Response) => {
     });
   }
 
+  const { location } = req.body as TUpdateUserSchemas['requirements'];
+  const globalLocation = await db.globalLocation.findFirst({
+    where: {
+      name: location,
+    },
+  });
+  if (!globalLocation) {
+    return defaultResponse({
+      res,
+      status: 404,
+      json: {
+        message: 'Location not found',
+        fields: [{ field: 'location', message: 'Location not found' }],
+      },
+    });
+  }
+  const userLocation = await db.userLocation.findFirst({
+    where: {
+      userId: +id,
+    },
+  });
+  if (!userLocation) {
+    return defaultResponse({
+      res,
+      status: 404,
+      json: {
+        message: 'User location not found',
+        fields: [{ field: 'location', message: 'User location not found' }],
+      },
+    });
+  }
+
+  await db.location.update({
+    where: { id: userLocation.locationId },
+    data: {
+      latitude: globalLocation.latitude,
+      longitude: globalLocation.longitude,
+      date: new Date(),
+    },
+  });
+
   const { name, lastName, email, gender, preference, birthDate, biography } =
     req.body as TUpdateUserSchemas['requirements'];
   await db.user.update({
@@ -157,6 +199,26 @@ export const updateUser = async (req: Request, res: Response) => {
       message: 'User updated',
     },
   });
+};
+
+export const getUserFame = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const user = await db.user.findFirst({
+    where: {
+      id: +id,
+    },
+  });
+  if (!user) {
+    return defaultResponse({
+      res,
+      status: 404,
+      json: { message: 'User not found' },
+    });
+  }
+
+  const userFame = await fameCalculator(user.id);
+
+  res.status(200).json({ fame: userFame.fame });
 };
 
 export const askResetPassword = async (req: Request, res: Response) => {

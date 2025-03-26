@@ -1,10 +1,10 @@
 import { events, Infer, TUser } from '@matcha/common';
 import { parse } from 'cookie';
 import jwt from 'jsonwebtoken';
+import { nanoid } from 'nanoid';
 import { Server, Socket } from 'socket.io';
 import db from '../database/Database';
 import { env } from '../env';
-import { nanoid } from 'nanoid';
 
 type Events = typeof events;
 type InferEvent<T extends keyof Events> = Infer<Events[T]>;
@@ -65,16 +65,15 @@ export const socketHandler = (io: Server) => {
       } else {
         user.socket = socket;
       }
-      setInterval(async () => {
-        await db.user.update({
-          where: {
-            id: userPayload.id,
-          },
-          data: {
-            lastTimeOnline: new Date(),
-          },
-        });
-      }, 5 * 60 * 1000);
+
+      await db.user.update({
+        where: {
+          id: dbUser.id,
+        },
+        data: {
+          isOnline: true,
+        },
+      });
     } catch (error) {
       console.error('Error parsing token', error);
       socket.disconnect();
@@ -139,8 +138,20 @@ export const socketHandler = (io: Server) => {
           message,
         });
       },
-      disconnect: (_args) => {
-        console.log(`User disconnected: ${socket.id}`);
+      disconnect: async (_args) => {
+        const user = connectedUsers.find((u) => u.socket.id === socket.id);
+        if (!user) return;
+        await db.user.update({
+          where: {
+            id: user.id,
+          },
+          data: {
+            isOnline: false,
+            lastTimeOnline: new Date(),
+          },
+        });
+        connectedUsers.splice(connectedUsers.indexOf(user), 1);
+        console.log('User disconnected', connectedUsers);
       },
     });
   });

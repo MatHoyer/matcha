@@ -89,7 +89,7 @@ const MatchRow: React.FC<{
               {gUser.user.biography}
             </Typography>
           </div>
-          <div className="flex gap-2">
+          <div className="grid grid-cols-2 md:flex gap-2">
             <Typography variant="code" className="flex items-center gap-1">
               {gUser.user.gender === 'Male' ? <Mars /> : <Venus />}{' '}
               {gUser.user.gender}
