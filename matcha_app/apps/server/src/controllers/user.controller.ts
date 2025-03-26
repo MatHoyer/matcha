@@ -55,7 +55,8 @@ export const getUser = async (req: Request, res: Response) => {
         },
       });
     }
-    res.status(200).json({ user });
+    const userWithoutPassword = { ...user, password: undefined };
+    res.status(200).json({ user: userWithoutPassword });
   } catch (error) {
     console.error('Error fetching user:', error);
     defaultResponse({

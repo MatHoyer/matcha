@@ -71,7 +71,7 @@ export const UserProfile = () => {
     queryFn: async () => {
       return await axiosFetch({
         method: 'GET',
-        url: getUrl('api-users', { id: +id! }),
+        url: getUrl('api-users', { id: +id!, type: 'fame' }),
         schemas: getUserFameSchemas,
         handleEnding: {
           cb: (data) => {
