@@ -151,9 +151,12 @@ const App = () => {
         queryClient.invalidateQueries({
           queryKey: ['matchUsers'],
         });
+        queryClient.invalidateQueries({
+          queryKey: ['userMatched'],
+        });
       }
     };
-    console.log(`before socket on notification-${session.user?.id}`);
+    // console.log(`before socket on notification-${session.user?.id}`);
     socket.on(`notification-${session.user?.id}`, chatListHandler);
     return () => {
       socket.off(`notification-${session.user?.id}`, chatListHandler);

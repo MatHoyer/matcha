@@ -8,6 +8,7 @@ import {
   resetPassword,
   updateUser,
   getMatchUser,
+  haveMatched,
 } from '../controllers/user.controller';
 import { bodyParser } from '../middlewares/bodyParser.middleware';
 import { isLogged } from '../middlewares/isLogged.middleware';
@@ -49,6 +50,13 @@ userRouter.get(
   isLogged,
   paramsParser(z.object({ id: z.number() })),
   getMatchUser
+);
+
+userRouter.get(
+  '/matched/:id',
+  isLogged,
+  paramsParser(z.object({ id: z.number() })),
+  haveMatched
 );
 
 export default userRouter;

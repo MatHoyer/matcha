@@ -133,6 +133,7 @@ export {
   getUsersSchemas,
   resetPasswordSchemas,
   updateUserSchemas,
+  usersMatchSchemas,
 } from './schemas/api/users.schema';
 export type {
   TAskResetPasswordSchemas,

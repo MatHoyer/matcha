@@ -23,6 +23,7 @@ import {
   getUserTagsSchemas,
   isLikedSchemas,
   TTag,
+  usersMatchSchemas,
 } from '@matcha/common';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Heart, MessageCircle } from 'lucide-react';
@@ -40,6 +41,7 @@ export const UserProfile = () => {
   const [isLiked, setIsLiked] = useState(false);
   const { addChatWindow } = useChatStore();
   const [fame, setFame] = useState(1);
+  const [haveMatched, setHaveMatched] = useState(false);
 
   const userQuery = useQuery({
     queryKey: ['user', id],
@@ -167,6 +169,25 @@ export const UserProfile = () => {
     },
   });
 
+  useQuery({
+    queryKey: ['userMatched'],
+    queryFn: async () => {
+      return await axiosFetch({
+        method: 'GET',
+        url: getUrl('api-users', {
+          type: 'matched',
+          id: +id!,
+        }),
+        schemas: usersMatchSchemas,
+        handleEnding: {
+          cb: (data) => {
+            setHaveMatched(data.matched);
+          },
+        },
+      });
+    },
+  });
+
   const likeMutation = useMutation({
     mutationFn: async () => {
       return await axiosFetch({
@@ -184,6 +205,9 @@ export const UserProfile = () => {
           cb: () => {
             queryClient.invalidateQueries({
               queryKey: ['liked', id],
+            });
+            queryClient.invalidateQueries({
+              queryKey: ['userMatched'],
             });
             socket.emit('send-like-unlike', {
               senderLikeId: session.user?.id,
@@ -251,10 +275,13 @@ export const UserProfile = () => {
                 </Button>
                 <Button
                   size="icon"
-                  className="rounded-full"
+                  className={`rounded-full ${
+                    !haveMatched ? 'opacity-50 cursor-not-allowed' : ''
+                  }`}
                   onClick={() => {
                     addChatWindow(userQuery.data!.user, session.user!.id);
                   }}
+                  disabled={!haveMatched}
                 >
                   <MessageCircle />
                 </Button>

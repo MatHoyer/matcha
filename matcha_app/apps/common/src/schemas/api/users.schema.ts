@@ -24,6 +24,12 @@ export type TGetUsersSchemas = {
   response: Infer<typeof getUsersSchemas.response>;
 };
 
+export const usersMatchSchemas = {
+  response: z.object({
+    matched: z.boolean(),
+  }),
+};
+
 export const getUserSchemas = {
   response: z.object({
     user: userSchema.pick([
