@@ -110,7 +110,7 @@ export type TUserLocation = Infer<typeof userLocationSchema>;
 export const viewSchema = z.object({
   id: z.number(),
   userId: userSchema.pick(['id']).shape.id,
-  viewedId: userSchema.pick(['id']).shape.id,
+  viewerId: userSchema.pick(['id']).shape.id,
   date: z.date(),
 });
 export type TView = Infer<typeof viewSchema>;

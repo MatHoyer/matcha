@@ -19,167 +19,27 @@ import {
   notificationsSchemas,
   TNotificationsOtherUserSchema,
   TUser,
+  updateNotificationSchemas,
 } from '@matcha/common';
-import {
-  Eye,
-  Heart,
-  HeartOff,
-  MessageCircle,
-  MessageCircleHeart,
-  Rows4,
-} from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getUrl } from '../../../../common/src/utils/getUrl';
 import { useSession } from '../../hooks/useSession';
 import { axiosFetch } from '../../lib/fetch-utils/axiosFetch';
+import { getIcon } from './Notifications-utils';
+import { getUrl } from '@matcha/common';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { NavigationProvider } from 'react-day-picker';
 
 const NotificationsList: React.FC = () => {
   const { notifications, setNotifications } = useSetNotification();
-  const [loading, setLoading] = useState(true);
   const session = useSession();
   const navigate = useNavigate();
   const { addChatWindow } = useChatStore();
   const handleChatClick = (otherUser: TUser, userId: number) => {
     addChatWindow(otherUser, userId);
   };
-
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        await axiosFetch({
-          method: 'POST',
-          url: getUrl('api-notifications', { type: 'get' }),
-          schemas: notificationsSchemas,
-          data: { userId: session.user!.id },
-          handleEnding: {
-            cb: (data) => {
-              const formattedNotifications = data.notificationsWithUser.map(
-                (notification: TNotificationsOtherUserSchema) => ({
-                  ...notification,
-                  dateTime: new Date(notification.date),
-                })
-              );
-              formattedNotifications.sort(
-                (a, b) => b.dateTime.getTime() - a.dateTime.getTime()
-              );
-              // console.log('formatted notif : ', formattedNotifications);
-              setNotifications(formattedNotifications);
-            },
-          },
-        });
-      } catch (error) {
-        console.log(`Error while fetching notifications: ${error}`);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchNotifications();
-  }, []);
-
-  const getIcon = (type: string) => {
-    if (type === 'All') {
-      return <Rows4 className="w-4 h-4" />;
-    }
-    if (type === 'Message') {
-      return <MessageCircle className="w-4 h-4" />;
-    }
-    if (type === 'Like') {
-      return <Heart className="w-4 h-4" />;
-    }
-    if (type === 'View') {
-      return <Eye className="w-4 h-4" />;
-    }
-    if (type === 'Match') {
-      return <MessageCircleHeart className="w-4 h-4" />;
-    }
-    if (type === 'Unlike') {
-      return <HeartOff className="w-4 h-4" />;
-    }
-    return null;
-  };
-
-  const getNotificationLink = (notification: TNotificationsOtherUserSchema) => {
-    if (notification.type === 'Message') {
-      return `/chat/${notification.userId}`;
-    }
-    if (notification.type === 'Like' || notification.type === 'View') {
-      return `/profile/${notification.userId}`;
-    }
-    return '#';
-  };
-
-  // const groupedNotifications = notifications.reduce(
-  //   (
-  //     acc: Record<string, TNotificationsOtherUserSchema & { count: number }>,
-  //     notification: TNotificationsOtherUserSchema
-  //   ) => {
-  //     const key = `${notification.userId}-${notification.message}`;
-  //     if (!acc[key]) {
-  //       acc[key] = { ...notification, count: 1 };
-  //     } else {
-  //       acc[key].count += 1;
-  //     }
-  //     return acc;
-  //   },
-  //   {}
-  // );
-
-  const getMessageNotification = (
-    notification: TNotificationsOtherUserSchema
-  ) => {
-    const userName = notification.otherUser?.name ?? 'unknown user';
-    if (notification.type === 'Message') {
-      return (
-        <>
-          {NOTIF_TYPES_MESSAGES[notification.type]}{' '}
-          <div
-            className="hover:inline-block"
-            onClick={() => navigate(`/profile/${notification.otherUser?.id}`)}
-          >
-            {userName}
-          </div>
-        </>
-      );
-    }
-
-    if (notification.type === 'Like' || notification.type === 'View') {
-      return (
-        <>
-          {' '}
-          {/* <a
-            href={`/profile/${notification.otherUser?.id}`}
-            onClick={(e) => e.stopPropagation()}
-            className="hover:underline"
-          > */}
-          <div
-            className="hover:inline-block"
-            onClick={() => navigate(`/profile/${notification.otherUser?.id}`)}
-          >
-            {userName}
-          </div>{' '}
-          {NOTIF_TYPES_MESSAGES[notification.type]}
-        </>
-      );
-    }
-  };
-
-  useEffect(() => {
-    const notificationHandler = (
-      newNotification: TNotificationsOtherUserSchema
-    ) => {
-      setNotifications((prev) => [newNotification, ...prev]);
-    };
-    socket.on(`notification-${session.user!.id}`, notificationHandler);
-
-    return () => {
-      socket.off(`notification-${session.user!.id}`, notificationHandler);
-    };
-  }, []);
-
-  // const formattedNotifications = Object.values(groupedNotifications);
+  const queryClient = useQueryClient();
   const formattedNotifications = notifications;
-
   const [selectedType, setSelectedType] = useState('All');
   const filteredNotifications =
     selectedType && selectedType !== 'All'
@@ -188,6 +48,134 @@ const NotificationsList: React.FC = () => {
         )
       : formattedNotifications;
   const typeNotif = ['All', ...NOTIF_TYPES];
+
+  useQuery({
+    queryKey: ['notifications'],
+    queryFn: async () => {
+      return await axiosFetch({
+        method: 'POST',
+        url: getUrl('api-notifications', { type: 'get' }),
+        schemas: notificationsSchemas,
+        data: { userId: session.user!.id },
+        handleEnding: {
+          cb: (data) => {
+            const formattedNotifications = data.notificationsWithUser.map(
+              (notification: TNotificationsOtherUserSchema) => ({
+                ...notification,
+                dateTime: new Date(notification.date),
+              })
+            );
+            formattedNotifications.sort(
+              (a, b) => b.dateTime.getTime() - a.dateTime.getTime()
+            );
+            setNotifications(formattedNotifications);
+            console.log('formattedNotifications : ', formattedNotifications);
+          },
+        },
+      });
+    },
+  });
+
+  const getNotificationLink = (notification: TNotificationsOtherUserSchema) => {
+    return `/profile/${notification.otherUser?.id}`;
+  };
+
+  const getMessageNotification = (
+    notification: TNotificationsOtherUserSchema
+  ) => {
+    const userName = notification.otherUser?.name ?? 'unknown user';
+    if (notification.type === 'Message' || notification.type === 'Match') {
+      return (
+        <span>
+          {NOTIF_TYPES_MESSAGES[notification.type]}{' '}
+          <span
+            className="hover:underline"
+            onClick={(e) => {
+              e.stopPropagation();
+              if (notification.type === 'Match') {
+                setReadNotif.mutate({
+                  otherUserId: notification.otherUserId as number,
+                  type: notification.type,
+                });
+              }
+              navigate(`/profile/${notification.otherUser?.id}`);
+            }}
+          >
+            {userName}
+          </span>
+        </span>
+      );
+    }
+    if (
+      notification.type === 'Like' ||
+      notification.type === 'Unlike' ||
+      notification.type === 'View'
+    ) {
+      return (
+        <span>
+          <span
+            className="hover:underline"
+            onClick={(e) => {
+              e.stopPropagation();
+              setReadNotif.mutate({
+                otherUserId: notification.otherUserId as number,
+                type: notification.type,
+              });
+              navigate(`/profile/${notification.otherUser?.id}`);
+            }}
+          >
+            {userName}
+          </span>{' '}
+          {NOTIF_TYPES_MESSAGES[notification.type]}
+        </span>
+      );
+    }
+  };
+
+  const setReadNotif = useMutation({
+    mutationFn: async (params: { otherUserId: number; type: string }) => {
+      return await axiosFetch({
+        method: 'POST',
+        url: getUrl('api-notifications', { type: 'update' }),
+        schemas: updateNotificationSchemas,
+        data: {
+          userId: session.user!.id,
+          otherUserId: params.otherUserId,
+          type: params.type,
+          read: true,
+        },
+        handleEnding: {
+          cb: (data) => {
+            // console.log('invalidate query from setReadMessageNotif mutation');
+            queryClient.invalidateQueries({
+              queryKey: ['notifications'],
+            });
+          },
+        },
+      });
+    },
+  });
+
+  useEffect(() => {
+    const notificationHandler = (
+      newNotification: TNotificationsOtherUserSchema
+    ) => {
+      if (
+        newNotification.type === 'Unlike' ||
+        newNotification.type === 'Match'
+      ) {
+        queryClient.invalidateQueries({
+          queryKey: ['matchUsers'],
+        });
+      }
+      setNotifications((prev) => [newNotification, ...prev]);
+    };
+
+    socket.on(`notification-${session.user!.id}`, notificationHandler);
+    return () => {
+      socket.off(`notification-${session.user!.id}`, notificationHandler);
+    };
+  }, []);
 
   return (
     <LayoutContent className="flex flex-col gap-2">
@@ -219,7 +207,13 @@ const NotificationsList: React.FC = () => {
                 notification.otherUser as TUser,
                 notification.userId as number
               );
-            else navigate(getNotificationLink(notification));
+            else {
+              setReadNotif.mutate({
+                otherUserId: notification.otherUserId as number,
+                type: notification.type,
+              });
+              navigate(getNotificationLink(notification));
+            }
           }}
         >
           <div className="flex items-center justify-between gap-4">
@@ -229,17 +223,7 @@ const NotificationsList: React.FC = () => {
               </Avatar>
 
               <div className="flex flex-col text-left">
-                <span>
-                  {/* {notification.count > 1
-                    ? notification.message.replace(
-                        'a new message',
-                        `${notification.count} new messages`
-                      ) +
-                      ' ' +
-                      notification.otherUser?.name
-                    : notification.message + ' ' + notification.otherUser?.name} */}
-                  {getMessageNotification(notification)}
-                </span>
+                <span>{getMessageNotification(notification)}</span>
                 <CardDescription>
                   {getNearDate(notification.date)}
                 </CardDescription>

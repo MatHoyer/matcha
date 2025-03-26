@@ -1,11 +1,13 @@
 import {
   getUrl,
+  getUsersSchemas,
   isNeedUpdateLocationSchemas,
+  TNotificationsOtherUserSchema,
   TUser,
   TUserWithNames,
   updateLocationSchemas,
 } from '@matcha/common';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   Crosshair,
   Heart,
@@ -25,15 +27,40 @@ import { useChatStore } from './hooks/use-chat';
 import { useSession } from './hooks/useSession';
 import { useUsers } from './hooks/useUsers';
 import { axiosFetch } from './lib/fetch-utils/axiosFetch';
+import { socket } from './lib/socket';
 import { Pages } from './pages/Pages';
 
 const App = () => {
   const session = useSession();
   const navigate = useNavigate();
   const { users } = useUsers();
+
   const usersAllButAuthUser = users.filter(
     (user: TUserWithNames) => user.id !== session.user?.id
   );
+  const queryClient = useQueryClient();
+  const [matchUsers, setMatchUsers] = useState<
+    Pick<TUser, 'id' | 'name' | 'lastName'>[]
+  >([]);
+
+  useQuery({
+    queryKey: ['matchUsers'],
+    queryFn: async () => {
+      return await axiosFetch({
+        method: 'GET',
+        url: getUrl('api-users', {
+          type: 'match',
+          id: session!.user!.id,
+        }),
+        schemas: getUsersSchemas,
+        handleEnding: {
+          cb: (data) => {
+            setMatchUsers(data.users);
+          },
+        },
+      });
+    },
+  });
 
   const { openedChats, addChatWindow, removeChatWindow } = useChatStore();
 
@@ -113,6 +140,24 @@ const App = () => {
         }
       );
     }
+
+    const chatListHandler = (
+      newNotification: TNotificationsOtherUserSchema
+    ) => {
+      if (
+        newNotification.type === 'Unlike' ||
+        newNotification.type === 'Match'
+      ) {
+        queryClient.invalidateQueries({
+          queryKey: ['matchUsers'],
+        });
+      }
+    };
+    console.log(`before socket on notification-${session.user?.id}`);
+    socket.on(`notification-${session.user?.id}`, chatListHandler);
+    return () => {
+      socket.off(`notification-${session.user?.id}`, chatListHandler);
+    };
   }, [isNeedUpdateLocationQuery.data]);
 
   return (
@@ -155,10 +200,12 @@ const App = () => {
                 item={{
                   title: 'Chat',
                   icon: MessageCircleHeart,
-                  items: usersAllButAuthUser.map((otherUser) => ({
-                    title: `${otherUser.name} ${otherUser.lastName} ${otherUser.id}`,
+                  items: matchUsers.map((user) => ({
+                    title: `${user.name} ${user.lastName}`,
                     url: '',
-                    onClick: () => handleChatClick(otherUser as TUser),
+                    onClick: () => {
+                      handleChatClick(user as TUser);
+                    },
                   })),
                 }}
               />

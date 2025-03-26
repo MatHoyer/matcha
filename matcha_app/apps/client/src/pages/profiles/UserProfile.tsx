@@ -28,6 +28,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Heart, MessageCircle } from 'lucide-react';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
+import { socket } from '../../lib/socket';
 
 export const UserProfile = () => {
   const { id } = useParams();
@@ -39,6 +40,7 @@ export const UserProfile = () => {
   const [isLiked, setIsLiked] = useState(false);
   const { addChatWindow } = useChatStore();
   const [fame, setFame] = useState(1);
+  const session = useSession();
 
   const userQuery = useQuery({
     queryKey: ['user', id],
@@ -48,6 +50,35 @@ export const UserProfile = () => {
         method: 'GET',
         url: getUrl('api-users', { id: +id }),
         schemas: getUserSchemas,
+        handleEnding: {
+          cb: (data) => {
+            console.log(
+              `about to emit send view ! senderViewId : ${session.user?.id} receiverViewId : ${id}`
+            );
+            if (session.user?.id !== +id) {
+              socket.emit('send-view', {
+                senderViewId: session.user?.id,
+                receiverViewId: id,
+              });
+            }
+          },
+        },
+      });
+    },
+  });
+
+  useQuery({
+    queryKey: ['fame', id],
+    queryFn: async () => {
+      return await axiosFetch({
+        method: 'GET',
+        url: getUrl('api-users', { id: +id! }),
+        schemas: getUserFameSchemas,
+        handleEnding: {
+          cb: (data) => {
+            setFame(data.fame);
+          },
+        },
       });
     },
   });
@@ -154,6 +185,13 @@ export const UserProfile = () => {
           cb: () => {
             queryClient.invalidateQueries({
               queryKey: ['liked', id],
+            });
+            socket.emit('send-like-unlike', {
+              senderLikeId: session.user?.id,
+              receiverLikeId: id,
+            });
+            queryClient.invalidateQueries({
+              queryKey: ['matchUsers'],
             });
           },
         },

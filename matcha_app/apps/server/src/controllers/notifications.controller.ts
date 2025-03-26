@@ -24,7 +24,7 @@ export const getNotifications = async (req: Request, res: Response) => {
         return { ...notification, otherUser };
       })
     );
-    console.log('notif :', notificationsWithUser);
+    // console.log('notif :', notificationsWithUser);
     res.status(200).json({ notificationsWithUser });
   } catch (error) {
     console.error('Error fetching messages:', error);

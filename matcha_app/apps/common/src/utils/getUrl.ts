@@ -34,7 +34,7 @@ export type TApiRouteDataRequirements = {
   };
   'api-users': {
     id?: number;
-    type?: 'reset-password' | 'fame';
+    type?: 'reset-password' | 'fame' | 'match';
   };
   'api-messages': {
     id?: number;
