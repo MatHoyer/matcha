@@ -92,6 +92,12 @@ const NotificationsList: React.FC = () => {
             className="hover:underline"
             onClick={(e) => {
               e.stopPropagation();
+              if (notification.type === 'Match') {
+                setReadNotif.mutate({
+                  otherUserId: notification.otherUserId as number,
+                  type: notification.type,
+                });
+              }
               navigate(`/profile/${notification.otherUser?.id}`);
             }}
           >
@@ -111,6 +117,10 @@ const NotificationsList: React.FC = () => {
             className="hover:underline"
             onClick={(e) => {
               e.stopPropagation();
+              setReadNotif.mutate({
+                otherUserId: notification.otherUserId as number,
+                type: notification.type,
+              });
               navigate(`/profile/${notification.otherUser?.id}`);
             }}
           >

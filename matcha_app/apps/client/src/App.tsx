@@ -202,7 +202,7 @@ const App = () => {
                   title: 'Chat',
                   icon: MessageCircleHeart,
                   items: matchUsers.map((user) => ({
-                    title: `${user.name} ${user.lastName} ${user.id}`,
+                    title: `${user.name} ${user.lastName}`,
                     url: '',
                     onClick: () => {
                       handleChatClick(user as TUser);
