@@ -39,3 +39,32 @@ export type TAdvancedSearchSchema = {
     }[];
   };
 };
+
+export const suggestUsersSchema = {
+  response: z.object({
+    users: z.array(
+      z.object({
+        user: userSchema,
+        location: z.string(),
+        tags: z.array(tagSchema),
+        fame: z.number(),
+      })
+    ),
+  }),
+};
+export type TSuggestUsersSchema = {
+  response: {
+    users: {
+      user: Infer<typeof userSchema>;
+      location: Infer<
+        typeof advancedSearchSchema.response
+      >['users'][number]['location'];
+      tags: Infer<
+        typeof advancedSearchSchema.response
+      >['users'][number]['tags'];
+      fame: Infer<
+        typeof advancedSearchSchema.response
+      >['users'][number]['fame'];
+    }[];
+  };
+};

@@ -145,3 +145,36 @@ export const advancedSearch = async (req: Request, res: Response) => {
 
   res.status(200).json({ users: usersResponse });
 };
+
+export const suggestedUsers = async (req: Request, res: Response) => {
+  console.log('--- suggestedUsers ---');
+  // const id = req.params.id;
+  // try {
+  //   const users = await db.user.findMany({
+  //     where: {
+  //       id: +id,
+  //     },
+  //   });
+  //   if (!users) {
+  //     return defaultResponse({
+  //       res,
+  //       status: 404,
+  //       json: {
+  //         message: 'User not found',
+  //       },
+  //     });
+  //   }
+  //   const user = users[0];
+  //   const userTags = await db.userTag.findMany({
+  //     where: {
+  //       userId: +id,
+  //     },
+  //   });
+  // } catch (error) {
+  //   defaultResponse({
+  //     res,
+  //     status: 500,
+  //     json: { message: 'Internal Server Error' },
+  //   });
+  // }
+};
