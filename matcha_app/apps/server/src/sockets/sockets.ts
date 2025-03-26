@@ -368,6 +368,7 @@ export const socketHandler = (io: Server) => {
         });
         connectedUsers.splice(connectedUsers.indexOf(user), 1);
         console.log('User disconnected', connectedUsers);
+      },
     });
   });
 };

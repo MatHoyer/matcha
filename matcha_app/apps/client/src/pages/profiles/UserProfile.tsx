@@ -40,7 +40,6 @@ export const UserProfile = () => {
   const [isLiked, setIsLiked] = useState(false);
   const { addChatWindow } = useChatStore();
   const [fame, setFame] = useState(1);
-  const session = useSession();
 
   const userQuery = useQuery({
     queryKey: ['user', id],
@@ -51,7 +50,7 @@ export const UserProfile = () => {
         url: getUrl('api-users', { id: +id }),
         schemas: getUserSchemas,
         handleEnding: {
-          cb: (data) => {
+          cb: () => {
             console.log(
               `about to emit send view ! senderViewId : ${session.user?.id} receiverViewId : ${id}`
             );

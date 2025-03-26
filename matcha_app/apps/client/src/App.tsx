@@ -15,7 +15,7 @@ import {
   MessageCircleHeart,
   Search,
 } from 'lucide-react';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ChatContainer } from './components/chat/ChatContainer';
 import { Logo } from './components/images/Logo';
