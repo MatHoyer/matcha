@@ -225,18 +225,6 @@ export const suggestedUsers = async (req: Request, res: Response) => {
       ids.map((id) => fameCalculator(id))
     );
     console.log('fameResults :', fameResults);
-    // const sortedByFame = users.sort((a, b) => {
-    //   const aFame = fameResults.find((f) => f.userId === a.id)?.fame || 1;
-    //   const bFame = fameResults.find((f) => f.userId === b.id)?.fame || 1;
-    //   return bFame - aFame;
-    // });
-
-    // const tag = await db.userTag.findMany({
-    //   where: {
-    //     userId: +id,
-    //   },
-    // });
-    // then if tag exist, put users that have the same tag at the beginning
     const usersResponse: TAdvancedSearchSchema['response']['users'] =
       await batchPromises(
         users.map(async (user) => {
@@ -252,12 +240,23 @@ export const suggestedUsers = async (req: Request, res: Response) => {
               },
             },
           });
+          const userLocation = await db.location.findFirst({
+            where: {
+              id: user.id,
+            },
+          });
+          const allLocations = await db.globalLocation.findMany({});
+          const locationName = allLocations.find(
+            (gl) =>
+              gl.latitude === userLocation?.latitude &&
+              gl.longitude === userLocation?.longitude
+          )?.name;
 
           return {
             user: user,
             tags: allTags as { id: number; name: string }[],
             fame: fameResults.find((f) => f.userId === user.id)?.fame || 1,
-            location: 'location', //a changer
+            location: locationName || 'Unknown',
           };
         })
       );
