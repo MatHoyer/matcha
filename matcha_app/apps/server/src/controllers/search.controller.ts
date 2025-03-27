@@ -10,11 +10,12 @@ import {
   getGenderPreferenceMatchCondition,
 } from '../services/search.service';
 import { defaultResponse } from '../utils/defaultResponse';
+import { TUser } from '@matcha/common';
 
 export const advancedSearch = async (req: Request, res: Response) => {
   const { ages, fame, location, tags } =
     req.body as TAdvancedSearchSchema['requirements'];
-
+  console.log('location here :', location);
   const dbLocation = await db.globalLocation.findFirst({
     where: {
       name: location,
@@ -147,34 +148,125 @@ export const advancedSearch = async (req: Request, res: Response) => {
 };
 
 export const suggestedUsers = async (req: Request, res: Response) => {
-  console.log('--- suggestedUsers ---');
-  // const id = req.params.id;
-  // try {
-  //   const users = await db.user.findMany({
-  //     where: {
-  //       id: +id,
-  //     },
-  //   });
-  //   if (!users) {
-  //     return defaultResponse({
-  //       res,
-  //       status: 404,
-  //       json: {
-  //         message: 'User not found',
-  //       },
-  //     });
-  //   }
-  //   const user = users[0];
-  //   const userTags = await db.userTag.findMany({
-  //     where: {
-  //       userId: +id,
-  //     },
-  //   });
-  // } catch (error) {
-  //   defaultResponse({
-  //     res,
-  //     status: 500,
-  //     json: { message: 'Internal Server Error' },
-  //   });
-  // }
+  const id = req.params.id;
+  try {
+    const user = await db.user.findMany({
+      where: {
+        id: +id,
+      },
+    });
+    if (!user) {
+      return defaultResponse({
+        res,
+        status: 404,
+        json: {
+          message: 'User not found',
+        },
+      });
+    }
+    // we want to send back a list of 50 suggested users that are not the user itself
+    // the closest to the user location (priority)
+    // the most common tags
+    // a maximum of fame
+    const location = await db.location.findFirst({
+      where: {
+        id: +id,
+      },
+    });
+    console.log('location :', location);
+    const latitude = location?.latitude as number;
+    const longitude = location?.longitude as number;
+    let locationDiff = 0.1;
+    let goodLocations = [] as TLocation[];
+    while (goodLocations.length < 30) {
+      goodLocations = await db.location.findMany({
+        where: {
+          latitude: {
+            $gte: latitude - locationDiff,
+            $lte: latitude + locationDiff,
+          },
+          longitude: {
+            $gte: longitude - locationDiff,
+            $lte: longitude + locationDiff,
+          },
+        },
+      });
+      locationDiff += 0.1;
+    }
+    let ids = [...new Set(goodLocations.map((l) => l.id))];
+    console.log('ids :', ids);
+    const likedUsers = await db.like.findMany({
+      where: {
+        userId: +id,
+      },
+    });
+    const users = await db.user.findMany({
+      where: {
+        id: {
+          $in: ids,
+        },
+        NOT: [
+          {
+            id: {
+              $in: [req.user.id, ...likedUsers.map((l) => l.likedId)],
+            },
+          },
+        ],
+        OR: getGenderPreferenceMatchCondition(
+          req.user.gender,
+          req.user.preference
+        ),
+      },
+    });
+    console.log('users :', users);
+
+    // first sort by fame
+    const fameResults = await batchPromises(
+      ids.map((id) => fameCalculator(id))
+    );
+    console.log('fameResults :', fameResults);
+    // const sortedByFame = users.sort((a, b) => {
+    //   const aFame = fameResults.find((f) => f.userId === a.id)?.fame || 1;
+    //   const bFame = fameResults.find((f) => f.userId === b.id)?.fame || 1;
+    //   return bFame - aFame;
+    // });
+
+    // const tag = await db.userTag.findMany({
+    //   where: {
+    //     userId: +id,
+    //   },
+    // });
+    // then if tag exist, put users that have the same tag at the beginning
+    const usersResponse: TAdvancedSearchSchema['response']['users'] =
+      await batchPromises(
+        users.map(async (user) => {
+          const allUserTags = await db.userTag.findMany({
+            where: {
+              userId: user.id,
+            },
+          });
+          const allTags = await db.tag.findMany({
+            where: {
+              id: {
+                $in: allUserTags.map((ut) => ut.tagId),
+              },
+            },
+          });
+
+          return {
+            user: user,
+            tags: allTags as { id: number; name: string }[],
+            fame: fameResults.find((f) => f.userId === user.id)?.fame || 1,
+            location: 'location', //a changer
+          };
+        })
+      );
+    res.status(200).json({ users: usersResponse });
+  } catch (error) {
+    defaultResponse({
+      res,
+      status: 500,
+      json: { message: 'Internal Server Error' },
+    });
+  }
 };
