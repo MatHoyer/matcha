@@ -11,47 +11,31 @@ export const updateLocation = async (req: Request, res: Response) => {
 
   const { id } = req.user;
 
-  const userLocation = await db.userLocation.findFirst({
+  let location = await db.location.findFirst({
     where: {
-      userId: id,
+      id: id,
     },
   });
-
-  if (!userLocation) {
-    const location = await db.location.create({
+  if (!location) {
+    location = await db.location.create({
       data: {
         latitude,
         longitude,
         date: new Date(),
       },
     });
-    if (!location) {
-      return defaultResponse({
-        res,
-        status: 400,
-        json: {
-          message: 'Location not created',
-        },
-      });
-    }
-    await db.userLocation.create({
-      data: {
-        userId: id,
-        locationId: location.id,
-      },
-    });
     return defaultResponse({
       res,
-      status: 200,
+      status: location ? 200 : 400,
       json: {
-        message: 'Location updated',
+        message: location ? 'Location updated' : 'Location not created',
       },
     });
   }
 
   await db.location.update({
     where: {
-      id: userLocation.locationId,
+      id: location.id,
     },
     data: {
       latitude,
@@ -72,23 +56,9 @@ export const updateLocation = async (req: Request, res: Response) => {
 export const isNeedUpdateLocation = async (req: Request, res: Response) => {
   const { id } = req.user;
 
-  const userLocation = await db.userLocation.findFirst({
-    where: {
-      userId: id,
-    },
-  });
-
-  if (!userLocation) {
-    res.status(200).json({
-      message: 'Needing update location',
-      isNeedUpdate: true,
-    });
-    return;
-  }
-
   const location = await db.location.findFirst({
     where: {
-      id: userLocation.locationId,
+      id: id,
     },
   });
 
@@ -117,24 +87,9 @@ export const isNeedUpdateLocation = async (req: Request, res: Response) => {
 export const getUserNearLocation = async (req: Request, res: Response) => {
   const { id } = req.params;
 
-  const userLocation = await db.userLocation.findFirst({
-    where: {
-      userId: +id,
-    },
-  });
-  if (!userLocation) {
-    return defaultResponse({
-      res,
-      status: 400,
-      json: {
-        message: 'User location not found',
-      },
-    });
-  }
-
   const location = await db.location.findFirst({
     where: {
-      id: userLocation.locationId,
+      id: +id,
     },
   });
   if (!location) {

@@ -161,7 +161,6 @@ export {
   orientationSchema,
   reportSchema,
   tagSchema,
-  userLocationSchema,
   userSchema,
   userTagSchema,
   viewSchema,
@@ -179,13 +178,11 @@ export type {
   TReport,
   TTag,
   TUser,
-  TUserLocation,
   TUserTag,
   TUserWithNames,
   TView,
 } from './schemas/database.schema';
-export { events } from './schemas/socket/events.schema';
-export { sendMessageSchema } from './schemas/socket/events.schema';
+export { events, sendMessageSchema } from './schemas/socket/events.schema';
 export type { TSendMessageSchema } from './schemas/socket/events.schema';
 
 //-----------------------Errors-----------------------

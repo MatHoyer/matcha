@@ -208,24 +208,9 @@ export const updateUser = async (req: Request, res: Response) => {
       },
     });
   }
-  const userLocation = await db.userLocation.findFirst({
-    where: {
-      userId: +id,
-    },
-  });
-  if (!userLocation) {
-    return defaultResponse({
-      res,
-      status: 404,
-      json: {
-        message: 'User location not found',
-        fields: [{ field: 'location', message: 'User location not found' }],
-      },
-    });
-  }
 
   await db.location.update({
-    where: { id: userLocation.locationId },
+    where: { id: +id },
     data: {
       latitude: globalLocation.latitude,
       longitude: globalLocation.longitude,

@@ -106,15 +106,6 @@ CREATE TABLE "Location" (
   "date" TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-DROP TABLE IF EXISTS "UserLocation";
-CREATE TABLE "UserLocation" (
-  "id" SERIAL PRIMARY KEY,
-  "userId" INT NOT NULL,
-  "locationId" INT NOT NULL,
-  FOREIGN KEY ("userId") REFERENCES "User" ("id")  ON DELETE CASCADE,
-  FOREIGN KEY ("locationId") REFERENCES "Location" ("id")  ON DELETE CASCADE
-);
-
 DROP TABLE IF EXISTS "View";
 CREATE TABLE "View" (
   "id" SERIAL PRIMARY KEY,
@@ -198,15 +189,7 @@ VALUES
 (43.2965, 5.3698), -- Marseille, France
 (45.7640, 4.8357), -- Lyon, France
 (43.6047, 1.4442), -- Toulouse, France
-(43.7102, 7.2620), -- Nice, France
-
-INSERT INTO "UserLocation" ("userId", "locationId") 
-VALUES 
-(1, 1), -- Alice -> Paris
-(2, 2), -- David -> Marseille
-(3, 3), -- Emma -> Lyon
-(4, 4), -- Michael -> Toulouse
-(5, 5); -- Sophia -> Nice
+(43.7102, 7.2620); -- Nice, France
 
 INSERT INTO "GlobalLocation" ("name", "latitude", "longitude") 
 VALUES 
@@ -258,7 +241,6 @@ VALUES
 ('Béziers', 43.3476, 3.2199),
 ('Valence', 44.9334, 4.8924),
 ('Chambéry', 45.5646, 5.9178),
-('Troyes', 48.2973, 4.0744),
 ('Antibes', 43.5804, 7.1251),
 ('Calais', 50.9513, 1.8587),
 ('Pau', 43.2951, -0.3708),
@@ -283,7 +265,6 @@ VALUES
 ('La Roche-sur-Yon', 46.6705, -1.4275),
 ('Bourg-en-Bresse', 46.2056, 5.2258),
 ('Tarbes', 43.2329, 0.0781),
-('Avignon', 43.9493, 4.8055),
 ('Angoulême', 45.6494, 0.1559),
 ('Châteauroux', 46.8122, 1.6936),
 ('Albi', 43.9280, 2.1466),
@@ -299,7 +280,6 @@ VALUES
 ('Sète', 43.4076, 3.6935),
 ('Beauvais', 49.4305, 2.0958),
 ('Périgueux', 45.1841, 0.7212),
-('Bayonne', 43.4934, -1.4761),
 ('Châlons-en-Champagne', 48.9581, 4.3673),
 ('Salon-de-Provence', 43.6403, 5.0973),
 ('Narbonne', 43.1844, 3.0031),
@@ -1312,77 +1292,8 @@ VALUES ('Kanya', 'Pegler', 'kpegler0@unicef.org', '094513168d4401c9dc5d693b3fbb9
  ('Dayle', 'Cawthry', 'dcawthryrq@vistaprint.com', '094513168d4401c9dc5d693b3fbb9382ce68e54bafbd180f990bdf193f7c0948', '1971-08-16', 'Male', 'Heterosexual', 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit.'),
  ('Gaelan', 'Mallall', 'gmallallrr@uiuc.edu', '094513168d4401c9dc5d693b3fbb9382ce68e54bafbd180f990bdf193f7c0948', '1958-09-13', 'Female', 'Heterosexual', 'Aliquam erat volutpat. In congue.');
 
-INSERT INTO "Location" ("latitude", "longitude") 
-VALUES (48.5734, 7.7521),
-(43.6119, 3.8772),
-(44.8378, -0.5792),
-(50.6292, 3.0573),
-(48.1173, -1.6778),
-(48.5734, 7.7521),
-(43.6119, 3.8772),
-(44.8378, -0.5792),
-(50.6292, 3.0573),
-(48.1173, -1.6778),
-(48.5734, 7.7521),
-(43.6119, 3.8772),
-(44.8378, -0.5792),
-(50.6292, 3.0573),
-(48.1173, -1.6778),
-(48.5734, 7.7521),
-(43.6119, 3.8772),
-(44.8378, -0.5792),
-(50.6292, 3.0573),
-(48.1173, -1.6778),
-(48.5734, 7.7521),
-(43.6119, 3.8772),
-(44.8378, -0.5792),
-(50.6292, 3.0573),
-(48.1173, -1.6778),
-(48.5734, 7.7521),
-(43.6119, 3.8772),
-(44.8378, -0.5792),
-(50.6292, 3.0573),
-(48.1173, -1.6778),
-(48.5734, 7.7521),
-(43.6119, 3.8772),
-(44.8378, -0.5792),
-(50.6292, 3.0573),
-(48.1173, -1.6778);
-
-
-INSERT INTO "UserLocation" ("userId", "locationId") 
-VALUES (6, 6),
-(7, 7),
-(8, 8),
-(9, 9),
-(10, 10),
-(11, 11),
-(12, 12),
-(13, 13),
-(14, 14),
-(15, 15),
-(16, 16),
-(17, 17),
-(18, 18),
-(19, 19),
-(20, 20),
-(21, 21),
-(22, 22),
-(23, 23),
-(24, 24),
-(25, 25),
-(26, 26),
-(27, 27),
-(28, 28),
-(29, 29),
-(30, 30),
-(31, 31),
-(32, 32),
-(33, 33),
-(34, 34),
-(35, 35),
-(36, 36),
-(37, 37),
-(38, 38),
-(39, 39),
-(40, 40);
+INSERT INTO "Location" ("latitude", "longitude")
+SELECT 
+    41.0 + RANDOM() * (51.5 - 41.0),   -- Latitude entre 41.0 et 51.5
+    -5.0 + RANDOM() * (9.5 - (-5.0))   -- Longitude entre -5.0 et 9.5
+FROM generate_series(1, 1000);

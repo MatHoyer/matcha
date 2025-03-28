@@ -10,7 +10,6 @@ import {
   getGenderPreferenceMatchCondition,
 } from '../services/search.service';
 import { defaultResponse } from '../utils/defaultResponse';
-import { TUser } from '@matcha/common';
 
 export const advancedSearch = async (req: Request, res: Response) => {
   const { ages, fame, location, tags } =
@@ -50,13 +49,6 @@ export const advancedSearch = async (req: Request, res: Response) => {
     });
     locationDiff += 0.1;
   }
-  const userLocations = await db.userLocation.findMany({
-    where: {
-      locationId: {
-        $in: goodLocations.map((l) => l.id),
-      },
-    },
-  });
 
   const goodTags = await db.tag.findMany({
     where: {
@@ -71,7 +63,7 @@ export const advancedSearch = async (req: Request, res: Response) => {
         $in: goodTags.map((t) => t.id),
       },
       userId: {
-        $in: userLocations.map((ul) => ul.userId),
+        $in: goodLocations.map((l) => l.id),
       },
     },
   });
@@ -79,7 +71,7 @@ export const advancedSearch = async (req: Request, res: Response) => {
   let ids = [
     ...new Set([
       ...(tags.length === 0
-        ? userLocations.map((ul) => ul.userId)
+        ? goodLocations.map((l) => l.id)
         : userTags.map((ut) => ut.userId)),
     ]),
   ];
@@ -193,7 +185,7 @@ export const suggestedUsers = async (req: Request, res: Response) => {
       });
       locationDiff += 0.1;
     }
-    let ids = [...new Set(goodLocations.map((l) => l.id))];
+    const ids = [...new Set(goodLocations.map((l) => l.id))];
     console.log('ids :', ids);
     const likedUsers = await db.like.findMany({
       where: {
@@ -240,7 +232,7 @@ export const suggestedUsers = async (req: Request, res: Response) => {
               },
             },
           });
-          const userLocation = await db.location.findFirst({
+          const location = await db.location.findFirst({
             where: {
               id: user.id,
             },
@@ -248,8 +240,8 @@ export const suggestedUsers = async (req: Request, res: Response) => {
           const allLocations = await db.globalLocation.findMany({});
           const locationName = allLocations.find(
             (gl) =>
-              gl.latitude === userLocation?.latitude &&
-              gl.longitude === userLocation?.longitude
+              gl.latitude === location?.latitude &&
+              gl.longitude === location?.longitude
           )?.name;
 
           return {

@@ -14,15 +14,13 @@ import {
   TMessage,
   TNotification,
   TReport,
-  TUserLocation,
+  TUser,
   TUserTag,
   TView,
-  userLocationSchema,
   userSchema,
   userTagSchema,
   viewSchema,
   ZodObject,
-  TUser,
 } from '@matcha/common';
 
 export type UserIncludes = {
@@ -32,7 +30,6 @@ export type UserIncludes = {
   like?: TLike;
   notification?: TNotification;
   block?: TBlock;
-  userLocation?: TUserLocation;
   view?: TView;
   image?: TImage;
 };
@@ -52,7 +49,6 @@ export const tableAlias: Record<string, string> = {
   block: 'b',
   globalLocation: 'gl',
   location: 'lo',
-  userLocation: 'ul',
   view: 'v',
   image: 'i',
 };
@@ -79,7 +75,6 @@ export const tableKeys: Record<string, Record<string, string>> = {
   block: transformSchema(blockSchema),
   globalLocation: transformSchema(globalLocationSchema),
   location: transformSchema(locationSchema),
-  userLocation: transformSchema(userLocationSchema),
   view: transformSchema(viewSchema),
   image: transformSchema(imageSchema),
 };

@@ -6,7 +6,6 @@ import LocationRepository from './repositories/LocationRepository.js';
 import MessageRepository from './repositories/MessageRepository.js';
 import NotificationRepository from './repositories/NotificationRepository';
 import TagRepository from './repositories/TagRepository.js';
-import UserLocationRepository from './repositories/UserLocationRepository.js';
 import UserRepository from './repositories/UserRepository.js';
 import UserTagRepository from './repositories/UserTagRepository.js';
 import ViewRepository from './repositories/ViewRepository';
@@ -18,7 +17,6 @@ class Database {
   userTag: UserTagRepository;
   globalLocation: GlobalLocationRepository;
   location: LocationRepository;
-  userLocation: UserLocationRepository;
   like: LikeRepository;
   view: ViewRepository;
   message: MessageRepository;
@@ -40,7 +38,6 @@ class Database {
     this.userTag = new UserTagRepository(this.pool);
     this.globalLocation = new GlobalLocationRepository(this.pool);
     this.location = new LocationRepository(this.pool);
-    this.userLocation = new UserLocationRepository(this.pool);
     this.like = new LikeRepository(this.pool);
     this.message = new MessageRepository(this.pool);
     this.image = new ImageRepository(this.pool);

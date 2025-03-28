@@ -100,13 +100,6 @@ export const locationSchema = z.object({
 });
 export type TLocation = Infer<typeof locationSchema>;
 
-export const userLocationSchema = z.object({
-  id: z.number(),
-  userId: userSchema.pick(['id']).shape.id,
-  locationId: locationSchema.pick(['id']).shape.id,
-});
-export type TUserLocation = Infer<typeof userLocationSchema>;
-
 export const viewSchema = z.object({
   id: z.number(),
   userId: userSchema.pick(['id']).shape.id,
