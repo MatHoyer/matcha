@@ -226,7 +226,7 @@ export const UserProfile = () => {
     <Layout>
       <LayoutHeader>
         <div className="flex flex-col md:flex-row gap-5 w-full">
-          <div className="flex flex-row md:flex-col items-center gap-5">
+          <div className="flex flex-row md:flex-col items-center md:items-start gap-5">
             <div className="relative">
               <img
                 className="size-40 rounded-full"
@@ -242,7 +242,7 @@ export const UserProfile = () => {
                 <div className="absolute bottom-2 right-2 w-8 h-8 border-4 border-gray-500 bg-background rounded-full" />
               )}
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 flex-1">
               <Typography variant="h2">
                 {userQuery.data?.user.name} {userQuery.data?.user.lastName}
               </Typography>
@@ -275,13 +275,11 @@ export const UserProfile = () => {
                 </Button>
                 <Button
                   size="icon"
-                  className={`rounded-full ${
-                    !haveMatched ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
+                  className={'rounded-full'}
+                  disabled={!haveMatched}
                   onClick={() => {
                     addChatWindow(userQuery.data!.user, session.user!.id);
                   }}
-                  disabled={!haveMatched}
                 >
                   <MessageCircle />
                 </Button>
