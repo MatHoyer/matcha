@@ -30,11 +30,12 @@ export type TApiRouteDataRequirements = {
   };
   'api-globalLocations': undefined;
   'api-search': {
+    id?: number;
     type: 'advancedSearch' | 'forYou';
   };
   'api-users': {
     id?: number;
-    type?: 'reset-password' | 'fame' | 'match';
+    type?: 'reset-password' | 'fame' | 'match' | 'matched';
   };
   'api-messages': {
     id?: number;
@@ -85,7 +86,18 @@ const routes: {
     return '/api/tags';
   },
   'api-globalLocations': () => '/api/globalLocations',
-  'api-search': ({ type }) => (type ? `/api/search/${type}` : '/api/search'),
+  // 'api-search': ({ type }) => (type ? `/api/search/${type}` : '/api/search'),
+  'api-search': ({ id, type }) => {
+    if (type) {
+      if (id) {
+        console.log('ID', id);
+        return `/api/search/${type}/${id}`;
+      }
+      console.log('TYPE', type);
+      return `/api/search/${type}`;
+    }
+    return '/api/search';
+  },
   'api-users': ({ id, type }) => {
     if (type) {
       if (['reset-password'].includes(type)) {

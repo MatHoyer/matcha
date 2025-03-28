@@ -12,6 +12,7 @@ import { PersonnalProfile } from './profiles/PersonnalProfile';
 import { UserProfile } from './profiles/UserProfile';
 import { AdvancedSearch } from './research/AdvancedSearch';
 import ResetPasswordPage from './ResetPassword';
+import { ForYou } from './research/ForYou';
 
 const AuthRoute = () => {
   const { user, loading } = useSession();
@@ -72,6 +73,10 @@ export const Pages = () => {
         <Route
           path={getUrl('client-search', { type: 'advancedSearch' })}
           element={<AdvancedSearch />}
+        />
+        <Route
+          path={getUrl('client-search', { type: 'forYou' })}
+          element={<ForYou />}
         />
         <Route
           path={`${getUrl('client-profile')}`}
