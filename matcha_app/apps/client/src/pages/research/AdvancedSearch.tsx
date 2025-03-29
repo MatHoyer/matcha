@@ -9,14 +9,19 @@ import {
 } from '@/components/pagination/Layout';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
+import { MultiCombobox } from '@/components/ui/combobox';
 import { FameRating } from '@/components/ui/FameRating';
 import { AppLoader } from '@/components/ui/loaders';
 import { Typography } from '@/components/ui/typography';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import {
+  GENDERS,
   getProfilePictureSchemas,
   getUrl,
+  ORIENTATIONS,
   TAdvancedSearchSchema,
+  TGender,
+  TOrientation,
 } from '@matcha/common';
 import { useQuery } from '@tanstack/react-query';
 import { ChevronRight, MapPin, Mars, Venus } from 'lucide-react';
@@ -118,6 +123,10 @@ export const AdvancedSearch: React.FC = () => {
     TAdvancedSearchSchema['response']['users'][number][]
   >([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [genderFilter, setGenderFilter] = useState<TGender[] | null>([]);
+  const [preferenceFilter, setPreferenceFilter] = useState<
+    TOrientation[] | null
+  >([]);
 
   return (
     <Layout>
@@ -136,11 +145,48 @@ export const AdvancedSearch: React.FC = () => {
           <div className="flex justify-center items-center">
             <AppLoader size={60} />
           </div>
-        ) : (
+        ) : users.length > 0 ? (
           <div className="flex flex-col gap-2">
-            {users.map((gUser) => (
-              <MatchRow key={gUser.user.id} gUser={gUser} />
-            ))}
+            <div className="flex justify-center gap-2">
+              <MultiCombobox
+                name="gender"
+                list={GENDERS.map((gender) => ({
+                  value: gender,
+                  label: gender,
+                }))}
+                value={genderFilter}
+                onChange={setGenderFilter}
+              />
+              <MultiCombobox
+                name="preference"
+                list={ORIENTATIONS.map((orientation) => ({
+                  value: orientation,
+                  label: orientation,
+                }))}
+                value={preferenceFilter}
+                onChange={setPreferenceFilter}
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              {users
+                .filter((user) => {
+                  return (
+                    (genderFilter?.includes(user.user.gender) ||
+                      !genderFilter ||
+                      genderFilter.length === 0) &&
+                    (preferenceFilter?.includes(user.user.preference) ||
+                      !preferenceFilter ||
+                      preferenceFilter.length === 0)
+                  );
+                })
+                .map((gUser) => (
+                  <MatchRow key={gUser.user.id} gUser={gUser} />
+                ))}
+            </div>
+          </div>
+        ) : (
+          <div className="flex justify-center items-center">
+            <Typography variant="muted">No users found</Typography>
           </div>
         )}
       </LayoutContent>
