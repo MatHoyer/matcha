@@ -1,4 +1,5 @@
 import { ImageContainer } from '@/components/images/ImageContainer';
+import { UserAvatar } from '@/components/images/UserAvatar';
 import {
   Layout,
   LayoutContent,
@@ -35,7 +36,6 @@ export const UserProfile = () => {
   const { id } = useParams();
   const session = useSession();
   const queryClient = useQueryClient();
-  const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [pictures, setPictures] = useState<File[]>([]);
   const [tags, setTags] = useState<TTag[]>([]);
   const [isLiked, setIsLiked] = useState(false);
@@ -112,11 +112,6 @@ export const UserProfile = () => {
         schemas: getPicturesSchemas,
         handleEnding: {
           cb: (data) => {
-            const uint8Array = new Uint8Array(data.pictures[0].file.buffer);
-            const file = new File([uint8Array], data.pictures[0].file.name, {
-              type: data.pictures[0].file.type,
-            });
-            setProfilePicture(file);
             setPictures(
               data.pictures.map((picture) => {
                 const uint8Array = new Uint8Array(picture.file.buffer);
@@ -228,14 +223,9 @@ export const UserProfile = () => {
         <div className="flex flex-col md:flex-row gap-5 w-full">
           <div className="flex flex-row md:flex-col items-center md:items-start gap-5">
             <div className="relative">
-              <img
-                className="size-40 rounded-full"
-                src={
-                  profilePicture
-                    ? URL.createObjectURL(profilePicture)
-                    : undefined
-                }
-              />
+              {userQuery.data?.user && (
+                <UserAvatar user={userQuery.data.user} size="lg" />
+              )}
               {userQuery.data?.user && userQuery.data.user.isOnline ? (
                 <div className="absolute bottom-2 right-2 w-8 h-8 bg-green-500 rounded-full" />
               ) : (

@@ -8,7 +8,6 @@ import { socket } from '@/lib/socket';
 import { cn } from '@/lib/utils';
 import {
   getNearDate,
-  getProfilePictureSchemas,
   getUrl,
   messagesSchemas,
   TMessage,
@@ -20,7 +19,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Minus, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { UserAvatar } from '../images/UserAvatar';
 import { Typography } from '../ui/typography';
 
 interface PrivateChatProps {
@@ -45,31 +44,7 @@ export const Chat: React.FC<PrivateChatProps> = ({
   const [loading, setLoading] = useState(true);
   const { notifications, setNotifications } = useSetNotification();
   const queryClient = useQueryClient();
-  const [pp, setPp] = useState<File | null>(null);
   const navigate = useNavigate();
-
-  useQuery({
-    queryKey: ['images-profile', 'dropdown'],
-    queryFn: async () => {
-      return await axiosFetch({
-        method: 'GET',
-        schemas: getProfilePictureSchemas,
-        url: getUrl('api-picture', {
-          type: 'user-pp',
-          id: otherUser.id,
-        }),
-        handleEnding: {
-          cb: (data) => {
-            const uint8Array = new Uint8Array(data.picture.file.buffer);
-            const file = new File([uint8Array], data.picture.file.name, {
-              type: data.picture.file.type,
-            });
-            setPp(file);
-          },
-        },
-      });
-    },
-  });
 
   useQuery({
     queryKey: ['messages', session.user!.id],
@@ -209,10 +184,7 @@ export const Chat: React.FC<PrivateChatProps> = ({
           className="flex items-center gap-2 cursor-pointer hover:bg-accent/50 px-2 py-1 rounded-md w-2/3"
           onClick={() => navigate(`/profile/${otherUser.id}`)}
         >
-          <Avatar>
-            <AvatarImage src={pp ? URL.createObjectURL(pp) : ''} />
-            <AvatarFallback>{otherUser.name.charAt(0)}</AvatarFallback>
-          </Avatar>
+          <UserAvatar user={otherUser} size="sm" />
           <Typography variant="small" className="truncate">
             {otherUser.name} {otherUser.lastName}
           </Typography>
