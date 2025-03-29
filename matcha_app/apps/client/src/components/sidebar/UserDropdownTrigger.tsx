@@ -5,7 +5,7 @@ import { getProfilePictureSchemas, getUrl, TUser } from '@matcha/common';
 import { useQuery } from '@tanstack/react-query';
 import { ChevronsUpDown } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { Avatar, AvatarImage } from '../ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { SidebarMenuButton } from '../ui/sidebar';
 import { Typography } from '../ui/typography';
 import UserDropdown from './UserDropdown';
@@ -65,6 +65,7 @@ export const UserDropdownTrigger: React.FC<{
                 src={file ? URL.createObjectURL(file) : undefined}
                 alt="Pp"
               />
+              <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
             </Avatar>
             {showBubble && (
               <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-500 rounded-full border"></div>

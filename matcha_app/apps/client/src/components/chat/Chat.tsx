@@ -1,13 +1,14 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Typography } from '@/components/ui/typography';
 import { useSetNotification } from '@/hooks/use-notification';
 import { useSession } from '@/hooks/useSession';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import { socket } from '@/lib/socket';
+import { cn } from '@/lib/utils';
 import {
   getNearDate,
+  getProfilePictureSchemas,
   getUrl,
   messagesSchemas,
   TMessage,
@@ -15,9 +16,12 @@ import {
   TUser,
   updateNotificationSchemas,
 } from '@matcha/common';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Minus, X } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useNavigate } from 'react-router-dom';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { Typography } from '../ui/typography';
 
 interface PrivateChatProps {
   otherUser: TUser;
@@ -41,6 +45,31 @@ export const Chat: React.FC<PrivateChatProps> = ({
   const [loading, setLoading] = useState(true);
   const { notifications, setNotifications } = useSetNotification();
   const queryClient = useQueryClient();
+  const [pp, setPp] = useState<File | null>(null);
+  const navigate = useNavigate();
+
+  useQuery({
+    queryKey: ['images-profile', 'dropdown'],
+    queryFn: async () => {
+      return await axiosFetch({
+        method: 'GET',
+        schemas: getProfilePictureSchemas,
+        url: getUrl('api-picture', {
+          type: 'user-pp',
+          id: otherUser.id,
+        }),
+        handleEnding: {
+          cb: (data) => {
+            const uint8Array = new Uint8Array(data.picture.file.buffer);
+            const file = new File([uint8Array], data.picture.file.name, {
+              type: data.picture.file.type,
+            });
+            setPp(file);
+          },
+        },
+      });
+    },
+  });
 
   useQuery({
     queryKey: ['messages', session.user!.id],
@@ -170,13 +199,31 @@ export const Chat: React.FC<PrivateChatProps> = ({
       className="p-3 w-80 h-fit "
       onClick={() => setReadMessageNotif.mutate()}
     >
-      <div className="flex items-center justify-between">
-        <Typography variant="small">
-          Chat with {otherUser.name} {otherUser.id}
-        </Typography>
-        <div className="flex items-center gap-2">
-          <Minus className="cursor-pointer" onClick={() => toggleChat()} />
-          <X className="cursor-pointer" onClick={() => closeChat()} />
+      <div
+        className={cn(
+          'flex items-center justify-between',
+          status === 'full' && 'mb-2'
+        )}
+      >
+        <div
+          className="flex items-center gap-2 cursor-pointer hover:bg-accent/50 px-2 py-1 rounded-md w-2/3"
+          onClick={() => navigate(`/profile/${otherUser.id}`)}
+        >
+          <Avatar>
+            <AvatarImage src={pp ? URL.createObjectURL(pp) : ''} />
+            <AvatarFallback>{otherUser.name.charAt(0)}</AvatarFallback>
+          </Avatar>
+          <Typography variant="small" className="truncate">
+            {otherUser.name} {otherUser.lastName}
+          </Typography>
+        </div>
+        <div className="flex items-center">
+          <Button variant="ghost" size="icon" onClick={() => toggleChat()}>
+            <Minus />
+          </Button>
+          <Button variant="ghost" size="icon" onClick={() => closeChat()}>
+            <X />
+          </Button>
         </div>
       </div>
       {status === 'full' && (
