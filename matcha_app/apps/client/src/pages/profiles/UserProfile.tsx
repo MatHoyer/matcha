@@ -7,6 +7,12 @@ import {
 } from '@/components/pagination/Layout';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { FameRating } from '@/components/ui/FameRating';
 import { Separator } from '@/components/ui/separator';
 import { Typography } from '@/components/ui/typography';
@@ -14,6 +20,7 @@ import { useChatStore } from '@/hooks/use-chat';
 import { useSession } from '@/hooks/useSession';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import {
+  blockUserSchemas,
   createLikeSchemas,
   deleteLikeSchemas,
   getNearDate,
@@ -22,15 +29,79 @@ import {
   getUserFameSchemas,
   getUserSchemas,
   getUserTagsSchemas,
+  isBlockedSchemas,
   isLikedSchemas,
   TTag,
+  unblockUserSchemas,
   usersMatchSchemas,
 } from '@matcha/common';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Heart, MessageCircle } from 'lucide-react';
+import { EllipsisVertical, Heart, MessageCircle } from 'lucide-react';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { socket } from '../../lib/socket';
+
+const ElipsisDropdown = () => {
+  const { id } = useParams();
+  const queryClient = useQueryClient();
+  const [isBlocked, setIsBlocked] = useState(false);
+
+  useQuery({
+    queryKey: ['isBlocked', id],
+    queryFn: async () => {
+      return await axiosFetch({
+        method: 'GET',
+        url: getUrl('api-users', { id: +id!, type: 'isBlocked' }),
+        schemas: isBlockedSchemas,
+        handleEnding: {
+          cb: (data) => {
+            setIsBlocked(data.blocked);
+          },
+        },
+      });
+    },
+  });
+
+  const blockMutation = useMutation({
+    mutationFn: async () => {
+      return await axiosFetch({
+        method: isBlocked ? 'DELETE' : 'POST',
+        url: getUrl('api-block'),
+        schemas: isBlocked ? unblockUserSchemas : blockUserSchemas,
+        data: {
+          userId: +id!,
+        },
+        handleEnding: {
+          successMessage: isBlocked ? 'User unblocked' : 'User blocked',
+          errorMessage: isBlocked
+            ? 'Error unblocking user'
+            : 'Error blocking user',
+          cb: () => {
+            queryClient.invalidateQueries({
+              queryKey: ['isBlocked'],
+            });
+          },
+        },
+      });
+    },
+  });
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button size="icon" className={'rounded-full'}>
+          <EllipsisVertical />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuItem onClick={() => blockMutation.mutate()}>
+          {isBlocked ? 'Unblock' : 'Block'}
+        </DropdownMenuItem>
+        <DropdownMenuItem>Report</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
 
 export const UserProfile = () => {
   const { id } = useParams();
@@ -273,6 +344,7 @@ export const UserProfile = () => {
                 >
                   <MessageCircle />
                 </Button>
+                <ElipsisDropdown />
               </div>
             )}
           </div>

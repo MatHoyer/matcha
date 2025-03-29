@@ -35,7 +35,7 @@ export type TApiRouteDataRequirements = {
   };
   'api-users': {
     id?: number;
-    type?: 'reset-password' | 'fame' | 'match' | 'matched';
+    type?: 'reset-password' | 'fame' | 'match' | 'matched' | 'isBlocked';
   };
   'api-messages': {
     id?: number;
@@ -55,6 +55,7 @@ export type TApiRouteDataRequirements = {
     id?: number;
     type?: 'is-need-update' | 'near/user';
   };
+  'api-block': undefined;
 };
 
 type TRouteDataRequirements = TClientRouteDataRequirements &
@@ -137,6 +138,7 @@ const routes: {
     }
     return id ? `/api/location/${id}` : '/api/location';
   },
+  'api-block': () => '/api/block',
 };
 
 type TUrlParams =

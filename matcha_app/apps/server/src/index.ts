@@ -6,6 +6,7 @@ import path from 'path';
 import { Server } from 'socket.io';
 import { env } from './env.js';
 import { default as authRouter } from './routes/auth.route.js';
+import blockRouter from './routes/block.route.js';
 import globalLocationRouter from './routes/globalLocation.route.js';
 import likeRouter from './routes/like.route.js';
 import locationRouter from './routes/location.route.js';
@@ -45,6 +46,7 @@ app.use(getUrl('api-picture'), pictureRouter);
 app.use(getUrl('api-notifications'), notificationsRouter);
 app.use(getUrl('api-likes'), likeRouter);
 app.use(getUrl('api-location'), locationRouter);
+app.use(getUrl('api-block'), blockRouter);
 
 if (env.NODE_ENV === 'PROD') {
   app.use(express.static(path.join(__dirname, '../../../public/dist')));

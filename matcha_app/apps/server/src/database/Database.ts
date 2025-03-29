@@ -1,4 +1,5 @@
 import pg from 'pg';
+import BlockRepository from './repositories/BlockRepository.js';
 import GlobalLocationRepository from './repositories/GlobalLocationRepository.js';
 import ImageRepository from './repositories/ImageRepository.js';
 import LikeRepository from './repositories/LikeRepository.js';
@@ -22,6 +23,7 @@ class Database {
   message: MessageRepository;
   image: ImageRepository;
   notification: NotificationRepository;
+  block: BlockRepository;
 
   constructor() {
     this.pool = new pg.Pool({
@@ -43,6 +45,7 @@ class Database {
     this.image = new ImageRepository(this.pool);
     this.notification = new NotificationRepository(this.pool);
     this.view = new ViewRepository(this.pool);
+    this.block = new BlockRepository(this.pool);
   }
 }
 

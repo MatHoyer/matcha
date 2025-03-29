@@ -2,13 +2,14 @@ import { resetPasswordSchemas, updateUserSchemas, z } from '@matcha/common';
 import { Router } from 'express';
 import {
   askResetPassword,
+  getMatchUser,
   getUser,
   getUserFame,
   getUsers,
+  haveMatched,
+  isBlocked,
   resetPassword,
   updateUser,
-  getMatchUser,
-  haveMatched,
 } from '../controllers/user.controller';
 import { bodyParser } from '../middlewares/bodyParser.middleware';
 import { isLogged } from '../middlewares/isLogged.middleware';
@@ -57,6 +58,13 @@ userRouter.get(
   isLogged,
   paramsParser(z.object({ id: z.number() })),
   haveMatched
+);
+
+userRouter.get(
+  '/isBlocked/:id',
+  isLogged,
+  paramsParser(z.object({ id: z.number() })),
+  isBlocked
 );
 
 export default userRouter;

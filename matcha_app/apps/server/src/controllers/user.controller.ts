@@ -350,3 +350,24 @@ export const resetPassword = async (req: Request, res: Response) => {
     json: { message: 'Password reset successfully' },
   });
 };
+
+export const isBlocked = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const user = await db.user.findFirst({
+    where: {
+      id: +id,
+    },
+  });
+  if (!user) {
+    return res.status(404).json({ message: 'User not found' });
+  }
+
+  const blocked = await db.block.findFirst({
+    where: {
+      userId: req.user.id,
+      blockedId: +id,
+    },
+  });
+
+  return res.status(200).json({ blocked: !!blocked });
+};
