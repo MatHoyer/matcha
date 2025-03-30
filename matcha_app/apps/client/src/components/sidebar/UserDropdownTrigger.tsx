@@ -1,11 +1,9 @@
-import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import { socket } from '@/lib/socket';
 import { useNotification } from '@/pages/notification/Notifications-context';
-import { getProfilePictureSchemas, getUrl, TUser } from '@matcha/common';
-import { useQuery } from '@tanstack/react-query';
+import { TUser } from '@matcha/common';
 import { ChevronsUpDown } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { Avatar, AvatarImage } from '../ui/avatar';
+import { useEffect } from 'react';
+import { UserAvatar } from '../images/UserAvatar';
 import { SidebarMenuButton } from '../ui/sidebar';
 import { Typography } from '../ui/typography';
 import UserDropdown from './UserDropdown';
@@ -13,31 +11,7 @@ import UserDropdown from './UserDropdown';
 export const UserDropdownTrigger: React.FC<{
   user: Omit<TUser, 'password'>;
 }> = ({ user }) => {
-  const [file, setFile] = useState<File | null>(null);
   const { showBubble, setShowBubble } = useNotification();
-
-  useQuery({
-    queryKey: ['images-profile', 'dropdown'],
-    queryFn: async () => {
-      return await axiosFetch({
-        method: 'GET',
-        schemas: getProfilePictureSchemas,
-        url: getUrl('api-picture', {
-          type: 'user-pp',
-          id: user.id,
-        }),
-        handleEnding: {
-          cb: (data) => {
-            const uint8Array = new Uint8Array(data.picture.file.buffer);
-            const file = new File([uint8Array], data.picture.file.name, {
-              type: data.picture.file.type,
-            });
-            setFile(file);
-          },
-        },
-      });
-    },
-  });
 
   useEffect(() => {
     const notificationBubbleHandler = () => {
@@ -60,12 +34,7 @@ export const UserDropdownTrigger: React.FC<{
       >
         <div className="flex size-full items-center gap-2">
           <div className="relative">
-            <Avatar>
-              <AvatarImage
-                src={file ? URL.createObjectURL(file) : undefined}
-                alt="Pp"
-              />
-            </Avatar>
+            <UserAvatar user={user} size="sm" />
             {showBubble && (
               <div className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-red-500 rounded-full border"></div>
             )}

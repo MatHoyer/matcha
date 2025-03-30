@@ -63,6 +63,14 @@ export type {
   TSessionSchemas,
   TSignupSchemas,
 } from './schemas/api/auth.schema';
+export {
+  blockUserSchemas,
+  unblockUserSchemas,
+} from './schemas/api/block.schema';
+export type {
+  TBlockUserSchemas,
+  TUnblockUserSchemas,
+} from './schemas/api/block.schema';
 export { errorSchema } from './schemas/api/error.schema';
 export type { TErrorSchema } from './schemas/api/error.schema';
 export { getGlobalLocationsSchemas } from './schemas/api/globalLocations.schema';
@@ -137,6 +145,7 @@ export {
   getUserFameSchemas,
   getUserSchemas,
   getUsersSchemas,
+  isBlockedSchemas,
   resetPasswordSchemas,
   updateUserSchemas,
   usersMatchSchemas,
@@ -146,6 +155,7 @@ export type {
   TGetUserFameSchemas,
   TGetUserSchemas,
   TGetUsersSchemas,
+  TIsBlockedSchemas,
   TResetPasswordSchemas,
   TUpdateUserSchemas,
 } from './schemas/api/users.schema';

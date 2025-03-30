@@ -109,3 +109,12 @@ export type TResetPasswordSchemas = {
   requirements: Infer<typeof resetPasswordSchemas.requirements>;
   response: Infer<typeof resetPasswordSchemas.response>;
 };
+
+export const isBlockedSchemas = {
+  response: z.object({
+    blocked: z.boolean(),
+  }),
+};
+export type TIsBlockedSchemas = {
+  response: Infer<typeof isBlockedSchemas.response>;
+};

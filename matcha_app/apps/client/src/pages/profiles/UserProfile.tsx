@@ -1,4 +1,5 @@
 import { ImageContainer } from '@/components/images/ImageContainer';
+import { UserAvatar } from '@/components/images/UserAvatar';
 import {
   Layout,
   LayoutContent,
@@ -6,6 +7,12 @@ import {
 } from '@/components/pagination/Layout';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { FameRating } from '@/components/ui/FameRating';
 import { Separator } from '@/components/ui/separator';
 import { Typography } from '@/components/ui/typography';
@@ -13,6 +20,7 @@ import { useChatStore } from '@/hooks/use-chat';
 import { useSession } from '@/hooks/useSession';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import {
+  blockUserSchemas,
   createLikeSchemas,
   deleteLikeSchemas,
   getNearDate,
@@ -21,21 +29,84 @@ import {
   getUserFameSchemas,
   getUserSchemas,
   getUserTagsSchemas,
+  isBlockedSchemas,
   isLikedSchemas,
   TTag,
+  unblockUserSchemas,
   usersMatchSchemas,
 } from '@matcha/common';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Heart, MessageCircle } from 'lucide-react';
+import { EllipsisVertical, Heart, MessageCircle } from 'lucide-react';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { socket } from '../../lib/socket';
+
+const ElipsisDropdown = () => {
+  const { id } = useParams();
+  const queryClient = useQueryClient();
+  const [isBlocked, setIsBlocked] = useState(false);
+
+  useQuery({
+    queryKey: ['isBlocked', id],
+    queryFn: async () => {
+      return await axiosFetch({
+        method: 'GET',
+        url: getUrl('api-users', { id: +id!, type: 'isBlocked' }),
+        schemas: isBlockedSchemas,
+        handleEnding: {
+          cb: (data) => {
+            setIsBlocked(data.blocked);
+          },
+        },
+      });
+    },
+  });
+
+  const blockMutation = useMutation({
+    mutationFn: async () => {
+      return await axiosFetch({
+        method: isBlocked ? 'DELETE' : 'POST',
+        url: getUrl('api-block'),
+        schemas: isBlocked ? unblockUserSchemas : blockUserSchemas,
+        data: {
+          userId: +id!,
+        },
+        handleEnding: {
+          successMessage: isBlocked ? 'User unblocked' : 'User blocked',
+          errorMessage: isBlocked
+            ? 'Error unblocking user'
+            : 'Error blocking user',
+          cb: () => {
+            queryClient.invalidateQueries({
+              queryKey: ['isBlocked'],
+            });
+          },
+        },
+      });
+    },
+  });
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button size="icon" className={'rounded-full'}>
+          <EllipsisVertical />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuItem onClick={() => blockMutation.mutate()}>
+          {isBlocked ? 'Unblock' : 'Block'}
+        </DropdownMenuItem>
+        <DropdownMenuItem>Report</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
 
 export const UserProfile = () => {
   const { id } = useParams();
   const session = useSession();
   const queryClient = useQueryClient();
-  const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [pictures, setPictures] = useState<File[]>([]);
   const [tags, setTags] = useState<TTag[]>([]);
   const [isLiked, setIsLiked] = useState(false);
@@ -112,11 +183,6 @@ export const UserProfile = () => {
         schemas: getPicturesSchemas,
         handleEnding: {
           cb: (data) => {
-            const uint8Array = new Uint8Array(data.pictures[0].file.buffer);
-            const file = new File([uint8Array], data.pictures[0].file.name, {
-              type: data.pictures[0].file.type,
-            });
-            setProfilePicture(file);
             setPictures(
               data.pictures.map((picture) => {
                 const uint8Array = new Uint8Array(picture.file.buffer);
@@ -226,23 +292,18 @@ export const UserProfile = () => {
     <Layout>
       <LayoutHeader>
         <div className="flex flex-col md:flex-row gap-5 w-full">
-          <div className="flex flex-row md:flex-col items-center gap-5">
+          <div className="flex flex-row md:flex-col items-center md:items-start gap-5">
             <div className="relative">
-              <img
-                className="size-40 rounded-full"
-                src={
-                  profilePicture
-                    ? URL.createObjectURL(profilePicture)
-                    : undefined
-                }
-              />
+              {userQuery.data?.user && (
+                <UserAvatar user={userQuery.data.user} size="lg" />
+              )}
               {userQuery.data?.user && userQuery.data.user.isOnline ? (
                 <div className="absolute bottom-2 right-2 w-8 h-8 bg-green-500 rounded-full" />
               ) : (
                 <div className="absolute bottom-2 right-2 w-8 h-8 border-4 border-gray-500 bg-background rounded-full" />
               )}
             </div>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 flex-1">
               <Typography variant="h2">
                 {userQuery.data?.user.name} {userQuery.data?.user.lastName}
               </Typography>
@@ -275,16 +336,15 @@ export const UserProfile = () => {
                 </Button>
                 <Button
                   size="icon"
-                  className={`rounded-full ${
-                    !haveMatched ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
+                  className={'rounded-full'}
+                  disabled={!haveMatched}
                   onClick={() => {
                     addChatWindow(userQuery.data!.user, session.user!.id);
                   }}
-                  disabled={!haveMatched}
                 >
                   <MessageCircle />
                 </Button>
+                <ElipsisDropdown />
               </div>
             )}
           </div>
