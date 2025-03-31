@@ -165,7 +165,7 @@ export const suggestedUsers = async (req: Request, res: Response) => {
         id: +id,
       },
     });
-    console.log('location :', location);
+    // console.log('location :', location);
     const latitude = location?.latitude as number;
     const longitude = location?.longitude as number;
     let locationDiff = 0.1;
@@ -186,7 +186,7 @@ export const suggestedUsers = async (req: Request, res: Response) => {
       locationDiff += 0.1;
     }
     const ids = [...new Set(goodLocations.map((l) => l.id))];
-    console.log('ids :', ids);
+    // console.log('ids :', ids);
     const likedUsers = await db.like.findMany({
       where: {
         userId: +id,

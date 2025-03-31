@@ -19,9 +19,7 @@ export const UserDropdownTrigger: React.FC<{
       localStorage.setItem('showBubble', JSON.stringify(true));
     };
     socket.on(`notification-bubble`, notificationBubbleHandler);
-    // console.log('notif bubble received');
     return () => {
-      // console.log('bye');
       socket.off(`notification-bubble`, notificationBubbleHandler);
     };
   }, []);

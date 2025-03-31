@@ -19,6 +19,15 @@ import { defaultResponse } from '../utils/defaultResponse';
 export const getUsers = async (_req: Request, res: Response) => {
   try {
     const users = await db.user.findMany({});
+    if (!users) {
+      return defaultResponse({
+        res,
+        status: 404,
+        json: {
+          message: 'User not found',
+        },
+      });
+    }
     const usersWithoutPassword = users.map((user) => {
       const { password: _, ...userWithoutPassword } = user;
       return userWithoutPassword;

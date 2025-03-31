@@ -1,25 +1,38 @@
 import { cn } from '@/lib/utils';
-import { ComponentProps } from 'react';
+import { useTheme } from '../theme/ThemeProvider';
+import { ComponentProps, use } from 'react';
 
 export const Logo: React.FC<{ size?: 'sm' } & ComponentProps<'button'>> = ({
   size,
   className,
   ...props
 }) => {
+  const { theme } = useTheme();
+
   if (size) {
     return (
       <button
         className={cn(
-          'flex items-center cursor-pointer',
+          'flex items-center justify-center mt-2 cursor-pointer',
           size === 'sm' ? 'w-full max-w-[300px]' : 'w-[800px]',
           className
         )}
         {...props}
       >
-        <img width={1100} height={220} src={'/logo.webp'} alt="logo" />
+        <img
+          width={110}
+          height={110}
+          src={
+            theme === 'dark'
+              ? '/images/logo_small_Dark.png'
+              : '/images/logo_small_Light.png'
+          }
+        />
       </button>
     );
   }
 
-  return <img width={1100} height={220} src={'/logo.webp'} alt="logo" />;
+  return (
+    <img width={120} height={120} src={'/images/logo_small.png'} alt="logo" />
+  );
 };

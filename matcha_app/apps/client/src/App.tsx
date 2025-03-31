@@ -25,7 +25,6 @@ import { UserDropdownTrigger } from './components/sidebar/UserDropdownTrigger';
 import { SidebarGroup, SidebarMenu } from './components/ui/sidebar';
 import { useChatStore } from './hooks/use-chat';
 import { useSession } from './hooks/useSession';
-import { useUsers } from './hooks/useUsers';
 import { axiosFetch } from './lib/fetch-utils/axiosFetch';
 import { socket } from './lib/socket';
 import { Pages } from './pages/Pages';
@@ -33,7 +32,9 @@ import { Pages } from './pages/Pages';
 const App = () => {
   const session = useSession();
   const navigate = useNavigate();
-  const { users } = useUsers();
+  const [users, setUsers] = useState<Pick<TUser, 'id' | 'name' | 'lastName'>[]>(
+    []
+  );
 
   const usersAllButAuthUser = users.filter(
     (user: TUserWithNames) => user.id !== session.user?.id
@@ -56,6 +57,22 @@ const App = () => {
         handleEnding: {
           cb: (data) => {
             setMatchUsers(data.users);
+          },
+        },
+      });
+    },
+  });
+
+  useQuery({
+    queryKey: ['users'],
+    queryFn: async () => {
+      return await axiosFetch({
+        method: 'GET',
+        url: getUrl('api-users'),
+        schemas: getUsersSchemas,
+        handleEnding: {
+          cb: (data) => {
+            setUsers(data.users);
           },
         },
       });

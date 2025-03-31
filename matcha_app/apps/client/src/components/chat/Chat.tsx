@@ -41,7 +41,6 @@ export const Chat: React.FC<PrivateChatProps> = ({
   >([]);
   const [message, setMessage] = useState<string>('');
   const [feedback, setFeedback] = useState('');
-  const [loading, setLoading] = useState(true);
   const { notifications, setNotifications } = useSetNotification();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -120,12 +119,10 @@ export const Chat: React.FC<PrivateChatProps> = ({
       setFeedback(message);
     };
 
-    // console.log('pv-', session.user!.id, '-', otherUser.id);
     socket.on(`pv-${session.user!.id}-${otherUser.id}`, messageHandler);
     socket.on(`feedback-${session.user!.id}-${otherUser.id}`, feedbackHandler);
 
     return () => {
-      // console.log('bye');
       socket.off(`pv-${session.user!.id}-${otherUser.id}`, messageHandler);
     };
   }, []);
@@ -134,7 +131,6 @@ export const Chat: React.FC<PrivateChatProps> = ({
     const receiverId = data.receiverId;
     const senderId = data.senderId;
     const message = data.message;
-    // console.log(`emitting ${type} with ${senderId}, ${receiverId}, ${message}`);
     socket.emit(type, { senderId, receiverId, message });
   };
 
