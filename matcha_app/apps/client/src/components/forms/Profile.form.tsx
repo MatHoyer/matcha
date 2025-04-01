@@ -134,60 +134,64 @@ export const ProfileForm: React.FC<
     <Form
       form={form}
       onSubmit={() => onSubmit()}
-      className="flex flex-col gap-2"
+      className="flex flex-col gap-4"
     >
-      <FormField
-        control={form.control}
-        name="name"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Name</FormLabel>
-            <FormControl>
-              <Input {...field} autoComplete="name" />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={form.control}
-        name="lastName"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Familly name</FormLabel>
-            <FormControl>
-              <Input {...field} autoComplete="family-name" />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={form.control}
-        name="birthDate"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Birth date</FormLabel>
-            <FormControl>
-              <DatePicker {...field} modal={modal} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={form.control}
-        name="email"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Email</FormLabel>
-            <FormControl>
-              <Input type="email" {...field} autoComplete="email" />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+      <div className="flex flex-col gap-2 md:flex-row">
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem className="flex-1">
+              <FormLabel>Name</FormLabel>
+              <FormControl>
+                <Input {...field} autoComplete="name" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="lastName"
+          render={({ field }) => (
+            <FormItem className="flex-1">
+              <FormLabel>Familly name</FormLabel>
+              <FormControl>
+                <Input {...field} autoComplete="family-name" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />{' '}
+      </div>
+      <div className="flex flex-col gap-2 md:flex-row">
+        <FormField
+          control={form.control}
+          name="birthDate"
+          render={({ field }) => (
+            <FormItem className="flex-1">
+              <FormLabel>Birth date</FormLabel>
+              <FormControl>
+                <DatePicker {...field} modal={modal} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem className="flex-1">
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input type="email" {...field} autoComplete="email" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
       <div className="flex flex-col gap-2 md:flex-row">
         <FormField
           control={form.control}
@@ -226,19 +230,35 @@ export const ProfileForm: React.FC<
           )}
         />
       </div>
-      <FormField
-        control={form.control}
-        name="tags"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Tags</FormLabel>
-            <FormControl>
-              <MultiTagCombobox {...field} modal={modal} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+      <div className="flex flex-col gap-2 md:flex-row">
+        <FormField
+          control={form.control}
+          name="tags"
+          render={({ field }) => (
+            <FormItem className="flex-1">
+              <FormLabel>Tags</FormLabel>
+              <FormControl>
+                <MultiTagCombobox {...field} modal={modal} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="location"
+          render={({ field }) => (
+            <FormItem className="flex-1">
+              <FormLabel>Location (update every days)</FormLabel>
+              <FormControl>
+                <GlobalLocationCombobox {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+      </div>
+
       <FormField
         control={form.control}
         name="biography"
@@ -250,19 +270,6 @@ export const ProfileForm: React.FC<
                 value={field.value || ''}
                 onChange={(e) => field.onChange(e.target.value)}
               />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
-      <FormField
-        control={form.control}
-        name="location"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Location (update every days)</FormLabel>
-            <FormControl>
-              <GlobalLocationCombobox {...field} />
             </FormControl>
             <FormMessage />
           </FormItem>

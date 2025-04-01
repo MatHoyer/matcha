@@ -4,11 +4,9 @@ import {
   LayoutContent,
   LayoutDescription,
   LayoutHeader,
-  LayoutTitle,
 } from '@/components/pagination/Layout';
 import { Card } from '@/components/ui/card';
 import { FameRating } from '@/components/ui/FameRating';
-import { AppLoader } from '@/components/ui/loaders';
 import { Typography } from '@/components/ui/typography';
 import { useSession } from '@/hooks/useSession';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
@@ -19,7 +17,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Badge } from '@/components/ui/badge';
 import { ChevronRight, MapPin, Mars, Venus } from 'lucide-react';
 import React, { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export const MatchRow: React.FC<{
   gUser: TAdvancedSearchSchema['response']['users'][number];
@@ -100,16 +98,15 @@ export const ForYou: React.FC = () => {
   // const [filteredUsers, setFilteredUsers] = useState(users);
   const { user } = useSession();
   const id = user?.id;
-  if (!id) return null;
 
   useQuery({
-    queryKey: ['suggestedProfiles'],
+    queryKey: ['suggestedProfiles', id],
     queryFn: async () => {
       return await axiosFetch({
         method: 'GET',
         url: getUrl('api-search', {
           type: 'forYou',
-          id: id,
+          id,
         }),
         schemas: suggestUsersSchema,
         handleEnding: {
@@ -125,7 +122,7 @@ export const ForYou: React.FC = () => {
   return (
     <Layout>
       <LayoutHeader>
-        <LayoutTitle>For you</LayoutTitle>
+        <div className="layout-title">For you</div>
         <LayoutDescription>Profiles you might like</LayoutDescription>
       </LayoutHeader>
 

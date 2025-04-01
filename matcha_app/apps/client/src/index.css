@@ -133,4 +133,7 @@
   body {
     @apply bg-background text-foreground;
   }
+  .layout-title {
+    @apply font-sans text-4xl;
+  }
 }

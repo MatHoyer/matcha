@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { useSetNotification } from '@/hooks/use-notification';
+// import { useSetNotification } from '@/hooks/use-notification';
 import { useSession } from '@/hooks/useSession';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import { socket } from '@/lib/socket';
@@ -41,7 +41,7 @@ export const Chat: React.FC<PrivateChatProps> = ({
   >([]);
   const [message, setMessage] = useState<string>('');
   const [feedback, setFeedback] = useState('');
-  const { notifications, setNotifications } = useSetNotification();
+  // const { notifications, setNotifications } = useSetNotification();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -91,7 +91,7 @@ export const Chat: React.FC<PrivateChatProps> = ({
           read: true,
         },
         handleEnding: {
-          cb: (data) => {
+          cb: () => {
             queryClient.invalidateQueries({
               queryKey: ['notifications'],
             });
