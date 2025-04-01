@@ -3,9 +3,7 @@ import {
   LayoutContent,
   LayoutDescription,
   LayoutHeader,
-  LayoutTitle,
 } from '@/components/pagination/Layout';
-import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Card, CardDescription } from '@/components/ui/card';
 import { useChatStore } from '@/hooks/use-chat';
@@ -28,7 +26,7 @@ import { axiosFetch } from '../../lib/fetch-utils/axiosFetch';
 import { getIcon } from './Notifications-utils';
 import { getUrl } from '@matcha/common';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { NavigationProvider } from 'react-day-picker';
+import { UserAvatar } from '@/components/images/UserAvatar';
 
 const NotificationsList: React.FC = () => {
   const { notifications, setNotifications } = useSetNotification();
@@ -69,7 +67,6 @@ const NotificationsList: React.FC = () => {
               (a, b) => b.dateTime.getTime() - a.dateTime.getTime()
             );
             setNotifications(formattedNotifications);
-            console.log('formattedNotifications : ', formattedNotifications);
           },
         },
       });
@@ -145,8 +142,7 @@ const NotificationsList: React.FC = () => {
           read: true,
         },
         handleEnding: {
-          cb: (data) => {
-            // console.log('invalidate query from setReadMessageNotif mutation');
+          cb: () => {
             queryClient.invalidateQueries({
               queryKey: ['notifications'],
             });
@@ -179,7 +175,7 @@ const NotificationsList: React.FC = () => {
 
   return (
     <LayoutContent className="flex flex-col gap-2">
-      <div className="flex gap-2 mb-4">
+      <div className="grid gap-2 grid-cols-1 md:flex md:flex-wrap">
         {typeNotif.map((type) => (
           <Button
             key={type}
@@ -218,9 +214,9 @@ const NotificationsList: React.FC = () => {
         >
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <Avatar>
-                <AvatarImage src="https://github.com/MatHoyer.png" />
-              </Avatar>
+              {notification.otherUser && (
+                <UserAvatar user={notification.otherUser} />
+              )}
 
               <div className="flex flex-col text-left">
                 <span>{getMessageNotification(notification)}</span>
@@ -244,7 +240,7 @@ export const Notifications: React.FC = () => {
   return (
     <Layout>
       <LayoutHeader>
-        <LayoutTitle>Notifications</LayoutTitle>
+        <div className="layout-title">Notifications</div>
         <LayoutDescription>What's new</LayoutDescription>
       </LayoutHeader>
       <NotificationsList />

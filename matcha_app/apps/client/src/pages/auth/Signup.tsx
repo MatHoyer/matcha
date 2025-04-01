@@ -14,7 +14,7 @@ const SignupPage: React.FC = () => {
         <Card className="w-96">
           <CardHeader>
             <CardTitle>
-              <Typography variant="h2">Sign up</Typography>
+              <Typography variant="h3">Sign up</Typography>
             </CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">

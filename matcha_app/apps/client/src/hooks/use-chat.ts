@@ -27,17 +27,30 @@ export const useChatStore = create<TChatStore>((set) => ({
     set((state) => {
       const sortedUserIds = [otherUser.id, userId].sort();
       const chatRoomName = `chat-${sortedUserIds[0]}-${sortedUserIds[1]}`;
-      console.log('chatRoomName : ', chatRoomName);
-      console.log('state.openedChats : ', state.openedChats);
-      if (!state.openedChats.some((chat) => chat.id === chatRoomName)) {
-        return {
-          openedChats: [
-            ...state.openedChats,
-            { id: chatRoomName, otherUser, status: 'full' },
-          ],
-        };
+
+      // if (!state.openedChats.some((chat) => chat.id === chatRoomName)) {
+      //   return {
+      //     openedChats: [
+      //       ...state.openedChats,
+      //       { id: chatRoomName, otherUser, status: 'full' },
+      //     ],
+      //   };
+      // }
+      // return state;
+
+      if (state.openedChats.some((chat) => chat.id === chatRoomName)) {
+        return state;
       }
-      return state;
+
+      let updatedChats = [...state.openedChats];
+      if (updatedChats.length >= 1) {
+        updatedChats = updatedChats.slice(1);
+      }
+      updatedChats.push({ id: chatRoomName, otherUser, status: 'full' });
+
+      return {
+        openedChats: updatedChats,
+      };
     });
   },
   removeChatWindow: (id) => {

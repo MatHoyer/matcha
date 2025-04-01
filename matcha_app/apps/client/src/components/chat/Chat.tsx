@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { useSetNotification } from '@/hooks/use-notification';
+// import { useSetNotification } from '@/hooks/use-notification';
 import { useSession } from '@/hooks/useSession';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import { socket } from '@/lib/socket';
@@ -41,8 +41,7 @@ export const Chat: React.FC<PrivateChatProps> = ({
   >([]);
   const [message, setMessage] = useState<string>('');
   const [feedback, setFeedback] = useState('');
-  const [loading, setLoading] = useState(true);
-  const { notifications, setNotifications } = useSetNotification();
+  // const { notifications, setNotifications } = useSetNotification();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
@@ -92,8 +91,7 @@ export const Chat: React.FC<PrivateChatProps> = ({
           read: true,
         },
         handleEnding: {
-          cb: (data) => {
-            // console.log('invalidate query from setReadMessageNotif mutation');
+          cb: () => {
             queryClient.invalidateQueries({
               queryKey: ['notifications'],
             });
@@ -120,12 +118,10 @@ export const Chat: React.FC<PrivateChatProps> = ({
       setFeedback(message);
     };
 
-    // console.log('pv-', session.user!.id, '-', otherUser.id);
     socket.on(`pv-${session.user!.id}-${otherUser.id}`, messageHandler);
     socket.on(`feedback-${session.user!.id}-${otherUser.id}`, feedbackHandler);
 
     return () => {
-      // console.log('bye');
       socket.off(`pv-${session.user!.id}-${otherUser.id}`, messageHandler);
     };
   }, []);
@@ -134,7 +130,6 @@ export const Chat: React.FC<PrivateChatProps> = ({
     const receiverId = data.receiverId;
     const senderId = data.senderId;
     const message = data.message;
-    // console.log(`emitting ${type} with ${senderId}, ${receiverId}, ${message}`);
     socket.emit(type, { senderId, receiverId, message });
   };
 
@@ -202,16 +197,14 @@ export const Chat: React.FC<PrivateChatProps> = ({
         <>
           <ul
             id="message-container"
-            className="relative flex flex-col h-60 overflow-y-auto bg-gray-800 rounded-lg p-3 shadow-inner"
+            className="relative flex flex-col h-60 overflow-y-auto rounded-lg p-3 shadow-inner"
           >
             {messages.map((data, index) => (
               <li
                 key={index}
-                className={`p-2 mb-2 rounded-md ${
-                  data.isOwnMessage
-                    ? 'bg-blue-600 text-white self-end'
-                    : 'bg-gray-700 text-gray-200'
-                }`}
+                className={`p-2 mb-2 rounded-md 
+                  ${data.isOwnMessage ? 'self-end' : ''}
+                `}
               >
                 <p className="text-sm">{data.message}</p>
                 <span className="text-xs block text-gray-400">
@@ -231,9 +224,6 @@ export const Chat: React.FC<PrivateChatProps> = ({
             onSubmit={sendMessage}
             className="mt-4 flex flex-col gap-2"
           >
-            <h2 className="text-xs mb-2 font-semibold">
-              {session.user!.name} :
-            </h2>
             <div className="flex items-center gap-2">
               <Input
                 id="message-input"

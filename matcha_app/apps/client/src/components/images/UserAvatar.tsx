@@ -12,7 +12,7 @@ export const UserAvatar: React.FC<{
   const [file, setFile] = useState<File | null>(null);
 
   useQuery({
-    queryKey: ['images-profile', 'dropdown'],
+    queryKey: ['images-profile', user.id],
     queryFn: async () => {
       return await axiosFetch({
         method: 'GET',

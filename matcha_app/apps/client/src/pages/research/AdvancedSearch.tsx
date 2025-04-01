@@ -131,7 +131,7 @@ export const AdvancedSearch: React.FC = () => {
   return (
     <Layout>
       <LayoutHeader>
-        <LayoutTitle>Advanced search</LayoutTitle>
+        <div className="layout-title">Advanced search</div>
         <LayoutDescription>Search love with criterias</LayoutDescription>
       </LayoutHeader>
       <LayoutContent className="flex flex-col gap-4">

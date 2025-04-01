@@ -140,7 +140,9 @@ export const advancedSearch = async (req: Request, res: Response) => {
 };
 
 export const suggestedUsers = async (req: Request, res: Response) => {
-  const id = req.params.id;
+  // const id = req.params.id;
+  const { id } = req.params;
+  console.log('->id :', id);
   try {
     const user = await db.user.findMany({
       where: {
@@ -156,16 +158,11 @@ export const suggestedUsers = async (req: Request, res: Response) => {
         },
       });
     }
-    // we want to send back a list of 50 suggested users that are not the user itself
-    // the closest to the user location (priority)
-    // the most common tags
-    // a maximum of fame
     const location = await db.location.findFirst({
       where: {
         id: +id,
       },
     });
-    console.log('location :', location);
     const latitude = location?.latitude as number;
     const longitude = location?.longitude as number;
     let locationDiff = 0.1;
@@ -186,7 +183,7 @@ export const suggestedUsers = async (req: Request, res: Response) => {
       locationDiff += 0.1;
     }
     const ids = [...new Set(goodLocations.map((l) => l.id))];
-    console.log('ids :', ids);
+    // console.log('ids :', ids);
     const likedUsers = await db.like.findMany({
       where: {
         userId: +id,
@@ -210,13 +207,11 @@ export const suggestedUsers = async (req: Request, res: Response) => {
         ),
       },
     });
-    console.log('users :', users);
 
-    // first sort by fame
     const fameResults = await batchPromises(
       ids.map((id) => fameCalculator(id))
     );
-    console.log('fameResults :', fameResults);
+    // console.log('fameResults :', fameResults);
     const usersResponse: TAdvancedSearchSchema['response']['users'] =
       await batchPromises(
         users.map(async (user) => {

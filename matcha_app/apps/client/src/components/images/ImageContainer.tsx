@@ -20,7 +20,7 @@ export const ImageContainer: React.FC<
     <div
       className={cn(
         className,
-        size === 'sm' ? 'w-[90px]' : 'w-[300px]',
+        size === 'sm' ? 'w-[90px]' : 'w-[200px]',
         'relative aspect-[3/4] overflow-hidden rounded-lg border bg-muted'
       )}
       {...containerProps}
