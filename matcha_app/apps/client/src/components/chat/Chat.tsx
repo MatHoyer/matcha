@@ -92,7 +92,6 @@ export const Chat: React.FC<PrivateChatProps> = ({
         },
         handleEnding: {
           cb: (data) => {
-            // console.log('invalidate query from setReadMessageNotif mutation');
             queryClient.invalidateQueries({
               queryKey: ['notifications'],
             });
@@ -198,16 +197,14 @@ export const Chat: React.FC<PrivateChatProps> = ({
         <>
           <ul
             id="message-container"
-            className="relative flex flex-col h-60 overflow-y-auto bg-gray-800 rounded-lg p-3 shadow-inner"
+            className="relative flex flex-col h-60 overflow-y-auto rounded-lg p-3 shadow-inner"
           >
             {messages.map((data, index) => (
               <li
                 key={index}
-                className={`p-2 mb-2 rounded-md ${
-                  data.isOwnMessage
-                    ? 'bg-blue-600 text-white self-end'
-                    : 'bg-gray-700 text-gray-200'
-                }`}
+                className={`p-2 mb-2 rounded-md 
+                  ${data.isOwnMessage ? 'self-end' : ''}
+                `}
               >
                 <p className="text-sm">{data.message}</p>
                 <span className="text-xs block text-gray-400">
@@ -227,9 +224,6 @@ export const Chat: React.FC<PrivateChatProps> = ({
             onSubmit={sendMessage}
             className="mt-4 flex flex-col gap-2"
           >
-            <h2 className="text-xs mb-2 font-semibold">
-              {session.user!.name} :
-            </h2>
             <div className="flex items-center gap-2">
               <Input
                 id="message-input"

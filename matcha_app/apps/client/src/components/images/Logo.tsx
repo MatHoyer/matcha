@@ -13,7 +13,7 @@ export const Logo: React.FC<{ size?: 'sm' } & ComponentProps<'button'>> = ({
     return (
       <button
         className={cn(
-          'flex items-center justify-center mt-2 cursor-pointer',
+          'flex items-center justify-center cursor-pointer',
           size === 'sm' ? 'w-full max-w-[300px]' : 'w-[800px]',
           className
         )}
