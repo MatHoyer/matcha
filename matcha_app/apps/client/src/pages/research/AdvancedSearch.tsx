@@ -150,55 +150,59 @@ export const AdvancedSearch: React.FC = () => {
           </div>
         ) : users.length > 0 ? (
           <div className="flex flex-col gap-2">
-            <div className="flex justify-center gap-2">
-              <MultiCombobox
-                name="gender"
-                list={GENDERS.map((gender) => ({
-                  value: gender,
-                  label: gender,
-                }))}
-                value={genderFilter}
-                onChange={setGenderFilter}
-              />
-              <MultiCombobox
-                name="preference"
-                list={ORIENTATIONS.map((orientation) => ({
-                  value: orientation,
-                  label: orientation,
-                }))}
-                value={preferenceFilter}
-                onChange={setPreferenceFilter}
-              />
-              <Button
-                variant="outline"
-                onClick={() =>
-                  setAgeOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'))
-                }
-                className="flex items-center gap-1"
-              >
-                Age{' '}
-                <motion.div
-                  animate={{ rotate: ageOrder === 'asc' ? 180 : 0 }}
-                  transition={{ duration: 0.3 }}
+            <div className="flex flex-col md:flex-row gap-2">
+              <div className="flex gap-2 w-full">
+                <MultiCombobox
+                  name="gender"
+                  list={GENDERS.map((gender) => ({
+                    value: gender,
+                    label: gender,
+                  }))}
+                  value={genderFilter}
+                  onChange={setGenderFilter}
+                />
+                <MultiCombobox
+                  name="preference"
+                  list={ORIENTATIONS.map((orientation) => ({
+                    value: orientation,
+                    label: orientation,
+                  }))}
+                  value={preferenceFilter}
+                  onChange={setPreferenceFilter}
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    setAgeOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'))
+                  }
+                  className="flex items-center gap-1 w-full md:w-auto"
                 >
-                  <ArrowUp />
-                </motion.div>
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() =>
-                  setFameOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'))
-                }
-                className="flex items-center gap-1"
-              >
-                Fame{' '}
-                <motion.div
-                  animate={{ rotate: fameOrder === 'asc' ? 180 : 0 }}
-                  transition={{ duration: 0.3 }}
+                  Age{' '}
+                  <motion.div
+                    animate={{ rotate: ageOrder === 'asc' ? 180 : 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <ArrowUp />
+                  </motion.div>
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    setFameOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'))
+                  }
+                  className="flex items-center gap-1 w-full md:w-auto"
                 >
-                  <ArrowUp />
-                </motion.div>
-              </Button>
+                  Fame{' '}
+                  <motion.div
+                    animate={{ rotate: fameOrder === 'asc' ? 180 : 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <ArrowUp />
+                  </motion.div>
+                </Button>
+              </div>
             </div>
             <div className="flex flex-col gap-2">
               {users
