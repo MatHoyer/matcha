@@ -41,7 +41,6 @@ export const MatchRow: React.FC<{
       {/* <div className="flex items-stretch"> */}
       <div className="w-full flex justify-center">
         <ImageContainer
-          // size="base"
           imageSrc={file ? URL.createObjectURL(file) : null}
           altImage="avatar"
           className=" w-full"

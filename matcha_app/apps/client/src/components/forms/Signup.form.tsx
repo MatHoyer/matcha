@@ -211,6 +211,7 @@ const SignupForm: React.FC<TFormProps<TForm, TSignupSchemas['response']>> = ({
         )}
       />
       <FormMessage>{form.formState.errors.root?.message}</FormMessage>
+      <div className="mb-2"></div>
       <SubmitButtonForm modal={modal} isLoading={mutation.isPending}>
         Signup
       </SubmitButtonForm>

@@ -10,8 +10,6 @@ const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const { theme } = useTheme();
 
-  console.log('theme', theme);
-
   return (
     <Layout className="flex justify-center">
       <img

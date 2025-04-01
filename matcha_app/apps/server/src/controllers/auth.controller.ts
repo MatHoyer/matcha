@@ -109,6 +109,7 @@ export const login = async (req: Request, res: Response) => {
   const token = jwt.sign({ id: user.id }, env.JWT_SECRET, {
     expiresIn: '5m',
   });
+  console.log('token : ', token);
 
   await sendEmail({
     to: user.email,

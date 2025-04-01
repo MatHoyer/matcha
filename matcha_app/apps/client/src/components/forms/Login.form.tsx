@@ -113,6 +113,7 @@ const LoginForm: React.FC<TFormProps<TForm, TLoginSchemas['response']>> = ({
         )}
       />
       <FormMessage>{form.formState.errors.root?.message}</FormMessage>
+      <div className="mb-2"></div>
       <SubmitButtonForm modal={modal} isLoading={mutation.isPending}>
         Login
       </SubmitButtonForm>
