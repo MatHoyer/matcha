@@ -2,7 +2,7 @@ import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import { cn } from '@/lib/utils';
 import { getProfilePictureSchemas, getUrl, TUser } from '@matcha/common';
 import { useQuery } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 
 export const UserAvatar: React.FC<{
@@ -11,7 +11,7 @@ export const UserAvatar: React.FC<{
 }> = ({ user, size = 'sm' }) => {
   const [file, setFile] = useState<File | null>(null);
 
-  useQuery({
+  const { data } = useQuery({
     queryKey: ['images-profile', user.id],
     queryFn: async () => {
       return await axiosFetch({
@@ -21,18 +21,19 @@ export const UserAvatar: React.FC<{
           type: 'user-pp',
           id: user.id,
         }),
-        handleEnding: {
-          cb: (data) => {
-            const uint8Array = new Uint8Array(data.picture.file.buffer);
-            const file = new File([uint8Array], data.picture.file.name, {
-              type: data.picture.file.type,
-            });
-            setFile(file);
-          },
-        },
       });
     },
   });
+
+  useEffect(() => {
+    if (data) {
+      const uint8Array = new Uint8Array(data.picture.file.buffer);
+      const file = new File([uint8Array], data.picture.file.name, {
+        type: data.picture.file.type,
+      });
+      setFile(file);
+    }
+  }, [data]);
 
   return (
     <Avatar className={cn(size === 'lg' && 'size-44')}>

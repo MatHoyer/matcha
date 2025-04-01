@@ -5,9 +5,9 @@ import {
   LayoutContent,
   LayoutDescription,
   LayoutHeader,
-  LayoutTitle,
 } from '@/components/pagination/Layout';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { MultiCombobox } from '@/components/ui/combobox';
 import { FameRating } from '@/components/ui/FameRating';
@@ -24,7 +24,8 @@ import {
   TOrientation,
 } from '@matcha/common';
 import { useQuery } from '@tanstack/react-query';
-import { ChevronRight, MapPin, Mars, Venus } from 'lucide-react';
+import { ArrowUp, ChevronRight, MapPin, Mars, Venus } from 'lucide-react';
+import { motion } from 'motion/react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -127,6 +128,8 @@ export const AdvancedSearch: React.FC = () => {
   const [preferenceFilter, setPreferenceFilter] = useState<
     TOrientation[] | null
   >([]);
+  const [ageOrder, setAgeOrder] = useState<'asc' | 'desc'>('asc');
+  const [fameOrder, setFameOrder] = useState<'asc' | 'desc'>('asc');
 
   return (
     <Layout>
@@ -147,25 +150,59 @@ export const AdvancedSearch: React.FC = () => {
           </div>
         ) : users.length > 0 ? (
           <div className="flex flex-col gap-2">
-            <div className="flex justify-center gap-2">
-              <MultiCombobox
-                name="gender"
-                list={GENDERS.map((gender) => ({
-                  value: gender,
-                  label: gender,
-                }))}
-                value={genderFilter}
-                onChange={setGenderFilter}
-              />
-              <MultiCombobox
-                name="preference"
-                list={ORIENTATIONS.map((orientation) => ({
-                  value: orientation,
-                  label: orientation,
-                }))}
-                value={preferenceFilter}
-                onChange={setPreferenceFilter}
-              />
+            <div className="flex flex-col md:flex-row gap-2">
+              <div className="flex gap-2 w-full">
+                <MultiCombobox
+                  name="gender"
+                  list={GENDERS.map((gender) => ({
+                    value: gender,
+                    label: gender,
+                  }))}
+                  value={genderFilter}
+                  onChange={setGenderFilter}
+                />
+                <MultiCombobox
+                  name="preference"
+                  list={ORIENTATIONS.map((orientation) => ({
+                    value: orientation,
+                    label: orientation,
+                  }))}
+                  value={preferenceFilter}
+                  onChange={setPreferenceFilter}
+                />
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    setAgeOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'))
+                  }
+                  className="flex items-center gap-1 w-full md:w-auto"
+                >
+                  Age{' '}
+                  <motion.div
+                    animate={{ rotate: ageOrder === 'asc' ? 180 : 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <ArrowUp />
+                  </motion.div>
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() =>
+                    setFameOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'))
+                  }
+                  className="flex items-center gap-1 w-full md:w-auto"
+                >
+                  Fame{' '}
+                  <motion.div
+                    animate={{ rotate: fameOrder === 'asc' ? 180 : 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <ArrowUp />
+                  </motion.div>
+                </Button>
+              </div>
             </div>
             <div className="flex flex-col gap-2">
               {users
@@ -178,6 +215,19 @@ export const AdvancedSearch: React.FC = () => {
                       !preferenceFilter ||
                       preferenceFilter.length === 0)
                   );
+                })
+                .sort((a, b) => {
+                  if (ageOrder === 'asc') {
+                    return a.user.age - b.user.age;
+                  } else if (ageOrder === 'desc') {
+                    return b.user.age - a.user.age;
+                  }
+                  if (fameOrder === 'asc') {
+                    return a.fame - b.fame;
+                  } else if (fameOrder === 'desc') {
+                    return b.fame - a.fame;
+                  }
+                  return 0;
                 })
                 .map((gUser) => (
                   <MatchRow key={gUser.user.id} gUser={gUser} />
