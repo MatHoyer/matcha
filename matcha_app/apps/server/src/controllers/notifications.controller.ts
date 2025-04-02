@@ -68,7 +68,7 @@ export const updateNotification = async (req: Request, res: Response) => {
         return { ...notification, otherUser };
       })
     );
-    console.log('notif (update) :', notificationsWithUser);
+    // console.log('notif (update) :', notificationsWithUser);
     res.status(200).json({ notificationsWithUser });
   } catch (error) {
     console.error('Error fetching messages:', error);

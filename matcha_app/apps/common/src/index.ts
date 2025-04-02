@@ -79,11 +79,13 @@ export {
   createLikeSchemas,
   deleteLikeSchemas,
   isLikedSchemas,
+  likesMeSchemas,
 } from './schemas/api/like.schema';
 export type {
   TCreateLikeSchemas,
   TDeleteLikeSchemas,
   TIsLikedSchemas,
+  TLikesMeSchemas,
 } from './schemas/api/like.schema';
 export {
   getUserLocationSchemas,
@@ -124,10 +126,12 @@ export type {
 } from './schemas/api/picture.schema';
 export {
   advancedSearchSchema,
+  forYouSchema,
   suggestUsersSchema,
 } from './schemas/api/search.schema';
 export type {
   TAdvancedSearchSchema,
+  TForYouSchema,
   TSuggestUsersSchema,
 } from './schemas/api/search.schema';
 export {

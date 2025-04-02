@@ -17,7 +17,7 @@ import {
 } from '@matcha/common';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Minus, X } from 'lucide-react';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserAvatar } from '../images/UserAvatar';
 import { Typography } from '../ui/typography';
@@ -126,6 +126,12 @@ export const Chat: React.FC<PrivateChatProps> = ({
     };
   }, []);
 
+  const messageEndRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
+
   const socketEmitter = (type: string, data: TSendMessageSchema) => {
     const receiverId = data.receiverId;
     const senderId = data.senderId;
@@ -206,7 +212,9 @@ export const Chat: React.FC<PrivateChatProps> = ({
                   ${data.isOwnMessage ? 'self-end' : ''}
                 `}
               >
-                <p className="text-sm">{data.message}</p>
+                <p className="text-sm break-all whitespace-normal">
+                  {data.message}
+                </p>
                 <span className="text-xs block text-gray-400">
                   {data.name} • {getNearDate(data.dateTime)}
                 </span>
@@ -217,6 +225,7 @@ export const Chat: React.FC<PrivateChatProps> = ({
                 {feedback}
               </li>
             )}
+            <div ref={messageEndRef} />
           </ul>
 
           <form
@@ -231,6 +240,7 @@ export const Chat: React.FC<PrivateChatProps> = ({
                 placeholder="Type a message..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
+                maxLength={500}
                 onFocus={() =>
                   sendFeedback(`${session.user?.name} is typing...`)
                 }

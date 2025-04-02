@@ -40,6 +40,41 @@ export type TAdvancedSearchSchema = {
   };
 };
 
+export const forYouSchema = {
+  requirements: z.object({
+    ages: z.object({
+      min: z.number(),
+      max: z.number(),
+    }),
+    fame: z.number().min(1),
+    location: z.string(),
+    tags: z.array(z.string()),
+  }),
+  response: z.object({
+    users: z.array(
+      z.object({
+        user: userSchema,
+        location: z.string(),
+        tags: z.array(tagSchema),
+        fame: z.number(),
+      })
+    ),
+  }),
+};
+export type TForYouSchema = {
+  requirements: Infer<typeof forYouSchema.requirements>;
+  response: {
+    users: {
+      user: Infer<typeof userSchema>;
+      location: Infer<
+        typeof forYouSchema.response
+      >['users'][number]['location'];
+      tags: Infer<typeof forYouSchema.response>['users'][number]['tags'];
+      fame: Infer<typeof forYouSchema.response>['users'][number]['fame'];
+    }[];
+  };
+};
+
 export const suggestUsersSchema = {
   response: z.object({
     users: z.array(

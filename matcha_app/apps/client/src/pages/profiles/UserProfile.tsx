@@ -31,15 +31,23 @@ import {
   getUserTagsSchemas,
   isBlockedSchemas,
   isLikedSchemas,
+  likesMeSchemas,
   TTag,
   unblockUserSchemas,
   usersMatchSchemas,
 } from '@matcha/common';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { EllipsisVertical, Heart, MessageCircle } from 'lucide-react';
+import {
+  ChevronRight,
+  EllipsisVertical,
+  Heart,
+  MessageCircle,
+} from 'lucide-react';
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { socket } from '../../lib/socket';
+import { motion } from 'framer-motion';
+import { useSidebar } from '@/components/ui/sidebar';
 
 const ElipsisDropdown = () => {
   const { id } = useParams();
@@ -110,6 +118,7 @@ export const UserProfile = () => {
   const [pictures, setPictures] = useState<File[]>([]);
   const [tags, setTags] = useState<TTag[]>([]);
   const [isLiked, setIsLiked] = useState(false);
+  const [likesMe, setLikesMe] = useState(false);
   const { addChatWindow } = useChatStore();
   const [fame, setFame] = useState(1);
   const [haveMatched, setHaveMatched] = useState(false);
@@ -124,9 +133,6 @@ export const UserProfile = () => {
         schemas: getUserSchemas,
         handleEnding: {
           cb: () => {
-            console.log(
-              `about to emit send view ! senderViewId : ${session.user?.id} receiverViewId : ${id}`
-            );
             if (session.user?.id !== +id) {
               socket.emit('send-view', {
                 senderViewId: session.user?.id,
@@ -236,6 +242,25 @@ export const UserProfile = () => {
   });
 
   useQuery({
+    queryKey: ['likes-me', id],
+    queryFn: async () => {
+      return await axiosFetch({
+        method: 'GET',
+        url: getUrl('api-likes', {
+          type: 'likes-me',
+          id: +id!,
+        }),
+        schemas: likesMeSchemas,
+        handleEnding: {
+          cb: (data) => {
+            setLikesMe(data.isLiked);
+          },
+        },
+      });
+    },
+  });
+
+  useQuery({
     queryKey: ['userMatched'],
     queryFn: async () => {
       return await axiosFetch({
@@ -292,41 +317,50 @@ export const UserProfile = () => {
     <Layout>
       <LayoutHeader>
         <div className="flex flex-col md:flex-row gap-5 w-full">
-          <div className="flex flex-row md:flex-col items-center md:items-start gap-5">
+          <div className="flex items-center  gap-5">
             <div className="relative">
               {userQuery.data?.user && (
-                <UserAvatar user={userQuery.data.user} size="lg" />
+                <UserAvatar user={userQuery.data.user} size="md" />
               )}
               {userQuery.data?.user && userQuery.data.user.isOnline ? (
-                <div className="absolute bottom-2 right-2 w-8 h-8 bg-green-500 rounded-full" />
+                <div className="absolute bottom-2 right-2 w-5 h-5 bg-green-500 rounded-full" />
               ) : (
-                <div className="absolute bottom-2 right-2 w-8 h-8 border-4 border-gray-500 bg-background rounded-full" />
+                <div className="absolute bottom-2 right-2 w-5 h-5 border-4 border-gray-500 bg-background rounded-full" />
               )}
             </div>
-            <div className="flex flex-col gap-2 flex-1">
+            <div>
               <Typography variant="h2">
                 {userQuery.data?.user.name} {userQuery.data?.user.lastName}
               </Typography>
-              <div className="flex gap-2">
-                {tags.map((tag) => (
-                  <Badge key={tag.id}>{tag.name}</Badge>
-                ))}
-              </div>
-              <Typography variant="muted">
-                {userQuery.data?.user.biography}
-              </Typography>
+              {userQuery.data?.user && !userQuery.data.user.isOnline && (
+                <Typography variant="muted">
+                  {`Connected ${getNearDate(
+                    userQuery.data.user.lastTimeOnline
+                  )}`}
+                </Typography>
+              )}
             </div>
           </div>
           <div className="flex-1 hidden md:block" />
-          <div className="flex flex-row md:flex-col items-end gap-10">
-            {userQuery.data?.user && !userQuery.data.user.isOnline && (
-              <Typography variant="muted">
-                {`Connected ${getNearDate(userQuery.data.user.lastTimeOnline)}`}
-              </Typography>
-            )}
+          <div className="flex flex-col items-end gap-5 mt-auto">
             <FameRating note={fame} />
             {session.user?.id !== +(id || 0) && (
               <div className="flex items-center gap-2">
+                {likesMe && !isLiked && (
+                  <div className="flex items-center space-x-2">
+                    <span className=" text-sm">Like back for a match !</span>
+                    <motion.div
+                      animate={{ x: [0, 5, -5, 0] }}
+                      transition={{
+                        repeat: Infinity,
+                        duration: 0.5,
+                        ease: 'easeInOut',
+                      }}
+                    >
+                      <ChevronRight />
+                    </motion.div>
+                  </div>
+                )}
                 <Button
                   size="icon"
                   className="rounded-full"
@@ -350,18 +384,34 @@ export const UserProfile = () => {
           </div>
         </div>
       </LayoutHeader>
-      <LayoutContent className="flex flex-col gap-6">
-        <Separator />
-        <Typography variant="large">Pictures</Typography>
-        <div className="flex flex-col items-center gap-2">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-2">
-            {pictures.map((picture) => (
-              <ImageContainer
-                key={picture.name}
-                imageSrc={URL.createObjectURL(picture)}
-                altImage="Profile picture"
-              />
+      <Separator />
+      <LayoutContent className="flex flex-col gap-6 lg:flex-row">
+        <div className="lg:w-1/2 flex flex-col gap-6">
+          <Typography variant="large">Bio</Typography>
+          <Typography variant="muted">
+            {userQuery.data?.user.biography}
+          </Typography>
+          <div className="flex gap-2">
+            {tags.map((tag) => (
+              <Badge key={tag.id} className="text-md px-3 py-1">
+                {tag.name}
+              </Badge>
             ))}
+          </div>
+        </div>
+        {/* <Separator /> */}
+        <div className="lg:w-1/2 flex flex-col gap-6">
+          <Typography variant="large">Pictures</Typography>
+          <div className="flex justify-center">
+            <div className="grid grid-cols-1 sm:grid-cols-3  lg:grid-cols-2 xl:grid-cols-2 gap-3">
+              {pictures.map((picture) => (
+                <ImageContainer
+                  key={picture.name}
+                  imageSrc={URL.createObjectURL(picture)}
+                  altImage="Profile picture"
+                />
+              ))}
+            </div>
           </div>
         </div>
       </LayoutContent>

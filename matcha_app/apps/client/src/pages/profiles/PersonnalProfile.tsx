@@ -156,23 +156,13 @@ export const PersonnalProfile = () => {
   return (
     <Layout>
       <LayoutHeader>
-        <div className="layout-title">My profile</div>
-      </LayoutHeader>
-      <LayoutContent className="flex flex-col gap-6 lg:flex-row">
-        <div className="lg:w-1/2 flex flex-col gap-6">
-          <Typography variant="large">Informations</Typography>
-          <ProfileForm />
-          <Button
-            variant="destructive"
-            onClick={() => resetPasswordMutation.mutate()}
-          >
-            Reset password
-          </Button>
-          <Separator />
-          <div className="w-full">
+        <div className="flex flex-row items-center justify-between w-full">
+          <div className="layout-title">My profile</div>
+
+          <div className="flex">
             <Button
               variant="ghost"
-              className="w-full"
+              className="w-full md:w-auto mt-2"
               onClick={() =>
                 navigate(getUrl('client-profile', { id: session!.user!.id }))
               }
@@ -181,11 +171,24 @@ export const PersonnalProfile = () => {
             </Button>
           </div>
         </div>
+      </LayoutHeader>
+      <LayoutContent className="flex flex-col gap-6 lg:flex-row">
+        <div className="lg:w-1/2 flex flex-col gap-6">
+          <Typography variant="large">Informations</Typography>
+          <ProfileForm />
+          <Separator />
+          <Button
+            variant="destructive"
+            onClick={() => resetPasswordMutation.mutate()}
+          >
+            Reset password
+          </Button>
+        </div>
 
         <div className="lg:w-1/2 flex flex-col gap-6">
           <Typography variant="large">Pictures</Typography>
-          <div className="flex flex-col items-center gap-2">
-            <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-2">
+          <div className="flex justify-center">
+            <div className="grid grid-cols-1 sm:grid-cols-3  lg:grid-cols-2 xl:grid-cols-2 gap-3">
               {imageQuery.data?.pictures.map((picture) => {
                 const uint8Array = new Uint8Array(picture.file.buffer);
                 const file = new File([uint8Array], picture.file.name, {
@@ -201,7 +204,7 @@ export const PersonnalProfile = () => {
                 );
               })}
               {Array.from({
-                length: 4 - (imageQuery.data?.pictures.length ?? 0),
+                length: 6 - (imageQuery.data?.pictures.length ?? 0),
               }).map((_, index) => (
                 <PictureCard
                   key={index}

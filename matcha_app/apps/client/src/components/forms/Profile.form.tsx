@@ -275,7 +275,7 @@ export const ProfileForm: React.FC<
           </FormItem>
         )}
       />
-      <div className="mt-4" />
+      <div className="mt-1" />
       <FormMessage>{form.formState.errors.root?.message}</FormMessage>
       <SubmitButtonForm modal={modal} isLoading={mutation.isPending}>
         Update profile

@@ -10,6 +10,15 @@ export type TIsLikedSchemas = {
   response: Infer<typeof isLikedSchemas.response>;
 };
 
+export const likesMeSchemas = {
+  response: z.object({
+    isLiked: z.boolean(),
+  }),
+};
+export type TLikesMeSchemas = {
+  response: Infer<typeof isLikedSchemas.response>;
+};
+
 export const createLikeSchemas = {
   requirements: z.object({
     likedId: userSchema.pick(['id']).shape.id,

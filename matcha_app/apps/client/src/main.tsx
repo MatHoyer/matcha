@@ -9,6 +9,7 @@ import { GlobalDialog } from './components/dialogs/components/GlobalDialog';
 import { ThemeProvider } from './components/theme/ThemeProvider';
 import './index.css';
 import { NotificationProvider } from './pages/notification/Notifications-context';
+import { TailwindIndicator } from './components/TailwindIndicator';
 
 const queryClient = new QueryClient();
 
@@ -22,6 +23,7 @@ createRoot(document.getElementById('root')!).render(
         <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
           <NotificationProvider>
             <App />
+            <TailwindIndicator />
           </NotificationProvider>
         </ThemeProvider>
       </BrowserRouter>
