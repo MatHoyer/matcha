@@ -113,32 +113,51 @@ export const advancedSearch = async (req: Request, res: Response) => {
     },
   });
 
-  const usersResponse: TAdvancedSearchSchema['response']['users'] =
-    await batchPromises(
-      users.map(async (user) => {
-        const allUserTags = await db.userTag.findMany({
-          where: {
-            userId: user.id,
+  const usersResponse: (
+    | TAdvancedSearchSchema['response']['users'][number]
+    | null
+  )[] = await batchPromises(
+    users.map(async (user) => {
+      const allUserTags = await db.userTag.findMany({
+        where: {
+          userId: user.id,
+        },
+      });
+      const allTags = await db.tag.findMany({
+        where: {
+          id: {
+            $in: allUserTags.map((ut) => ut.tagId),
           },
-        });
-        const allTags = await db.tag.findMany({
-          where: {
-            id: {
-              $in: allUserTags.map((ut) => ut.tagId),
-            },
-          },
-        });
+        },
+      });
 
-        return {
-          user: user,
-          tags: allTags as { id: number; name: string }[],
-          fame: fameResults.find((f) => f.userId === user.id)?.fame || 1,
-          location,
-        };
-      })
-    );
+      const userLocation = await db.location.findFirst({
+        where: {
+          id: user.id,
+        },
+      });
+      if (!userLocation) {
+        return null;
+      }
 
-  res.status(200).json({ users: usersResponse });
+      const allLocations = await db.globalLocation.findMany({});
+      const goodLocation = findClosestLocation(userLocation, allLocations);
+      const locationName = allLocations.find(
+        (gl) =>
+          gl.latitude === goodLocation?.latitude &&
+          gl.longitude === goodLocation?.longitude
+      )?.name;
+
+      return {
+        user: user,
+        tags: allTags as { id: number; name: string }[],
+        fame: fameResults.find((f) => f.userId === user.id)?.fame || 1,
+        location: locationName || 'Unknown',
+      };
+    })
+  );
+
+  res.status(200).json({ users: usersResponse.filter((u) => u) });
 };
 
 export const suggestedUsers = async (req: Request, res: Response) => {

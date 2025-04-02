@@ -25,6 +25,7 @@ import {
   deleteLikeSchemas,
   getNearDate,
   getPicturesSchemas,
+  getProfilePictureSchemas,
   getUrl,
   getUserFameSchemas,
   getUserSchemas,
@@ -122,6 +123,7 @@ export const UserProfile = () => {
   const { addChatWindow } = useChatStore();
   const [fame, setFame] = useState(1);
   const [haveMatched, setHaveMatched] = useState(false);
+  const [canLike, setCanLike] = useState(false);
 
   const userQuery = useQuery({
     queryKey: ['user', id],
@@ -313,6 +315,25 @@ export const UserProfile = () => {
     },
   });
 
+  useQuery({
+    queryKey: ['image-profile', 'profile'],
+    queryFn: async () => {
+      return await axiosFetch({
+        method: 'GET',
+        url: getUrl('api-picture', {
+          type: 'user-pp',
+          id: session.user?.id,
+        }),
+        schemas: getProfilePictureSchemas,
+        handleEnding: {
+          cb: (data) => {
+            setCanLike(!!data.picture);
+          },
+        },
+      });
+    },
+  });
+
   return (
     <Layout>
       <LayoutHeader>
@@ -364,7 +385,8 @@ export const UserProfile = () => {
                 <Button
                   size="icon"
                   className="rounded-full"
-                  onClick={() => likeMutation.mutate()}
+                  onClick={canLike ? () => likeMutation.mutate() : undefined}
+                  disabled={!canLike}
                 >
                   <Heart fill={isLiked ? 'red' : 'none'} />
                 </Button>

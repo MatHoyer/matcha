@@ -38,6 +38,22 @@ export const createLike = async (req: Request, res: Response) => {
   const { likedId } = req.body as TCreateLikeSchemas['requirements'];
   const { id } = req.user;
 
+  const profilePicture = await db.image.findFirst({
+    where: {
+      userId: id,
+      isProfile: true,
+    },
+  });
+  if (!profilePicture) {
+    return defaultResponse({
+      res,
+      status: 400,
+      json: {
+        message: 'Cannot like without a profile picture',
+      },
+    });
+  }
+
   const like = await db.like.create({
     data: {
       likedId,
