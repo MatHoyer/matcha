@@ -10,14 +10,19 @@ import { FameRating } from '@/components/ui/FameRating';
 import { Typography } from '@/components/ui/typography';
 import { useSession } from '@/hooks/useSession';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
-import { TAdvancedSearchSchema } from '@matcha/common';
+import { GENDERS, ORIENTATIONS, TAdvancedSearchSchema } from '@matcha/common';
 import { getUrl } from '@matcha/common';
 import { suggestUsersSchema } from '@matcha/common';
 import { useQuery } from '@tanstack/react-query';
 import { Badge } from '@/components/ui/badge';
-import { ChevronRight, MapPin, Mars, Venus } from 'lucide-react';
+import { ArrowUp, ChevronRight, MapPin, Mars, Venus } from 'lucide-react';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { TGender } from '@matcha/common';
+import { TOrientation } from '@matcha/common';
+import { MultiCombobox } from '@/components/ui/combobox';
+import { Button } from '@/components/ui/button';
+import { motion } from 'motion/react';
 
 export const MatchRow: React.FC<{
   gUser: TAdvancedSearchSchema['response']['users'][number];
@@ -99,6 +104,13 @@ export const ForYou: React.FC = () => {
   const { user } = useSession();
   const id = user?.id;
 
+  const [genderFilter, setGenderFilter] = useState<TGender[] | null>([]);
+  const [preferenceFilter, setPreferenceFilter] = useState<
+    TOrientation[] | null
+  >([]);
+  const [ageOrder, setAgeOrder] = useState<'asc' | 'desc'>('asc');
+  const [fameOrder, setFameOrder] = useState<'asc' | 'desc'>('asc');
+
   useQuery({
     queryKey: ['suggestedProfiles', id],
     queryFn: async () => {
@@ -112,6 +124,7 @@ export const ForYou: React.FC = () => {
         handleEnding: {
           cb: (data) => {
             setUsers(data.users);
+            console.log('users : ', data.users);
             // setFilteredUsers(data.users);
           },
         },
@@ -126,11 +139,100 @@ export const ForYou: React.FC = () => {
         <LayoutDescription>Profiles you might like</LayoutDescription>
       </LayoutHeader>
 
-      <LayoutContent className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4">
-        {users.map((gUser) => (
-          <MatchRow key={gUser.user.id} gUser={gUser} />
-        ))}
+      <LayoutContent>
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-wrap gap-2 w-full items-center">
+            <div className="flex gap-2 w-full">
+              <MultiCombobox
+                name="gender"
+                list={GENDERS.map((gender) => ({
+                  value: gender,
+                  label: gender,
+                }))}
+                value={genderFilter}
+                onChange={setGenderFilter}
+              />
+              <MultiCombobox
+                name="preference"
+                list={ORIENTATIONS.map((orientation) => ({
+                  value: orientation,
+                  label: orientation,
+                }))}
+                value={preferenceFilter}
+                onChange={setPreferenceFilter}
+              />
+            </div>
+            {/* <div className="flex gap-2"> */}
+            <Button
+              variant="outline"
+              onClick={() =>
+                setAgeOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'))
+              }
+              className="flex items-center gap-1 w-full md:w-auto"
+            >
+              Age{' '}
+              <motion.div
+                animate={{ rotate: ageOrder === 'asc' ? 180 : 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <ArrowUp />
+              </motion.div>
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() =>
+                setFameOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'))
+              }
+              className="flex items-center gap-1 w-full md:w-auto"
+            >
+              Fame{' '}
+              <motion.div
+                animate={{ rotate: fameOrder === 'asc' ? 180 : 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <ArrowUp />
+              </motion.div>
+            </Button>
+            {/* </div> */}
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4">
+            {users
+              .filter((user) => {
+                return (
+                  (genderFilter?.includes(user.user.gender) ||
+                    !genderFilter ||
+                    genderFilter.length === 0) &&
+                  (preferenceFilter?.includes(user.user.preference) ||
+                    !preferenceFilter ||
+                    preferenceFilter.length === 0)
+                );
+              })
+              .sort((a, b) => {
+                if (ageOrder === 'asc') {
+                  return a.user.age - b.user.age;
+                } else if (ageOrder === 'desc') {
+                  return b.user.age - a.user.age;
+                }
+                if (fameOrder === 'asc') {
+                  return a.fame - b.fame;
+                } else if (fameOrder === 'desc') {
+                  return b.fame - a.fame;
+                }
+                return 0;
+              })
+              .map((gUser) => (
+                // <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4">
+                <MatchRow key={gUser.user.id} gUser={gUser} />
+                // </div>
+              ))}
+          </div>
+        </div>
       </LayoutContent>
     </Layout>
   );
 };
+{
+  /* {users.map((gUser) => (
+          <MatchRow key={gUser.user.id} gUser={gUser} />
+        ))} */
+}

@@ -49,7 +49,7 @@ export type TApiRouteDataRequirements = {
   };
   'api-likes': {
     id?: number;
-    type?: 'new' | 'is-liked';
+    type?: 'new' | 'is-liked' | 'likes-me';
   };
   'api-location': {
     id?: number;
@@ -122,7 +122,8 @@ const routes: {
     type ? `/api/notifications/${type}` : '/api/notifications',
   'api-likes': ({ id, type }) => {
     if (type) {
-      if (['is-liked'].includes(type) && id) {
+      if (['is-liked', 'likes-me'].includes(type) && id) {
+        console.log('type', type);
         return `/api/likes/${type}/${id}`;
       }
       return `/api/likes/${type}`;

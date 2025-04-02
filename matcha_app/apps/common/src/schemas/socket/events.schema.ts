@@ -25,5 +25,6 @@ export const events = {
   'send-feedback': sendMessageSchema,
   'send-like-unlike': likesSchema,
   'send-view': viewsSchema,
-  disconnect: z.null(),
+  // disconnect: z.null(),
+  disconnect: z.union([z.null(), z.string()]),
 };

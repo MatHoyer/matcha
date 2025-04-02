@@ -163,7 +163,7 @@ export const createPicture = async (req: Request, res: Response) => {
       where: { userId },
     });
 
-    if (pictures.length >= 5) {
+    if (pictures.length >= 6) {
       return defaultResponse({
         res,
         status: 400,

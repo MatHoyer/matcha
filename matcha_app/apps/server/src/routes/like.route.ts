@@ -9,6 +9,7 @@ import {
   createLike,
   deleteLike,
   isLiked,
+  likesMe,
 } from '../controllers/like.controller.js';
 import { bodyParser } from '../middlewares/bodyParser.middleware.js';
 import { isLogged } from '../middlewares/isLogged.middleware.js';
@@ -21,6 +22,12 @@ likeRouter.get(
   isLogged,
   paramsParser(z.object({ id: userSchema.pick(['id']).shape.id })),
   isLiked
+);
+likeRouter.get(
+  '/likes-me/:id',
+  isLogged,
+  paramsParser(z.object({ id: userSchema.pick(['id']).shape.id })),
+  likesMe
 );
 likeRouter.post(
   '/new',

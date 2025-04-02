@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 
 export const UserAvatar: React.FC<{
   user: Omit<TUser, 'password'>;
-  size?: 'sm' | 'lg';
+  size?: 'sm' | 'md' | 'lg';
 }> = ({ user, size = 'sm' }) => {
   const [file, setFile] = useState<File | null>(null);
 
@@ -36,9 +36,15 @@ export const UserAvatar: React.FC<{
   }, [data]);
 
   return (
-    <Avatar className={cn(size === 'lg' && 'size-44')}>
+    <Avatar
+      className={cn(
+        (size === 'lg' && 'size-44') || (size === 'md' && 'size-32')
+      )}
+    >
       <AvatarImage src={file ? URL.createObjectURL(file) : ''} />
-      <AvatarFallback className={cn(size === 'lg' && 'text-6xl')}>
+      <AvatarFallback
+        className={cn(size === 'lg' && 'text-6xl', size === 'md' && 'text-4xl')}
+      >
         {user.name.charAt(0)}
       </AvatarFallback>
     </Avatar>
