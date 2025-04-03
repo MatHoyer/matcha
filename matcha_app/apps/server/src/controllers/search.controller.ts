@@ -12,6 +12,7 @@ import {
   getGenderPreferenceMatchCondition,
 } from '../services/search.service';
 import { defaultResponse } from '../utils/defaultResponse';
+import { random } from 'nanoid';
 
 export const advancedSearch = async (req: Request, res: Response) => {
   const { ages, fame, location, tags } =
@@ -149,9 +150,11 @@ export const advancedSearch = async (req: Request, res: Response) => {
       )?.name;
 
       return {
-        user: user,
+        // user: user,
+        user: { ...user, age: 30 },
         tags: allTags as { id: number; name: string }[],
-        fame: fameResults.find((f) => f.userId === user.id)?.fame || 1,
+        // fame: fameResults.find((f) => f.userId === user.id)?.fame || 1,
+        fame: Math.floor(Math.random() * 5),
         location: locationName || 'Unknown',
       };
     })
@@ -161,9 +164,7 @@ export const advancedSearch = async (req: Request, res: Response) => {
 };
 
 export const suggestedUsers = async (req: Request, res: Response) => {
-  // const id = req.params.id;
   const { id } = req.params;
-  // console.log('->id :', id);
   const user = await db.user.findFirst({
     where: {
       id: +id,
@@ -212,7 +213,6 @@ export const suggestedUsers = async (req: Request, res: Response) => {
     locationDiff += 0.1;
   }
   const ids = [...new Set(goodLocations.map((l) => l.id))];
-  // console.log('ids :', ids);
   const likedUsers = await db.like.findMany({
     where: {
       userId: +id,
@@ -236,7 +236,7 @@ export const suggestedUsers = async (req: Request, res: Response) => {
       ),
     },
   });
-
+  console.log('users :', users);
   const fameResults = await batchPromises(ids.map((id) => fameCalculator(id)));
   // console.log('fameResults :', fameResults);
   const usersResponse: (TForYouSchema['response']['users'][number] | null)[] =
@@ -281,12 +281,24 @@ export const suggestedUsers = async (req: Request, res: Response) => {
             gl.latitude === globalLocationsNear.latitude &&
             gl.longitude === globalLocationsNear.longitude
         )?.name;
-
+        const sessionUser = req.user;
+        const tagsSessionUser = await db.userTag.findMany({
+          where: {
+            userId: sessionUser.id,
+          },
+        });
+        const tagIdsInSessionUser = new Set(
+          tagsSessionUser.map((tag) => tag.tagId)
+        );
+        const similarTagsCount = allTags.filter((tag) =>
+          tagIdsInSessionUser.has(tag.id)
+        ).length;
+        console.log('similarTagsCount :', similarTagsCount);
         return {
           user: user,
-          tags: allTags,
+          tags: { names: allTags, order: similarTagsCount },
           fame: fameResults.find((f) => f.userId === user.id)?.fame || 1,
-          location: locationName || 'Unknown',
+          location: { name: locationName || 'Unknown', order: 1 },
         };
       })
     );

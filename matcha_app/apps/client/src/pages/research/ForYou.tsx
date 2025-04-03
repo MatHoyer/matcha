@@ -23,9 +23,13 @@ import { TOrientation } from '@matcha/common';
 import { MultiCombobox } from '@/components/ui/combobox';
 import { Button } from '@/components/ui/button';
 import { motion } from 'motion/react';
+import { Label } from '@/components/ui/label';
+import NumberInput from '@/components/ui/NumberField';
+import { Controller } from 'react-hook-form';
+import { TSuggestUsersSchema } from '@matcha/common';
 
 export const MatchRow: React.FC<{
-  gUser: TAdvancedSearchSchema['response']['users'][number];
+  gUser: TSuggestUsersSchema['response']['users'][number];
 }> = ({ gUser }) => {
   const navigate = useNavigate();
   const [file, setFile] = useState<File | null>(null);
@@ -63,7 +67,7 @@ export const MatchRow: React.FC<{
             </div>
           </div>
           <div className="flex gap-1">
-            {gUser.tags.map((tag) => (
+            {gUser.tags.names.map((tag) => (
               <Badge key={tag.id}>{tag.name}</Badge>
             ))}
           </div>
@@ -83,7 +87,7 @@ export const MatchRow: React.FC<{
             </Typography>
             <Typography variant="code" className="flex gap-1 items-center">
               <MapPin size={16} />
-              {gUser.location}
+              {gUser.location.name}
             </Typography>
             <div className="mt-3">
               <FameRating note={gUser.fame} />
@@ -98,7 +102,7 @@ export const MatchRow: React.FC<{
 
 export const ForYou: React.FC = () => {
   const [users, setUsers] = useState<
-    TAdvancedSearchSchema['response']['users'][number][]
+    TSuggestUsersSchema['response']['users'][number][]
   >([]);
   // const [filteredUsers, setFilteredUsers] = useState(users);
   const { user } = useSession();
@@ -108,8 +112,12 @@ export const ForYou: React.FC = () => {
   const [preferenceFilter, setPreferenceFilter] = useState<
     TOrientation[] | null
   >([]);
+  const [ageFilter, setAgeFilter] = useState<string[]>([]);
+
   const [ageOrder, setAgeOrder] = useState<'asc' | 'desc'>('asc');
   const [fameOrder, setFameOrder] = useState<'asc' | 'desc'>('asc');
+  const [distanceOrder, setDistanceOrder] = useState<'asc' | 'desc'>('asc');
+  const [tagsOrder, setTagsOrder] = useState<'asc' | 'desc'>('asc');
 
   useQuery({
     queryKey: ['suggestedProfiles', id],
@@ -170,7 +178,7 @@ export const ForYou: React.FC = () => {
               }
               className="flex items-center gap-1 w-full md:w-auto"
             >
-              Age{' '}
+              Age
               <motion.div
                 animate={{ rotate: ageOrder === 'asc' ? 180 : 0 }}
                 transition={{ duration: 0.3 }}
@@ -185,9 +193,24 @@ export const ForYou: React.FC = () => {
               }
               className="flex items-center gap-1 w-full md:w-auto"
             >
-              Fame{' '}
+              Fame
               <motion.div
                 animate={{ rotate: fameOrder === 'asc' ? 180 : 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <ArrowUp />
+              </motion.div>
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() =>
+                setTagsOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'))
+              }
+              className="flex items-center gap-1 w-full md:w-auto"
+            >
+              Tags
+              <motion.div
+                animate={{ rotate: tagsOrder === 'asc' ? 180 : 0 }}
                 transition={{ duration: 0.3 }}
               >
                 <ArrowUp />
@@ -208,6 +231,8 @@ export const ForYou: React.FC = () => {
                 );
               })
               .sort((a, b) => {
+                console.log('tagsOrder : ', tagsOrder);
+
                 if (ageOrder === 'asc') {
                   return a.user.age - b.user.age;
                 } else if (ageOrder === 'desc') {
@@ -218,12 +243,15 @@ export const ForYou: React.FC = () => {
                 } else if (fameOrder === 'desc') {
                   return b.fame - a.fame;
                 }
+                if (tagsOrder === 'asc') {
+                  return a.tags.order - b.tags.order;
+                } else if (tagsOrder === 'desc') {
+                  return b.tags.order - a.tags.order;
+                }
                 return 0;
               })
               .map((gUser) => (
-                // <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4">
                 <MatchRow key={gUser.user.id} gUser={gUser} />
-                // </div>
               ))}
           </div>
         </div>
