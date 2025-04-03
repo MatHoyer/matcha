@@ -7,10 +7,10 @@ import {
   LayoutHeader,
 } from '@/components/pagination/Layout';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { MultiCombobox } from '@/components/ui/combobox';
 import { FameRating } from '@/components/ui/FameRating';
+import { FilterToggle } from '@/components/ui/FilterToggle';
 import { AppLoader } from '@/components/ui/loaders';
 import { Typography } from '@/components/ui/typography';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
@@ -24,8 +24,7 @@ import {
   TOrientation,
 } from '@matcha/common';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowUp, ChevronRight, MapPin, Mars, Venus } from 'lucide-react';
-import { motion } from 'motion/react';
+import { ChevronRight, MapPin, Mars, Venus } from 'lucide-react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -128,8 +127,14 @@ export const AdvancedSearch: React.FC = () => {
   const [preferenceFilter, setPreferenceFilter] = useState<
     TOrientation[] | null
   >([]);
-  const [ageOrder, setAgeOrder] = useState<'asc' | 'desc'>('asc');
-  const [fameOrder, setFameOrder] = useState<'asc' | 'desc'>('asc');
+  const [ageFilter, setAgeFilter] = useState<{
+    order: 'asc' | 'desc';
+    isActive: boolean;
+  }>({ order: 'asc', isActive: false });
+  const [fameFilter, setFameFilter] = useState<{
+    order: 'asc' | 'desc';
+    isActive: boolean;
+  }>({ order: 'asc', isActive: false });
 
   return (
     <Layout>
@@ -150,7 +155,7 @@ export const AdvancedSearch: React.FC = () => {
           </div>
         ) : users.length > 0 ? (
           <div className="flex flex-col gap-2">
-            <div className="flex flex-col md:flex-row gap-2">
+            <div className="flex flex-col md:flex-row md:items-center gap-2">
               <div className="flex gap-2 w-full">
                 <MultiCombobox
                   name="gender"
@@ -172,36 +177,40 @@ export const AdvancedSearch: React.FC = () => {
                 />
               </div>
               <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  onClick={() =>
-                    setAgeOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'))
+                <FilterToggle
+                  label="Age"
+                  order={ageFilter.order}
+                  toggleOrder={() =>
+                    setAgeFilter((prev) => ({
+                      ...prev,
+                      order: prev.order === 'asc' ? 'desc' : 'asc',
+                    }))
                   }
-                  className="flex items-center gap-1 w-full md:w-auto"
-                >
-                  Age{' '}
-                  <motion.div
-                    animate={{ rotate: ageOrder === 'asc' ? 180 : 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <ArrowUp />
-                  </motion.div>
-                </Button>
-                <Button
-                  variant="outline"
-                  onClick={() =>
-                    setFameOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'))
+                  isActive={ageFilter.isActive}
+                  toggleActive={() =>
+                    setAgeFilter((prev) => ({
+                      ...prev,
+                      isActive: !prev.isActive,
+                    }))
                   }
-                  className="flex items-center gap-1 w-full md:w-auto"
-                >
-                  Fame{' '}
-                  <motion.div
-                    animate={{ rotate: fameOrder === 'asc' ? 180 : 0 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <ArrowUp />
-                  </motion.div>
-                </Button>
+                />
+                <FilterToggle
+                  label="Fame"
+                  order={fameFilter.order}
+                  toggleOrder={() =>
+                    setFameFilter((prev) => ({
+                      ...prev,
+                      order: prev.order === 'asc' ? 'desc' : 'asc',
+                    }))
+                  }
+                  isActive={fameFilter.isActive}
+                  toggleActive={() =>
+                    setFameFilter((prev) => ({
+                      ...prev,
+                      isActive: !prev.isActive,
+                    }))
+                  }
+                />
               </div>
             </div>
             <div className="flex flex-col gap-2">
@@ -217,15 +226,28 @@ export const AdvancedSearch: React.FC = () => {
                   );
                 })
                 .sort((a, b) => {
-                  if (ageOrder === 'asc') {
-                    return a.user.age - b.user.age;
-                  } else if (ageOrder === 'desc') {
-                    return b.user.age - a.user.age;
+                  if (!ageFilter.isActive && !fameFilter.isActive) {
+                    return 0;
                   }
-                  if (fameOrder === 'asc') {
-                    return a.fame - b.fame;
-                  } else if (fameOrder === 'desc') {
-                    return b.fame - a.fame;
+
+                  const activeCriteria = [];
+                  if (ageFilter.isActive) {
+                    activeCriteria.push({
+                      value: a.user.age - b.user.age,
+                      order: ageFilter.order === 'asc' ? 1 : -1,
+                    });
+                  }
+                  if (fameFilter.isActive) {
+                    activeCriteria.push({
+                      value: a.fame - b.fame,
+                      order: fameFilter.order === 'asc' ? 1 : -1,
+                    });
+                  }
+
+                  for (const criterion of activeCriteria) {
+                    if (criterion.value !== 0) {
+                      return criterion.value * criterion.order;
+                    }
                   }
                   return 0;
                 })
