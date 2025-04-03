@@ -111,32 +111,19 @@ export const getMatchUser = async (req: Request, res: Response) => {
 
 export const haveMatched = async (req: Request, res: Response) => {
   const userId = req.params.id;
-  try {
-    const likes = await db.like.findMany({
-      where: {
-        OR: [{ userId: +userId }, { likedId: +userId }],
-      },
-    });
-    const match = likes.find((like) =>
-      likes.find(
-        (l) =>
-          l.userId === like.likedId &&
-          l.likedId === like.userId &&
-          l.userId !== l.likedId
-      )
-    );
-    if (match) {
-      res.status(200).json({ matched: true });
-    } else {
-      res.status(200).json({ matched: false });
-    }
-  } catch (error) {
-    defaultResponse({
-      res,
-      status: 500,
-      json: { message: 'Internal Server Error' },
-    });
-  }
+  const like = await db.like.findFirst({
+    where: {
+      userId: +userId,
+      likedId: req.user.id,
+    },
+  });
+  const likeOtherUser = await db.like.findFirst({
+    where: {
+      userId: req.user.id,
+      likedId: +userId,
+    },
+  });
+  res.status(200).json({ matched: like && likeOtherUser });
 };
 
 export const updateUser = async (req: Request, res: Response) => {

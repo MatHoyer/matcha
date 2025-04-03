@@ -27,6 +27,7 @@ import { Label } from '@/components/ui/label';
 import NumberInput from '@/components/ui/NumberField';
 import { Controller } from 'react-hook-form';
 import { TSuggestUsersSchema } from '@matcha/common';
+import { FilterToggle } from '../../components/ui/FilterToggle';
 
 export const MatchRow: React.FC<{
   gUser: TSuggestUsersSchema['response']['users'][number];
@@ -112,12 +113,27 @@ export const ForYou: React.FC = () => {
   const [preferenceFilter, setPreferenceFilter] = useState<
     TOrientation[] | null
   >([]);
-  const [ageFilter, setAgeFilter] = useState<string[]>([]);
+  const [ageOrder, setAgeOrder] = useState<{
+    order: 'asc' | 'desc';
+    isActive: boolean;
+  }>({ order: 'asc', isActive: false });
+  const [fameOrder, setFameOrder] = useState<{
+    order: 'asc' | 'desc';
+    isActive: boolean;
+  }>({ order: 'asc', isActive: false });
+  const [tagOrder, setTagOrder] = useState<{
+    order: 'asc' | 'desc';
+    isActive: boolean;
+  }>({ order: 'asc', isActive: false });
+  const [locationOrder, setLocationOrder] = useState<{
+    order: 'asc' | 'desc';
+    isActive: boolean;
+  }>({ order: 'asc', isActive: false });
 
-  const [ageOrder, setAgeOrder] = useState<'asc' | 'desc'>('asc');
-  const [fameOrder, setFameOrder] = useState<'asc' | 'desc'>('asc');
-  const [distanceOrder, setDistanceOrder] = useState<'asc' | 'desc'>('asc');
-  const [tagsOrder, setTagsOrder] = useState<'asc' | 'desc'>('asc');
+  // const [ageOrder, setAgeOrder] = useState<'asc' | 'desc'>('asc');
+  // const [fameOrder, setFameOrder] = useState<'asc' | 'desc'>('asc');
+  // const [distanceOrder, setDistanceOrder] = useState<'asc' | 'desc'>('asc');
+  // const [tagsOrder, setTagsOrder] = useState<'asc' | 'desc'>('asc');
 
   useQuery({
     queryKey: ['suggestedProfiles', id],
@@ -132,8 +148,6 @@ export const ForYou: React.FC = () => {
         handleEnding: {
           cb: (data) => {
             setUsers(data.users);
-            console.log('users : ', data.users);
-            // setFilteredUsers(data.users);
           },
         },
       });
@@ -171,52 +185,75 @@ export const ForYou: React.FC = () => {
               />
             </div>
             {/* <div className="flex gap-2"> */}
-            <Button
-              variant="outline"
-              onClick={() =>
-                setAgeOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'))
-              }
-              className="flex items-center gap-1 w-full md:w-auto"
-            >
-              Age
-              <motion.div
-                animate={{ rotate: ageOrder === 'asc' ? 180 : 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <ArrowUp />
-              </motion.div>
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() =>
-                setFameOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'))
-              }
-              className="flex items-center gap-1 w-full md:w-auto"
-            >
-              Fame
-              <motion.div
-                animate={{ rotate: fameOrder === 'asc' ? 180 : 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <ArrowUp />
-              </motion.div>
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() =>
-                setTagsOrder((prev) => (prev === 'asc' ? 'desc' : 'asc'))
-              }
-              className="flex items-center gap-1 w-full md:w-auto"
-            >
-              Tags
-              <motion.div
-                animate={{ rotate: tagsOrder === 'asc' ? 180 : 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <ArrowUp />
-              </motion.div>
-            </Button>
             {/* </div> */}
+            <FilterToggle
+              label="Age"
+              order={ageOrder.order}
+              toggleOrder={() =>
+                setAgeOrder((prev) => ({
+                  ...prev,
+                  order: prev.order === 'asc' ? 'desc' : 'asc',
+                }))
+              }
+              isActive={ageOrder.isActive}
+              toggleActive={() =>
+                setAgeOrder((prev) => ({
+                  ...prev,
+                  isActive: !prev.isActive,
+                }))
+              }
+            />
+            <FilterToggle
+              label="Fame"
+              order={fameOrder.order}
+              toggleOrder={() =>
+                setFameOrder((prev) => ({
+                  ...prev,
+                  order: prev.order === 'asc' ? 'desc' : 'asc',
+                }))
+              }
+              isActive={fameOrder.isActive}
+              toggleActive={() =>
+                setFameOrder((prev) => ({
+                  ...prev,
+                  isActive: !prev.isActive,
+                }))
+              }
+            />
+            <FilterToggle
+              label="Tag"
+              order={tagOrder.order}
+              toggleOrder={() =>
+                setTagOrder((prev) => ({
+                  ...prev,
+                  order: prev.order === 'asc' ? 'desc' : 'asc',
+                }))
+              }
+              isActive={tagOrder.isActive}
+              toggleActive={() =>
+                setTagOrder((prev) => ({
+                  ...prev,
+                  isActive: !prev.isActive,
+                }))
+              }
+            />
+            <FilterToggle
+              label="Location"
+              order={locationOrder.order}
+              toggleOrder={() =>
+                setLocationOrder((prev) => ({
+                  ...prev,
+                  order: prev.order === 'asc' ? 'desc' : 'asc',
+                }))
+              }
+              isActive={locationOrder.isActive}
+              toggleActive={() =>
+                setLocationOrder((prev) => ({
+                  ...prev,
+                  isActive: !prev.isActive,
+                }))
+              }
+            />
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-4">
             {users
@@ -231,22 +268,35 @@ export const ForYou: React.FC = () => {
                 );
               })
               .sort((a, b) => {
-                console.log('tagsOrder : ', tagsOrder);
-
-                if (ageOrder === 'asc') {
-                  return a.user.age - b.user.age;
-                } else if (ageOrder === 'desc') {
-                  return b.user.age - a.user.age;
+                const activeCriteria = [];
+                if (ageOrder.isActive) {
+                  activeCriteria.push({
+                    value: a.user.age - b.user.age,
+                    order: ageOrder.order === 'asc' ? 1 : -1,
+                  });
                 }
-                if (fameOrder === 'asc') {
-                  return a.fame - b.fame;
-                } else if (fameOrder === 'desc') {
-                  return b.fame - a.fame;
+                if (fameOrder.isActive) {
+                  activeCriteria.push({
+                    value: a.fame - b.fame,
+                    order: fameOrder.order === 'asc' ? 1 : -1,
+                  });
                 }
-                if (tagsOrder === 'asc') {
-                  return a.tags.order - b.tags.order;
-                } else if (tagsOrder === 'desc') {
-                  return b.tags.order - a.tags.order;
+                if (tagOrder.isActive) {
+                  activeCriteria.push({
+                    value: a.tags.order - b.tags.order,
+                    order: tagOrder.order === 'asc' ? 1 : -1,
+                  });
+                }
+                if (locationOrder.isActive) {
+                  activeCriteria.push({
+                    value: a.location.order - b.location.order,
+                    order: locationOrder.order === 'asc' ? 1 : -1,
+                  });
+                }
+                for (const criterion of activeCriteria) {
+                  if (criterion.value !== 0) {
+                    return criterion.value * criterion.order;
+                  }
                 }
                 return 0;
               })

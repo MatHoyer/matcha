@@ -73,7 +73,6 @@ export const ProfileForm: React.FC<
         schemas: getTagsSchemas,
         handleEnding: {
           cb: (data) => {
-            console.log(data);
             form.setValue(
               'tags',
               data.tags.map((tag) => tag.name)

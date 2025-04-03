@@ -91,10 +91,8 @@ const routes: {
   'api-search': ({ id, type }) => {
     if (type) {
       if (id) {
-        console.log('ID', id);
         return `/api/search/${type}/${id}`;
       }
-      console.log('TYPE', type);
       return `/api/search/${type}`;
     }
     return '/api/search';
@@ -123,7 +121,6 @@ const routes: {
   'api-likes': ({ id, type }) => {
     if (type) {
       if (['is-liked', 'likes-me'].includes(type) && id) {
-        console.log('type', type);
         return `/api/likes/${type}/${id}`;
       }
       return `/api/likes/${type}`;
