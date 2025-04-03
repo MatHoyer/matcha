@@ -54,8 +54,14 @@ export const forYouSchema = {
     users: z.array(
       z.object({
         user: userSchema,
-        location: z.string(),
-        tags: z.array(tagSchema),
+        location: z.object({
+          order: z.number(),
+          name: z.string(),
+        }),
+        tags: z.object({
+          order: z.number(),
+          names: z.array(tagSchema),
+        }),
         fame: z.number(),
       })
     ),
@@ -80,8 +86,14 @@ export const suggestUsersSchema = {
     users: z.array(
       z.object({
         user: userSchema,
-        location: z.string(),
-        tags: z.array(tagSchema),
+        location: z.object({
+          order: z.number(),
+          name: z.string(),
+        }),
+        tags: z.object({
+          order: z.number(),
+          names: z.array(tagSchema),
+        }),
         fame: z.number(),
       })
     ),
@@ -92,14 +104,10 @@ export type TSuggestUsersSchema = {
     users: {
       user: Infer<typeof userSchema>;
       location: Infer<
-        typeof advancedSearchSchema.response
+        typeof suggestUsersSchema.response
       >['users'][number]['location'];
-      tags: Infer<
-        typeof advancedSearchSchema.response
-      >['users'][number]['tags'];
-      fame: Infer<
-        typeof advancedSearchSchema.response
-      >['users'][number]['fame'];
+      tags: Infer<typeof suggestUsersSchema.response>['users'][number]['tags'];
+      fame: Infer<typeof suggestUsersSchema.response>['users'][number]['fame'];
     }[];
   };
 };

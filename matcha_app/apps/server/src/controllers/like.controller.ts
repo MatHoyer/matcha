@@ -21,16 +21,12 @@ export const likesMe = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { id: userId } = req.user;
 
-  console.log('--> id', id);
-  console.log('--> userId', userId);
-
   const like = await db.like.findFirst({
     where: {
       userId: +id,
       likedId: userId,
     },
   });
-  console.log('--> like in likesMe', like);
   res.status(200).json({ isLiked: !!like });
 };
 
