@@ -124,6 +124,8 @@ export type {
   TGetProfilePictureSchemas,
   TUpdatePictureSchemas,
 } from './schemas/api/picture.schema';
+export { reportUserSchemas } from './schemas/api/report.schema';
+export type { TReportUserSchemas } from './schemas/api/report.schema';
 export {
   advancedSearchSchema,
   forYouSchema,

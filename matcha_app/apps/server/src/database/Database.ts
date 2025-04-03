@@ -6,6 +6,7 @@ import LikeRepository from './repositories/LikeRepository.js';
 import LocationRepository from './repositories/LocationRepository.js';
 import MessageRepository from './repositories/MessageRepository.js';
 import NotificationRepository from './repositories/NotificationRepository';
+import ReportRepository from './repositories/ReportRepository.js';
 import TagRepository from './repositories/TagRepository.js';
 import UserRepository from './repositories/UserRepository.js';
 import UserTagRepository from './repositories/UserTagRepository.js';
@@ -24,6 +25,7 @@ class Database {
   image: ImageRepository;
   notification: NotificationRepository;
   block: BlockRepository;
+  report: ReportRepository;
 
   constructor() {
     this.pool = new pg.Pool({
@@ -46,6 +48,7 @@ class Database {
     this.notification = new NotificationRepository(this.pool);
     this.view = new ViewRepository(this.pool);
     this.block = new BlockRepository(this.pool);
+    this.report = new ReportRepository(this.pool);
   }
 }
 

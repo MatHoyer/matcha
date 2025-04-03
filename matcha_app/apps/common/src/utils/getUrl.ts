@@ -56,6 +56,9 @@ export type TApiRouteDataRequirements = {
     type?: 'is-need-update' | 'near/user';
   };
   'api-block': undefined;
+  'api-report': {
+    userId: number;
+  };
 };
 
 type TRouteDataRequirements = TClientRouteDataRequirements &
@@ -140,6 +143,7 @@ const routes: {
     return id ? `/api/location/${id}` : '/api/location';
   },
   'api-block': () => '/api/block',
+  'api-report': ({ userId }) => `/api/report/${userId}`,
 };
 
 type TUrlParams =

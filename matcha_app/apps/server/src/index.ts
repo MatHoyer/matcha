@@ -13,6 +13,7 @@ import locationRouter from './routes/location.route.js';
 import messagesRouter from './routes/messages.route.js';
 import notificationsRouter from './routes/notifications.route.js';
 import pictureRouter from './routes/picture.route.js';
+import reportRouter from './routes/report.route.js';
 import searchRouter from './routes/search.route.js';
 import tagRouter from './routes/tag.route.js';
 import userRouter from './routes/user.route.js';
@@ -47,6 +48,7 @@ app.use(getUrl('api-notifications'), notificationsRouter);
 app.use(getUrl('api-likes'), likeRouter);
 app.use(getUrl('api-location'), locationRouter);
 app.use(getUrl('api-block'), blockRouter);
+app.use(getUrl('api-report'), reportRouter);
 
 if (env.NODE_ENV === 'PROD') {
   app.use(express.static(path.join(__dirname, '../../../public/dist')));
