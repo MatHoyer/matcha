@@ -17,6 +17,7 @@ import { FameRating } from '@/components/ui/FameRating';
 import { Separator } from '@/components/ui/separator';
 import { Typography } from '@/components/ui/typography';
 import { useChatStore } from '@/hooks/use-chat';
+import { openGlobalDialog } from '@/hooks/use-dialog';
 import { useSession } from '@/hooks/useSession';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import {
@@ -38,6 +39,7 @@ import {
   usersMatchSchemas,
 } from '@matcha/common';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { motion } from 'framer-motion';
 import {
   ChevronRight,
   EllipsisVertical,
@@ -47,8 +49,6 @@ import {
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { socket } from '../../lib/socket';
-import { motion } from 'framer-motion';
-import { useSidebar } from '@/components/ui/sidebar';
 
 const ElipsisDropdown = () => {
   const { id } = useParams();
@@ -106,7 +106,15 @@ const ElipsisDropdown = () => {
         <DropdownMenuItem onClick={() => blockMutation.mutate()}>
           {isBlocked ? 'Unblock' : 'Block'}
         </DropdownMenuItem>
-        <DropdownMenuItem>Report</DropdownMenuItem>
+        <DropdownMenuItem
+          onClick={() =>
+            openGlobalDialog('report-user', {
+              userId: +id!,
+            })
+          }
+        >
+          Report
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
