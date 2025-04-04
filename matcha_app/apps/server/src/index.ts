@@ -51,9 +51,9 @@ app.use(getUrl('api-block'), blockRouter);
 app.use(getUrl('api-report'), reportRouter);
 
 if (env.NODE_ENV === 'PROD') {
-  app.use(express.static(path.join(__dirname, '../../../public/dist')));
+  app.use(express.static(path.join(__dirname, '../../../public')));
   app.get('*', (_req, res) => {
-    res.sendFile(path.join(__dirname, '../../../public/dist/index.html'));
+    res.sendFile(path.join(__dirname, '../../../public/index.html'));
   });
 }
 
