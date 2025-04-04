@@ -1,3 +1,4 @@
+import { TZDate } from '@date-fns/tz';
 import {
   AUTH_COOKIE_NAME,
   getUsersSchemas,
@@ -6,6 +7,7 @@ import {
   TUpdateUserSchemas,
   z,
 } from '@matcha/common';
+import { getHours, setHours } from 'date-fns';
 import type { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import db from '../database/Database';
@@ -100,7 +102,7 @@ export const getMatchUser = async (req: Request, res: Response) => {
       },
     });
     res.status(200).json({ users });
-  } catch (error) {
+  } catch (_error) {
     defaultResponse({
       res,
       status: 500,
@@ -123,7 +125,7 @@ export const haveMatched = async (req: Request, res: Response) => {
       likedId: +userId,
     },
   });
-  res.status(200).json({ matched: like && likeOtherUser });
+  res.status(200).json({ matched: !!(like && likeOtherUser) });
 };
 
 export const updateUser = async (req: Request, res: Response) => {
@@ -216,6 +218,9 @@ export const updateUser = async (req: Request, res: Response) => {
 
   const { name, lastName, email, gender, preference, birthDate, biography } =
     req.body as TUpdateUserSchemas['requirements'];
+  console.log(
+    setHours(birthDate, getHours(new TZDate(birthDate, 'Europe/Paris')))
+  );
   await db.user.update({
     where: {
       id: +id,
@@ -292,7 +297,7 @@ export const askResetPassword = async (req: Request, res: Response) => {
     html: ResetPasswordMail({
       link: `${
         env.NODE_ENV === 'DEV'
-          ? `http://localhost:${env.CLIENT_PORT}`
+          ? `http://localhost:${env.CLIENT_PORT}/`
           : env.SERVER_URL
       }reset-password/${token}`,
       linkText: 'Reset password',

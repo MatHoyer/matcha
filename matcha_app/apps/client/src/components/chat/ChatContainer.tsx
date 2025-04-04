@@ -1,10 +1,14 @@
 import { Chat } from '@/components/chat/Chat';
+import { useChatStore } from '@/hooks/use-chat';
 import { TUser } from '@matcha/common';
 import React from 'react';
-import { useChatStore } from '@/hooks/use-chat';
 
 export const ChatContainer: React.FC<{
-  openedChats: { id: string; otherUser: TUser; status: 'full' | 'collapse' }[];
+  openedChats: {
+    id: string;
+    otherUser: Omit<TUser, 'password'>;
+    status: 'full' | 'collapse';
+  }[];
   removeChatWindow: (id: string) => void;
 }> = ({ openedChats, removeChatWindow }) => {
   const { setChatStatus } = useChatStore();

@@ -69,9 +69,9 @@ export const signup = async (req: Request, res: Response) => {
       linkText: 'Confirm my signup',
       link: `${
         env.NODE_ENV === 'DEV'
-          ? `http://localhost:${env.CLIENT_PORT}`
+          ? `http://localhost:${env.CLIENT_PORT}/`
           : env.SERVER_URL
-      }/auth/confirm/${token}`,
+      }auth/confirm/${token}`,
     }),
   });
 
@@ -118,9 +118,9 @@ export const login = async (req: Request, res: Response) => {
       linkText: 'Log me in',
       link: `${
         env.NODE_ENV === 'DEV'
-          ? `http://localhost:${env.CLIENT_PORT}`
+          ? `http://localhost:${env.CLIENT_PORT}/`
           : env.SERVER_URL
-      }/auth/confirm/${token}`,
+      }auth/confirm/${token}`,
     }),
   });
 

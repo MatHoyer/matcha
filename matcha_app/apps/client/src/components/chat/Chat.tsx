@@ -16,14 +16,14 @@ import {
   updateNotificationSchemas,
 } from '@matcha/common';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Minus, X } from 'lucide-react';
+import { Minus, Send, X } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { UserAvatar } from '../images/UserAvatar';
 import { Typography } from '../ui/typography';
 
 interface PrivateChatProps {
-  otherUser: TUser;
+  otherUser: Omit<TUser, 'password'>;
   status: 'full' | 'collapse';
   toggleChat: () => void;
   closeChat: () => void;
@@ -208,8 +208,12 @@ export const Chat: React.FC<PrivateChatProps> = ({
             {messages.map((data, index) => (
               <li
                 key={index}
-                className={`p-2 mb-2 rounded-md 
-                  ${data.isOwnMessage ? 'self-end' : ''}
+                className={`p-2 mb-2 rounded-md border
+                  ${
+                    data.isOwnMessage
+                      ? 'self-end border-[#8c52ff81]'
+                      : 'border-[#ffacac83]'
+                  }
                 `}
               >
                 <p className="text-sm break-all whitespace-normal">
@@ -249,7 +253,9 @@ export const Chat: React.FC<PrivateChatProps> = ({
                 }
                 onBlur={() => sendFeedback('')}
               />
-              <Button type="submit">Send</Button>
+              <Button type="submit" variant="outline">
+                <Send />
+              </Button>
             </div>
           </form>
         </>

@@ -6,10 +6,10 @@ import { Toaster } from 'sonner';
 import App from './App';
 import { AlertDialogRenderer } from './components/dialogs/alert-dialog/AlertDialogRenderer';
 import { GlobalDialog } from './components/dialogs/components/GlobalDialog';
+import { TailwindIndicator } from './components/TailwindIndicator';
 import { ThemeProvider } from './components/theme/ThemeProvider';
 import './index.css';
 import { NotificationProvider } from './pages/notification/Notifications-context';
-import { TailwindIndicator } from './components/TailwindIndicator';
 
 const queryClient = new QueryClient();
 
@@ -20,7 +20,7 @@ createRoot(document.getElementById('root')!).render(
         <GlobalDialog />
         <AlertDialogRenderer />
         <Toaster />
-        <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+        <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
           <NotificationProvider>
             <App />
             <TailwindIndicator />

@@ -1,7 +1,6 @@
-import { z } from '../../validator/validator';
+import { Infer, z } from '../../validator/validator';
 
 import { userSchema } from '../database.schema';
-import { Infer } from '../../../dist/validator/validator';
 
 export const sendMessageSchema = z.object({
   receiverId: userSchema.pick(['id']).shape.id,

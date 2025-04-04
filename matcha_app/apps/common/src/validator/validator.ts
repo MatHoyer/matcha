@@ -1,5 +1,5 @@
 // A minimal custom clone of Zod
-
+import { TZDate } from '@date-fns/tz';
 import { SchemaError } from '../errors/schema.error';
 import { TErrorSchema } from '../schemas/api/error.schema';
 
@@ -197,7 +197,8 @@ export class ZodBoolean extends ZodType<boolean> {
 export class ZodDate extends ZodType<Date> {
   #tryCoerce(data: unknown): unknown {
     if (typeof data === 'string' || typeof data === 'number') {
-      const date = new Date(data);
+      const tmpDate = new Date(data);
+      const date = new TZDate(tmpDate, 'Europe/Paris');
       if (isNaN(date.getTime())) {
         throw new Error('Invalid date');
       }

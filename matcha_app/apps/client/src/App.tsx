@@ -4,7 +4,6 @@ import {
   isNeedUpdateLocationSchemas,
   TNotificationsOtherUserSchema,
   TUser,
-  TUserWithNames,
   updateLocationSchemas,
 } from '@matcha/common';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -32,13 +31,6 @@ import { Pages } from './pages/Pages';
 const App = () => {
   const session = useSession();
   const navigate = useNavigate();
-  const [users, setUsers] = useState<Pick<TUser, 'id' | 'name' | 'lastName'>[]>(
-    []
-  );
-
-  const usersAllButAuthUser = users.filter(
-    (user: TUserWithNames) => user.id !== session.user?.id
-  );
   const queryClient = useQueryClient();
   const [matchUsers, setMatchUsers] = useState<
     Pick<TUser, 'id' | 'name' | 'lastName'>[]
@@ -57,22 +49,6 @@ const App = () => {
         handleEnding: {
           cb: (data) => {
             setMatchUsers(data.users);
-          },
-        },
-      });
-    },
-  });
-
-  useQuery({
-    queryKey: ['users'],
-    queryFn: async () => {
-      return await axiosFetch({
-        method: 'GET',
-        url: getUrl('api-users'),
-        schemas: getUsersSchemas,
-        handleEnding: {
-          cb: (data) => {
-            setUsers(data.users);
           },
         },
       });

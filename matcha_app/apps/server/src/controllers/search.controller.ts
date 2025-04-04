@@ -12,7 +12,6 @@ import {
   getGenderPreferenceMatchCondition,
 } from '../services/search.service';
 import { defaultResponse } from '../utils/defaultResponse';
-import { random } from 'nanoid';
 
 export const advancedSearch = async (req: Request, res: Response) => {
   const { ages, fame, location, tags } =
@@ -218,6 +217,11 @@ export const suggestedUsers = async (req: Request, res: Response) => {
       userId: +id,
     },
   });
+  const blockedUsers = await db.block.findMany({
+    where: {
+      userId: req.user.id,
+    },
+  });
   const users = await db.user.findMany({
     where: {
       id: {
@@ -226,7 +230,13 @@ export const suggestedUsers = async (req: Request, res: Response) => {
       NOT: [
         {
           id: {
-            $in: [req.user.id, ...likedUsers.map((l) => l.likedId)],
+            $in: [
+              req.user.id,
+              ...likedUsers.map(
+                (l) => l.likedId,
+                ...blockedUsers.map((bu) => bu.blockedId)
+              ),
+            ],
           },
         },
       ],
@@ -307,10 +317,9 @@ export const suggestedUsers = async (req: Request, res: Response) => {
         const locationOrder =
           sortedLocationNames.indexOf(locationName || 'Unknown') + 1;
         return {
-          user: user,
+          user,
           tags: { names: allTags, order: similarTagsCount },
-          // fame: fameResults.find((f) => f.userId === user.id)?.fame || 1,
-          fame: Math.floor(Math.random() * 5),
+          fame: fameResults.find((f) => f.userId === user.id)?.fame || 1,
           location: { name: locationName || 'Unknown', order: locationOrder },
         };
       })

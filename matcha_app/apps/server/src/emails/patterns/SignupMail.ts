@@ -1,11 +1,5 @@
 import { getDateAsString } from '@matcha/common';
-import fs from 'fs';
-import path from 'path';
-
-const template = fs.readFileSync(
-  path.join(__dirname, 'default-email.html'),
-  'utf-8'
-);
+import { template } from './import-template';
 
 export const SignupMail = ({
   link,
