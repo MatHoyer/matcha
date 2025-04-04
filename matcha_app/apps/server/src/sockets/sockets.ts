@@ -270,19 +270,6 @@ export const socketHandler = (io: Server) => {
             });
             receiverOnline.socket.emit(`notification-bubble`);
           }
-
-          // const senderOnline = connectedUsers.find((u) => u.id === sender.id);
-          // if (senderOnline) {
-          //   senderOnline.socket.emit(`notification-${sender.id}`, {
-          //     id: nanoid(),
-          //     userId: senderLikeId,
-          //     otherUserId: receiverLikeId,
-          //     otherUser: receiver,
-          //     type: 'Unlike',
-          //     date: new Date(),
-          //     read: false,
-          //   });
-          // }
         }
       },
       'send-view': async (args) => {
@@ -348,6 +335,7 @@ export const socketHandler = (io: Server) => {
               date: new Date(),
               read: false,
             });
+            receiverOnline.socket.emit(`notification-bubble`);
           }
         }
       },

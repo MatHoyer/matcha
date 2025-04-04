@@ -1,19 +1,19 @@
 import {
   Layout,
   LayoutContent,
-  LayoutDescription,
   LayoutHeader,
-  LayoutTitle,
 } from '@/components/pagination/Layout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle } from '@/components/ui/card';
 import { Typography } from '@/components/ui/typography';
 import { useSession } from '@/hooks/useSession';
-import { getDateAsString } from '@matcha/common';
 import { useTheme } from '../components/theme/ThemeProvider';
 
 export const Home = () => {
   const { user } = useSession();
-  const { theme } = useTheme();
+  // const { theme } = useTheme();
+  // const { theme = 'dark' } = useTheme() || {};
+  const { theme: rawTheme } = useTheme() || {};
+  const theme = rawTheme === 'system' ? 'dark' : rawTheme || 'dark';
 
   return (
     <Layout className="flex flex-row items-center">

@@ -1,13 +1,17 @@
 import { cn } from '@/lib/utils';
 import { useTheme } from '../theme/ThemeProvider';
-import { ComponentProps, use } from 'react';
+import { ComponentProps } from 'react';
 
 export const Logo: React.FC<{ size?: 'sm' } & ComponentProps<'button'>> = ({
   size,
   className,
   ...props
 }) => {
-  const { theme } = useTheme();
+  // const { theme } = useTheme();
+  // const { theme = 'dark' } = useTheme() || {};
+  // console.log('theme', theme);
+  const { theme: rawTheme } = useTheme() || {};
+  const theme = rawTheme === 'system' ? 'dark' : rawTheme || 'dark';
 
   if (size) {
     return (
