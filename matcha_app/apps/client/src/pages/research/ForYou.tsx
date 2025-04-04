@@ -6,28 +6,26 @@ import {
   LayoutHeader,
 } from '@/components/pagination/Layout';
 import { Card } from '@/components/ui/card';
-import { FameRating } from '@/components/ui/FameRating';
+import { FameRating, FameSlider } from '@/components/ui/FameRating';
 import { Typography } from '@/components/ui/typography';
 import { useSession } from '@/hooks/useSession';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
-import { GENDERS, ORIENTATIONS, TAdvancedSearchSchema } from '@matcha/common';
+import { GENDERS, ORIENTATIONS } from '@matcha/common';
 import { getUrl } from '@matcha/common';
 import { suggestUsersSchema } from '@matcha/common';
 import { useQuery } from '@tanstack/react-query';
 import { Badge } from '@/components/ui/badge';
-import { ArrowUp, ChevronRight, MapPin, Mars, Venus } from 'lucide-react';
+import { ChevronRight, MapPin, Mars, Venus } from 'lucide-react';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { TGender } from '@matcha/common';
 import { TOrientation } from '@matcha/common';
 import { MultiCombobox } from '@/components/ui/combobox';
-import { Button } from '@/components/ui/button';
-import { motion } from 'motion/react';
-import { Label } from '@/components/ui/label';
-import NumberInput from '@/components/ui/NumberField';
-import { Controller } from 'react-hook-form';
 import { TSuggestUsersSchema } from '@matcha/common';
 import { FilterToggle } from '../../components/ui/FilterToggle';
+import NumberInput from '@/components/ui/NumberField';
+import { Controller, useForm, useWatch } from 'react-hook-form';
+import MultiTagCombobox from '@/components/comboxes/Tag.combobox';
 
 export const MatchRow: React.FC<{
   gUser: TSuggestUsersSchema['response']['users'][number];
@@ -113,6 +111,7 @@ export const ForYou: React.FC = () => {
   const [preferenceFilter, setPreferenceFilter] = useState<
     TOrientation[] | null
   >([]);
+
   const [ageOrder, setAgeOrder] = useState<{
     order: 'asc' | 'desc';
     isActive: boolean;
@@ -130,10 +129,13 @@ export const ForYou: React.FC = () => {
     isActive: boolean;
   }>({ order: 'asc', isActive: false });
 
-  // const [ageOrder, setAgeOrder] = useState<'asc' | 'desc'>('asc');
-  // const [fameOrder, setFameOrder] = useState<'asc' | 'desc'>('asc');
-  // const [distanceOrder, setDistanceOrder] = useState<'asc' | 'desc'>('asc');
-  // const [tagsOrder, setTagsOrder] = useState<'asc' | 'desc'>('asc');
+  const [ageFilter, setAgeFilter] = useState<{ min: number; max: number }>({
+    min: 18,
+    max: 100,
+  });
+  const [locationFilter, setLocationFilter] = useState<string[] | null>([]);
+  const [fameFilter, setFameFilter] = useState<number>(1);
+  const [tagFilter, setTagFilter] = useState<string[] | null>([]);
 
   useQuery({
     queryKey: ['suggestedProfiles', id],
@@ -184,6 +186,55 @@ export const ForYou: React.FC = () => {
                 onChange={setPreferenceFilter}
               />
             </div>
+            <div className="flex gap-2 items-center w-full">
+              <NumberInput
+                id="min-age"
+                min={18}
+                max={ageFilter.max}
+                scale={0}
+                step={1}
+                value={ageFilter.min}
+                onChange={(value) =>
+                  setAgeFilter((prev) => ({
+                    ...prev,
+                    min: (value as number) || 18,
+                  }))
+                }
+                placeholder="Min Age"
+              />
+              <NumberInput
+                id="max-age"
+                min={ageFilter.min}
+                max={100}
+                scale={0}
+                step={1}
+                value={ageFilter.max}
+                onChange={(value) =>
+                  setAgeFilter((prev) => ({
+                    ...prev,
+                    max: (value as number) || 100,
+                  }))
+                }
+                placeholder="Max Age"
+              />
+            </div>
+
+            <MultiCombobox
+              name="location"
+              list={Array.from(new Set(users.map((u) => u.location.name)))
+                .filter(Boolean)
+                .map((location) => ({
+                  value: location,
+                  label: location,
+                }))}
+              value={locationFilter}
+              onChange={setLocationFilter}
+            />
+
+            <MultiTagCombobox value={tagFilter} onChange={setTagFilter} />
+
+            <FameSlider value={fameFilter} onChange={setFameFilter} />
+
             {/* <div className="flex gap-2"> */}
             {/* </div> */}
             <FilterToggle
@@ -264,7 +315,14 @@ export const ForYou: React.FC = () => {
                     genderFilter.length === 0) &&
                   (preferenceFilter?.includes(user.user.preference) ||
                     !preferenceFilter ||
-                    preferenceFilter.length === 0)
+                    preferenceFilter.length === 0) &&
+                  user.user.age >= ageFilter.min &&
+                  user.user.age <= ageFilter.max &&
+                  (!locationFilter?.length ||
+                    locationFilter.includes(user.location.name)) &&
+                  user.fame >= fameFilter &&
+                  (!tagFilter?.length ||
+                    user.tags.names.some((tag) => tagFilter.includes(tag.name)))
                 );
               })
               .sort((a, b) => {

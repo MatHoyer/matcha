@@ -8,7 +8,10 @@ import { useNavigate } from 'react-router-dom';
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
-  const { theme } = useTheme();
+  // const { theme } = useTheme();
+  // const { theme = 'dark' } = useTheme() || {};
+  const { theme: rawTheme } = useTheme() || {};
+  const theme = rawTheme === 'system' ? 'dark' : rawTheme || 'dark';
 
   return (
     <Layout className="flex justify-center">
