@@ -34,6 +34,45 @@ export const createLike = async (req: Request, res: Response) => {
   const { likedId } = req.body as TCreateLikeSchemas['requirements'];
   const { id } = req.user;
 
+  const isBlocked = await db.block.findFirst({
+    where: {
+      OR: [
+        {
+          userId: id,
+          blockedId: likedId,
+        },
+        {
+          userId: likedId,
+          blockedId: id,
+        },
+      ],
+    },
+  });
+  if (isBlocked) {
+    return defaultResponse({
+      res,
+      status: 400,
+      json: {
+        message: 'Cannot like a blocked user',
+      },
+    });
+  }
+  const isAlreadyLiked = await db.like.findFirst({
+    where: {
+      userId: id,
+      likedId,
+    },
+  });
+  if (isAlreadyLiked) {
+    return defaultResponse({
+      res,
+      status: 400,
+      json: {
+        message: 'Already liked',
+      },
+    });
+  }
+
   const profilePicture = await db.image.findFirst({
     where: {
       userId: id,
@@ -78,6 +117,46 @@ export const createLike = async (req: Request, res: Response) => {
 export const deleteLike = async (req: Request, res: Response) => {
   const { likedId } = req.body as TDeleteLikeSchemas['requirements'];
   const { id } = req.user;
+
+  const isBlocked = await db.block.findFirst({
+    where: {
+      OR: [
+        {
+          userId: id,
+          blockedId: likedId,
+        },
+        {
+          userId: likedId,
+          blockedId: id,
+        },
+      ],
+    },
+  });
+  if (isBlocked) {
+    return defaultResponse({
+      res,
+      status: 400,
+      json: {
+        message: 'Cannot like a blocked user',
+      },
+    });
+  }
+
+  const isAlreadyLiked = await db.like.findFirst({
+    where: {
+      userId: id,
+      likedId,
+    },
+  });
+  if (!isAlreadyLiked) {
+    return defaultResponse({
+      res,
+      status: 400,
+      json: {
+        message: 'Not liked yet',
+      },
+    });
+  }
 
   const like = await db.like.remove({
     where: {

@@ -35,6 +35,24 @@ type TUserManager = {
 
 const connectedUsers = [] as TUserManager[];
 
+const isBlocked = async (id: number, otherId: number) => {
+  const blocked = await db.block.findFirst({
+    where: {
+      OR: [
+        {
+          userId: id,
+          blockedId: otherId,
+        },
+        {
+          userId: otherId,
+          blockedId: id,
+        },
+      ],
+    },
+  });
+  return blocked ? true : false;
+};
+
 export const socketHandler = (io: Server) => {
   io.on('connection', async (socket: Socket) => {
     const cookies = parse(socket.handshake.headers.cookie || '');
@@ -83,7 +101,7 @@ export const socketHandler = (io: Server) => {
     socketMiddleware(socket, {
       'send-message': async (args) => {
         const { senderId, receiverId, message } = args;
-
+        if (await isBlocked(senderId, receiverId)) return;
         await db.message.create({
           data: {
             userId: senderId,
@@ -126,8 +144,8 @@ export const socketHandler = (io: Server) => {
         receiver.socket.emit(`notification-bubble`);
       },
       'send-feedback': async (args) => {
-        console.log('send-feedback from back');
         const { senderId, receiverId, message } = args;
+        if (await isBlocked(senderId, receiverId)) return;
 
         const sender = connectedUsers.find((u) => u.id === senderId);
         if (!sender) return;
@@ -140,6 +158,7 @@ export const socketHandler = (io: Server) => {
       },
       'send-like-unlike': async (args) => {
         const { senderLikeId, receiverLikeId } = args;
+        if (await isBlocked(senderLikeId, receiverLikeId)) return;
         const sender = await db.user.findFirst({
           where: {
             id: senderLikeId,
@@ -273,9 +292,10 @@ export const socketHandler = (io: Server) => {
         }
       },
       'send-view': async (args) => {
-        console.log('entering send view');
         const { senderViewId, receiverViewId } = args;
-        // checking if match exists
+        console.log('send view enter');
+        if (await isBlocked(senderViewId, receiverViewId)) return;
+        console.log('send view enter 2');
         const senderView = await db.like.findFirst({
           where: {
             userId: senderViewId,
@@ -288,7 +308,6 @@ export const socketHandler = (io: Server) => {
             likedId: senderViewId,
           },
         });
-        console.log(`senderView: ${senderView}, receiverLike: ${receiverView}`);
         if (!senderView || !receiverView) {
           console.log('about to create view');
           await db.view.create({
@@ -298,7 +317,6 @@ export const socketHandler = (io: Server) => {
               date: new Date(),
             },
           });
-          console.log('about to create notif view');
           await db.notification.create({
             data: {
               userId: receiverViewId,
@@ -308,7 +326,6 @@ export const socketHandler = (io: Server) => {
               read: false,
             },
           });
-          console.log(`receiverViewId: ${receiverViewId}`);
           const receiver = await db.user.findFirst({
             where: {
               id: receiverViewId,
@@ -326,7 +343,6 @@ export const socketHandler = (io: Server) => {
           );
 
           if (receiverOnline) {
-            console.log('about to emit notif view');
             receiverOnline.socket.emit(`notification-${receiverViewId}`, {
               userId: receiverViewId,
               otherUserId: senderViewId,
@@ -339,9 +355,6 @@ export const socketHandler = (io: Server) => {
           }
         }
       },
-      // disconnect: (_args) => {
-      //   console.log(`User disconnected: ${socket.id}`);
-      // },
       disconnect: async (_args) => {
         const user = connectedUsers.find((u) => u.socket.id === socket.id);
         if (!user) return;
@@ -355,7 +368,6 @@ export const socketHandler = (io: Server) => {
           },
         });
         connectedUsers.splice(connectedUsers.indexOf(user), 1);
-        console.log('User disconnected', connectedUsers);
       },
     });
   });
