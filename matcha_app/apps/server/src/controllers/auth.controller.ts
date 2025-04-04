@@ -8,6 +8,7 @@ import {
   TSignupSchemas,
   wait,
 } from '@matcha/common';
+import { setHours } from 'date-fns';
 import type { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import db from '../database/Database.js';
@@ -46,6 +47,7 @@ export const signup = async (req: Request, res: Response) => {
       preference: preference as TOrientation,
       password: hashedPassword,
       ...userData,
+      birthDate: setHours(userData.birthDate, 3),
     },
   });
   if (!user) {

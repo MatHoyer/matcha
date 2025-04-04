@@ -1,4 +1,3 @@
-import { TZDate } from '@date-fns/tz';
 import {
   AUTH_COOKIE_NAME,
   getUsersSchemas,
@@ -7,7 +6,7 @@ import {
   TUpdateUserSchemas,
   z,
 } from '@matcha/common';
-import { getHours, setHours } from 'date-fns';
+import { setHours } from 'date-fns';
 import type { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import db from '../database/Database';
@@ -218,14 +217,19 @@ export const updateUser = async (req: Request, res: Response) => {
 
   const { name, lastName, email, gender, preference, birthDate, biography } =
     req.body as TUpdateUserSchemas['requirements'];
-  console.log(
-    setHours(birthDate, getHours(new TZDate(birthDate, 'Europe/Paris')))
-  );
   await db.user.update({
     where: {
       id: +id,
     },
-    data: { name, lastName, email, gender, preference, birthDate, biography },
+    data: {
+      name,
+      lastName,
+      email,
+      gender,
+      preference,
+      birthDate: setHours(birthDate, 3),
+      biography,
+    },
   });
   const { password: _, ...userWithoutPassword } = user;
   const token = jwt.sign({ ...userWithoutPassword }, env.JWT_SECRET, {
