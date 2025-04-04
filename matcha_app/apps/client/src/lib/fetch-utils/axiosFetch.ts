@@ -65,7 +65,6 @@ export const axiosFetch = async <
     if (axios.isAxiosError(error) && error.response) {
       if (form && form.setError) {
         for (const field of error.response.data.fields) {
-          console.log('field', field);
           form.setError(field.field, {
             type: 'manual',
             message: field.message,

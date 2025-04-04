@@ -80,9 +80,20 @@ export const getUser = async (req: Request, res: Response) => {
 export const getMatchUser = async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
+    const blockedUsers = await db.block.findMany({
+      where: {
+        OR: [{ userId: +id }, { blockedId: +id }],
+      },
+    });
+    const blockedIds = blockedUsers.map((blockedUser) => blockedUser.blockedId);
+
     const likes = await db.like.findMany({
       where: {
-        OR: [{ userId: +id }, { likedId: +id }],
+        AND: [
+          {
+            OR: [{ userId: +id }, { likedId: +id }],
+          },
+        ],
       },
     });
     const matchIds = likes
@@ -91,7 +102,9 @@ export const getMatchUser = async (req: Request, res: Response) => {
           (l) =>
             l.userId === like.likedId &&
             l.likedId === like.userId &&
-            l.userId !== l.likedId
+            l.userId !== l.likedId &&
+            !blockedIds.includes(l.userId) &&
+            !blockedIds.includes(l.likedId)
         )
       )
       .map((like) => (like.userId === +id ? like.likedId : like.userId));
@@ -375,6 +388,31 @@ export const isBlocked = async (req: Request, res: Response) => {
     where: {
       userId: req.user.id,
       blockedId: +id,
+    },
+  });
+
+  res.status(200).json({ blocked: !!blocked });
+};
+
+export const blockedMe = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const user = await db.user.findFirst({
+    where: {
+      id: +id,
+    },
+  });
+  if (!user) {
+    return defaultResponse({
+      res,
+      status: 404,
+      json: { message: 'User not found' },
+    });
+  }
+
+  const blocked = await db.block.findFirst({
+    where: {
+      userId: +id,
+      blockedId: req.user.id,
     },
   });
 

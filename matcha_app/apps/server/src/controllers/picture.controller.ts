@@ -16,11 +16,31 @@ const PICTURES_DIR = path.join(
 
 export const getPicture = async (req: Request, res: Response) => {
   const { id } = req.params;
+  const userId = req.user.id;
 
   try {
+    const blockedUsers = await db.block.findMany({
+      where: {
+        userId: userId,
+      },
+    });
+    const blockedUserIds = blockedUsers.map(
+      (blockedUser) => blockedUser.blockedId
+    );
     const picture = await db.image.findFirst({
       where: {
-        id: +id,
+        AND: [
+          {
+            id: +id,
+          },
+          {
+            NOT: [
+              {
+                userId: { $in: blockedUserIds },
+              },
+            ],
+          },
+        ],
       },
     });
     if (!picture) {

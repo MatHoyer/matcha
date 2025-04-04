@@ -2,6 +2,7 @@ import { resetPasswordSchemas, updateUserSchemas, z } from '@matcha/common';
 import { Router } from 'express';
 import {
   askResetPassword,
+  blockedMe,
   getMatchUser,
   getUser,
   getUserFame,
@@ -65,6 +66,13 @@ userRouter.get(
   isLogged,
   paramsParser(z.object({ id: z.number() })),
   isBlocked
+);
+
+userRouter.get(
+  '/blockedMe/:id',
+  isLogged,
+  paramsParser(z.object({ id: z.number() })),
+  blockedMe
 );
 
 export default userRouter;

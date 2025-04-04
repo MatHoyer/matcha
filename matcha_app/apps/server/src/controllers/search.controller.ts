@@ -90,6 +90,12 @@ export const advancedSearch = async (req: Request, res: Response) => {
     },
   });
 
+  const blockedUsers = await db.block.findMany({
+    where: {
+      userId: req.user.id,
+    },
+  });
+
   const users = await db.user.findMany({
     where: {
       id: {
@@ -98,7 +104,11 @@ export const advancedSearch = async (req: Request, res: Response) => {
       NOT: [
         {
           id: {
-            $in: [req.user.id, ...likedUsers.map((l) => l.likedId)],
+            $in: [
+              req.user.id,
+              ...likedUsers.map((l) => l.likedId),
+              ...blockedUsers.map((bu) => bu.blockedId),
+            ],
           },
         },
       ],

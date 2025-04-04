@@ -50,26 +50,9 @@ import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { socket } from '../../lib/socket';
 
-const ElipsisDropdown = () => {
+const ElipsisDropdown: React.FC<{ isBlocked: boolean }> = ({ isBlocked }) => {
   const { id } = useParams();
   const queryClient = useQueryClient();
-  const [isBlocked, setIsBlocked] = useState(false);
-
-  useQuery({
-    queryKey: ['isBlocked', id],
-    queryFn: async () => {
-      return await axiosFetch({
-        method: 'GET',
-        url: getUrl('api-users', { id: +id!, type: 'isBlocked' }),
-        schemas: isBlockedSchemas,
-        handleEnding: {
-          cb: (data) => {
-            setIsBlocked(data.blocked);
-          },
-        },
-      });
-    },
-  });
 
   const blockMutation = useMutation({
     mutationFn: async () => {
@@ -87,7 +70,7 @@ const ElipsisDropdown = () => {
             : 'Error blocking user',
           cb: () => {
             queryClient.invalidateQueries({
-              queryKey: ['isBlocked'],
+              queryKey: [id],
             });
           },
         },
@@ -132,6 +115,40 @@ export const UserProfile = () => {
   const [fame, setFame] = useState(1);
   const [haveMatched, setHaveMatched] = useState(false);
   const [canLike, setCanLike] = useState(false);
+  const [isBlocked, setIsBlocked] = useState(false);
+  const [blockedMe, setBlockedMe] = useState(false);
+
+  useQuery({
+    queryKey: ['isBlocked', id],
+    queryFn: async () => {
+      return await axiosFetch({
+        method: 'GET',
+        url: getUrl('api-users', { id: +id!, type: 'isBlocked' }),
+        schemas: isBlockedSchemas,
+        handleEnding: {
+          cb: (data) => {
+            setIsBlocked(data.blocked);
+          },
+        },
+      });
+    },
+  });
+
+  useQuery({
+    queryKey: ['blockedMe', id],
+    queryFn: async () => {
+      return await axiosFetch({
+        method: 'GET',
+        url: getUrl('api-users', { id: +id!, type: 'blockedMe' }),
+        schemas: isBlockedSchemas,
+        handleEnding: {
+          cb: (data) => {
+            setBlockedMe(data.blocked);
+          },
+        },
+      });
+    },
+  });
 
   const userQuery = useQuery({
     queryKey: ['user', id],
@@ -161,22 +178,6 @@ export const UserProfile = () => {
       return await axiosFetch({
         method: 'GET',
         url: getUrl('api-users', { id: +id!, type: 'fame' }),
-        schemas: getUserFameSchemas,
-        handleEnding: {
-          cb: (data) => {
-            setFame(data.fame);
-          },
-        },
-      });
-    },
-  });
-
-  useQuery({
-    queryKey: ['fame', id],
-    queryFn: async () => {
-      return await axiosFetch({
-        method: 'GET',
-        url: getUrl('api-users', { id: +id! }),
         schemas: getUserFameSchemas,
         handleEnding: {
           cb: (data) => {
@@ -394,21 +395,21 @@ export const UserProfile = () => {
                   size="icon"
                   className="rounded-full"
                   onClick={canLike ? () => likeMutation.mutate() : undefined}
-                  disabled={!canLike}
+                  disabled={!canLike || isBlocked || blockedMe}
                 >
                   <Heart fill={isLiked ? 'red' : 'none'} />
                 </Button>
                 <Button
                   size="icon"
                   className={'rounded-full'}
-                  disabled={!haveMatched}
+                  disabled={!haveMatched || isBlocked || blockedMe}
                   onClick={() => {
                     addChatWindow(userQuery.data!.user, session.user!.id);
                   }}
                 >
                   <MessageCircle />
                 </Button>
-                <ElipsisDropdown />
+                <ElipsisDropdown isBlocked={isBlocked} />
               </div>
             )}
           </div>
