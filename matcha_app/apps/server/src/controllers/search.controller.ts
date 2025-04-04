@@ -150,8 +150,8 @@ export const advancedSearch = async (req: Request, res: Response) => {
       )?.name;
 
       return {
-        // user: user,
-        user: { ...user, age: 30 },
+        user: user,
+        // user: { ...user, age: 30 },
         tags: allTags as { id: number; name: string }[],
         // fame: fameResults.find((f) => f.userId === user.id)?.fame || 1,
         fame: Math.floor(Math.random() * 5),
@@ -236,7 +236,12 @@ export const suggestedUsers = async (req: Request, res: Response) => {
       ),
     },
   });
-  console.log('users :', users);
+  const usersWithOrderLoc = users.map((user, index) => ({
+    user,
+    order: index + 1,
+  }));
+
+  console.log('usersWithOrderLoc :', usersWithOrderLoc);
   const fameResults = await batchPromises(ids.map((id) => fameCalculator(id)));
   // console.log('fameResults :', fameResults);
   const usersResponse: (TForYouSchema['response']['users'][number] | null)[] =
@@ -293,14 +298,23 @@ export const suggestedUsers = async (req: Request, res: Response) => {
         const similarTagsCount = allTags.filter((tag) =>
           tagIdsInSessionUser.has(tag.id)
         ).length;
-        console.log('similarTagsCount :', similarTagsCount);
+        // console.log('similarTagsCount :', similarTagsCount);
+
+        // const locationOrder =
+        const sortedLocationNames = globalLocations
+          .map((gl) => gl.name)
+          .sort((a, b) => a.localeCompare(b));
+        const locationOrder =
+          sortedLocationNames.indexOf(locationName || 'Unknown') + 1;
         return {
           user: user,
           tags: { names: allTags, order: similarTagsCount },
-          fame: fameResults.find((f) => f.userId === user.id)?.fame || 1,
-          location: { name: locationName || 'Unknown', order: 1 },
+          // fame: fameResults.find((f) => f.userId === user.id)?.fame || 1,
+          fame: Math.floor(Math.random() * 5),
+          location: { name: locationName || 'Unknown', order: locationOrder },
         };
       })
     );
+
   res.status(200).json({ users: usersResponse.filter((u) => u) });
 };
