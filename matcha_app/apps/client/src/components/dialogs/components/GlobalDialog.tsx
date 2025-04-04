@@ -5,11 +5,13 @@ import {
   useGlobalDialogStore,
 } from '@/hooks/use-dialog';
 import { CreateTagDialog } from '../CreateTag.dialog';
+import { ReportUserDialog } from '../ReportUser.dialog';
 import { UplaodPictureDialog } from '../UploadPicture.dialog';
 
 const dialogComponents: Record<TDialogType, React.FC> = {
   'create-tag': CreateTagDialog,
   'upload-picture': UplaodPictureDialog,
+  'report-user': ReportUserDialog,
 };
 
 export const GlobalDialog = () => {

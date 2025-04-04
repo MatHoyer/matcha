@@ -368,7 +368,11 @@ export const isBlocked = async (req: Request, res: Response) => {
     },
   });
   if (!user) {
-    return res.status(404).json({ message: 'User not found' });
+    return defaultResponse({
+      res,
+      status: 404,
+      json: { message: 'User not found' },
+    });
   }
 
   const blocked = await db.block.findFirst({
@@ -378,5 +382,5 @@ export const isBlocked = async (req: Request, res: Response) => {
     },
   });
 
-  return res.status(200).json({ blocked: !!blocked });
+  res.status(200).json({ blocked: !!blocked });
 };

@@ -3,6 +3,9 @@ import { create } from 'zustand';
 type TDialogDataMap = {
   'create-tag': undefined;
   'upload-picture': undefined;
+  'report-user': {
+    userId: number;
+  };
 };
 
 export type TDialogType = keyof TDialogDataMap;
