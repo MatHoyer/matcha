@@ -33,9 +33,9 @@ export const useZodForm = <T extends FieldValues>({
   ...formProps
 }: UseZodFormProps<T>) => {
   const form = useForm<T>({
-    ...formProps,
     resolver: zodResolver(schema),
     mode: 'onBlur',
+    ...formProps,
   });
 
   return form;

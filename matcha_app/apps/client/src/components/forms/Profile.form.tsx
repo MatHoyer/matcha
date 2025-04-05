@@ -1,4 +1,4 @@
-import { closeGlobalDialog } from '@/hooks/use-dialog';
+import { closeGlobalDialog, openGlobalDialog } from '@/hooks/use-dialog';
 import { useSession } from '@/hooks/useSession';
 import { useZodForm } from '@/hooks/useZodForm';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
@@ -15,9 +15,11 @@ import {
   updateUserSchemas,
 } from '@matcha/common';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { Plus } from 'lucide-react';
 import { useEffect } from 'react';
 import GlobalLocationCombobox from '../comboxes/GlobalLocation.combobox';
 import MultiTagCombobox from '../comboxes/Tag.combobox';
+import { Button } from '../ui/button';
 import { DatePicker } from '../ui/date-time-picker';
 import {
   Form,
@@ -230,19 +232,30 @@ export const ProfileForm: React.FC<
         />
       </div>
       <div className="flex flex-col gap-2 md:flex-row">
-        <FormField
-          control={form.control}
-          name="tags"
-          render={({ field }) => (
-            <FormItem className="flex-1">
-              <FormLabel>Tags</FormLabel>
-              <FormControl>
-                <MultiTagCombobox {...field} modal={modal} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="flex flex-1 items-end gap-2">
+          <FormField
+            control={form.control}
+            name="tags"
+            render={({ field }) => (
+              <FormItem className="flex-1">
+                <FormLabel>Tags</FormLabel>
+                <FormControl>
+                  <MultiTagCombobox {...field} modal={modal} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button
+            variant="outline"
+            type="button"
+            onClick={() => {
+              openGlobalDialog('create-tag');
+            }}
+          >
+            <Plus />
+          </Button>
+        </div>
         <FormField
           control={form.control}
           name="location"

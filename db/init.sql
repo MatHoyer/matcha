@@ -139,6 +139,18 @@ INSERT INTO "Tag" ("name") VALUES
 ('Music'),
 ('Tech'),
 ('Art'),
+('Food'),
+('Gaming'),
+('Reading'),
+('Writing'),
+('Cooking'),
+('Animals'),
+('Nature'),
+('Photography'),
+('Yoga'),
+('Meditation'),
+('Hiking'),
+('Swimming'),
 ('Travel');
 
 INSERT INTO "UserTag" ("userId", "tagId") VALUES

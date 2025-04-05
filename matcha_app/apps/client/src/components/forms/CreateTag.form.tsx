@@ -3,7 +3,7 @@ import { useZodForm } from '@/hooks/useZodForm';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import { defaultHandleSubmit } from '@/lib/fetch-utils/defaultHandleSubmit';
 import { createTagSchemas, getUrl, TCreateTagSchemas } from '@matcha/common';
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import {
   Form,
@@ -30,7 +30,9 @@ export const CreateTagForm: React.FC<
       name: '',
       ...defaultValues,
     },
+    mode: 'onSubmit',
   });
+  const queryClient = useQueryClient();
 
   const mutation = useMutation({
     mutationFn: async (data: TForm) => {
@@ -48,6 +50,9 @@ export const CreateTagForm: React.FC<
           cb: (data) => {
             if (modal) closeGlobalDialog();
             getData?.(data);
+            queryClient.invalidateQueries({
+              queryKey: ['tags'],
+            });
           },
         },
       });
