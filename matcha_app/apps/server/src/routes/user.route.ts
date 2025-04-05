@@ -41,7 +41,6 @@ userRouter.get(
 userRouter.get('/password/reset-password', isLogged, askResetPassword);
 userRouter.post(
   '/password/reset-password/:token',
-  isLogged,
   paramsParser(z.object({ token: z.string() })),
   bodyParser(resetPasswordSchemas.requirements),
   resetPassword

@@ -6,7 +6,6 @@ import {
   TLoginSchemas,
   TOrientation,
   TSignupSchemas,
-  wait,
 } from '@matcha/common';
 import { setHours } from 'date-fns';
 import type { Request, Response } from 'express';
@@ -68,7 +67,7 @@ export const signup = async (req: Request, res: Response) => {
     to: user.email,
     subject: 'Welcome to Matcha',
     html: SignupMail({
-      linkText: 'Confirm my signup',
+      linkText: 'Confirm my account',
       link: `${
         env.NODE_ENV === 'DEV'
           ? `http://localhost:${env.CLIENT_PORT}/`
@@ -88,13 +87,12 @@ export const signup = async (req: Request, res: Response) => {
 };
 
 export const login = async (req: Request, res: Response) => {
-  const { email, password } = req.body as TLoginSchemas['requirements'];
+  const { username, password } = req.body as TLoginSchemas['requirements'];
   const hashedPassword = hashPassword(password, env.AUTH_SECRET);
-  await wait(2000);
 
   const user = await db.user.findFirst({
     where: {
-      email,
+      username,
       password: hashedPassword,
     },
   });
@@ -113,26 +111,47 @@ export const login = async (req: Request, res: Response) => {
   });
   console.log('token : ', token);
 
-  await sendEmail({
-    to: user.email,
-    subject: 'Login to Matcha',
-    html: LoginMail({
-      linkText: 'Log me in',
-      link: `${
-        env.NODE_ENV === 'DEV'
-          ? `http://localhost:${env.CLIENT_PORT}/`
-          : env.SERVER_URL
-      }auth/confirm/${token}`,
-    }),
-  });
+  if (!user.isActivate) {
+    await sendEmail({
+      to: user.email,
+      subject: 'Welcome to Matcha',
+      html: SignupMail({
+        linkText: 'Confirm my account',
+        link: `${
+          env.NODE_ENV === 'DEV'
+            ? `http://localhost:${env.CLIENT_PORT}/`
+            : env.SERVER_URL
+        }auth/confirm/${token}`,
+      }),
+    });
 
-  const resendToken = jwt.sign({ id: user.id }, env.JWT_SECRET, {
-    expiresIn: '5m',
-  });
+    const resendToken = jwt.sign({ id: user.id }, env.JWT_SECRET, {
+      expiresIn: '5m',
+    });
 
-  res.status(200).json({
-    message: 'Successfully logged in',
-    resendToken,
+    res.status(201).json({
+      message: 'Need to confirm your account',
+      resendToken,
+    });
+    return;
+  }
+
+  return defaultResponse({
+    res,
+    status: 200,
+    cookie: {
+      name: AUTH_COOKIE_NAME,
+      val: token,
+      options: {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'strict',
+        maxAge: 30 * 24 * 60 * 60 * 1000,
+      },
+    },
+    json: {
+      message: 'Logged in',
+    },
   });
 };
 
@@ -205,6 +224,14 @@ export const confirm = async (req: Request, res: Response) => {
         json: { message: 'Unauthorized' },
       });
     }
+    await db.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        isActivate: true,
+      },
+    });
 
     const newToken = jwt.sign({ id: decoded.id }, env.JWT_SECRET, {
       expiresIn: 30 * 24 * 60 * 60,

@@ -17,11 +17,12 @@ import { getUrl, loginSchemas, TLoginSchemas } from '@matcha/common';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { SubmitButtonForm } from './components/SubmitButton.form';
 import { TFormProps } from './types.form';
 
 type TForm = {
-  email: string;
+  username: string;
   password: string;
 };
 
@@ -36,7 +37,7 @@ const LoginForm: React.FC<TFormProps<TForm, TLoginSchemas['response']>> = ({
   const form = useZodForm<TForm>({
     schema: loginSchemas.requirements,
     defaultValues: {
-      email: '',
+      username: '',
       password: '',
       ...defaultValues,
     },
@@ -56,14 +57,19 @@ const LoginForm: React.FC<TFormProps<TForm, TLoginSchemas['response']>> = ({
           cb: (data) => {
             if (modal) closeGlobalDialog();
             getData?.(data);
-            navigate(
-              getUrl('client-auth', {
-                type: 'wait-confirm',
-                urlParams: {
-                  token: data.resendToken,
-                },
-              })
-            );
+            if (data.resendToken) {
+              navigate(
+                getUrl('client-auth', {
+                  type: 'wait-confirm',
+                  urlParams: {
+                    token: data.resendToken,
+                  },
+                })
+              );
+              toast.info('Please confirm your account');
+              return;
+            }
+            navigate(getUrl('client-home'));
             socket.emit('connection');
           },
         },
@@ -85,17 +91,12 @@ const LoginForm: React.FC<TFormProps<TForm, TLoginSchemas['response']>> = ({
     >
       <FormField
         control={form.control}
-        name="email"
+        name="username"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Email</FormLabel>
+            <FormLabel>Username</FormLabel>
             <FormControl>
-              <Input
-                {...field}
-                type="email"
-                placeholder="example@domain.com"
-                autoComplete="email"
-              />
+              <Input {...field} autoComplete="username" />
             </FormControl>
             <FormMessage />
           </FormItem>

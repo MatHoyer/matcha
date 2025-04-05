@@ -7,6 +7,7 @@ export const signupSchemas = {
       'name',
       'lastName',
       'email',
+      'username',
       'birthDate',
       'gender',
       'preference',
@@ -29,10 +30,10 @@ export type TSignupSchemas = {
 };
 
 export const loginSchemas = {
-  requirements: userSchema.pick(['email', 'password']),
+  requirements: userSchema.pick(['username', 'password']),
   response: z.object({
     message: z.string(),
-    resendToken: z.string(),
+    resendToken: z.string().optional(),
   }),
 };
 export type TLoginSchemas = {

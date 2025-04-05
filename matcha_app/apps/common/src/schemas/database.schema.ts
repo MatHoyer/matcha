@@ -13,6 +13,7 @@ export const userSchema = z.object({
   name: z.string(),
   lastName: z.string(),
   email: z.string().email(),
+  username: z.string(),
   password: z.string(),
   age: z.number(),
   birthDate: z
@@ -25,7 +26,8 @@ export const userSchema = z.object({
   preference: orientationSchema,
   biography: z.string().optional().nullable(),
   lastTimeOnline: z.date(),
-  isOnline: z.boolean().optional(),
+  isOnline: z.boolean(),
+  isActivate: z.boolean(),
 });
 export type TUser = Infer<typeof userSchema>;
 export type TUserWithNames = Pick<TUser, 'id' | 'name' | 'lastName'>;

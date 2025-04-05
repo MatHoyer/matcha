@@ -33,6 +33,7 @@ type TForm = {
   name: string;
   lastName: string;
   email: string;
+  username: string;
   password: string;
   birthDate: Date;
   gender: 'Male' | 'Female' | null;
@@ -53,6 +54,7 @@ const SignupForm: React.FC<TFormProps<TForm, TSignupSchemas['response']>> = ({
       name: '',
       lastName: '',
       email: '',
+      username: '',
       password: '',
       birthDate: new Date(),
       gender: null,
@@ -109,7 +111,7 @@ const SignupForm: React.FC<TFormProps<TForm, TSignupSchemas['response']>> = ({
           <FormItem>
             <FormLabel>Name</FormLabel>
             <FormControl>
-              <Input {...field} placeholder="Jean" autoComplete="name" />
+              <Input {...field} autoComplete="name" />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -122,11 +124,7 @@ const SignupForm: React.FC<TFormProps<TForm, TSignupSchemas['response']>> = ({
           <FormItem>
             <FormLabel>Familly name</FormLabel>
             <FormControl>
-              <Input
-                {...field}
-                placeholder="Dupont"
-                autoComplete="family-name"
-              />
+              <Input {...field} autoComplete="family-name" />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -158,6 +156,19 @@ const SignupForm: React.FC<TFormProps<TForm, TSignupSchemas['response']>> = ({
                 placeholder="example@domain.com"
                 autoComplete="email"
               />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="username"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Username</FormLabel>
+            <FormControl>
+              <Input {...field} autoComplete="username" />
             </FormControl>
             <FormMessage />
           </FormItem>

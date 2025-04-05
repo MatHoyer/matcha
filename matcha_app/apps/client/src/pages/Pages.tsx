@@ -11,8 +11,8 @@ import { Notifications } from './notification/Notifications';
 import { PersonnalProfile } from './profiles/PersonnalProfile';
 import { UserProfile } from './profiles/UserProfile';
 import { AdvancedSearch } from './research/AdvancedSearch';
-import ResetPasswordPage from './ResetPassword';
 import { ForYou } from './research/ForYou';
+import ResetPasswordPage from './ResetPassword';
 
 const AuthRoute = () => {
   const { user, loading } = useSession();
@@ -67,6 +67,10 @@ export const Pages = () => {
           })}/:token`}
           element={<ConfirmPage />}
         />
+        <Route
+          path={`/reset-password/:token`}
+          element={<ResetPasswordPage />}
+        />
       </Route>
       <Route element={<PrivateRoute />}>
         <Route path="/" element={<Home />} />
@@ -81,10 +85,6 @@ export const Pages = () => {
         <Route
           path={`${getUrl('client-profile')}`}
           element={<PersonnalProfile />}
-        />
-        <Route
-          path={`/reset-password/:token`}
-          element={<ResetPasswordPage />}
         />
         <Route
           path={`${getUrl('client-profile')}/:id`}

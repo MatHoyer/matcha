@@ -4,6 +4,7 @@ import {
   Infer,
   TResetPasswordSchemas,
   TUpdateUserSchemas,
+  TUser,
   z,
 } from '@matcha/common';
 import { setHours } from 'date-fns';
@@ -330,6 +331,21 @@ export const askResetPassword = async (req: Request, res: Response) => {
 
 export const resetPassword = async (req: Request, res: Response) => {
   const { password } = req.body as TResetPasswordSchemas['requirements'];
+
+  const { token } = req.params;
+  const decoded = jwt.verify(token, env.JWT_SECRET) as { id: TUser['id'] };
+  const user = await db.user.findFirst({
+    where: {
+      id: decoded.id,
+    },
+  });
+  if (!user) {
+    return defaultResponse({
+      res,
+      status: 404,
+      json: { message: 'User not found' },
+    });
+  }
 
   const passwordSchema = z
     .string()

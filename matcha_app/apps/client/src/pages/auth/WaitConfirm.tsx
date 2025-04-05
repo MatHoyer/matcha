@@ -53,13 +53,13 @@ export const WaitConfirmPage: React.FC = () => {
       <LayoutContent className="flex justify-center">
         <Card className="w-96">
           <CardHeader>
-            <CardTitle>Waiting for confirmation</CardTitle>
+            <CardTitle>Waiting for your account activation</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
             <Separator />
             <Typography variant="small">
-              If you don't see the email, please don't forget to check your spam
-              folder
+              We sent you an email to activate your account, if you don't see
+              the email, please don't forget to check your spam folder
             </Typography>
             <Button
               variant="outline"
