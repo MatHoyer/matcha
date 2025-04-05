@@ -373,7 +373,7 @@ export const resetPassword = async (req: Request, res: Response) => {
 
   await db.user.update({
     where: {
-      id: req.user.id,
+      id: decoded.id,
     },
     data: { password: hashedPassword },
   });

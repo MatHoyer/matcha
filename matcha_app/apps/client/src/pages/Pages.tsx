@@ -67,10 +67,6 @@ export const Pages = () => {
           })}/:token`}
           element={<ConfirmPage />}
         />
-        <Route
-          path={`/reset-password/:token`}
-          element={<ResetPasswordPage />}
-        />
       </Route>
       <Route element={<PrivateRoute />}>
         <Route path="/" element={<Home />} />
@@ -95,6 +91,7 @@ export const Pages = () => {
           element={<Notifications />}
         />
       </Route>
+      <Route path={`/reset-password/:token`} element={<ResetPasswordPage />} />
     </Routes>
   );
 };
