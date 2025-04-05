@@ -146,7 +146,8 @@ const routes: {
     return id ? `/api/location/${id}` : '/api/location';
   },
   'api-block': () => '/api/block',
-  'api-report': ({ userId }) => `/api/report/${userId}`,
+  'api-report': ({ userId }) =>
+    userId ? `/api/report/${userId}` : '/api/report',
 };
 
 type TUrlParams =

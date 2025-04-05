@@ -13,20 +13,15 @@ export const blockUser = async (req: Request, res: Response) => {
       blockedId: userId,
     },
   });
-  if (block) {
-    return defaultResponse({
-      res,
-      status: 400,
-      json: { message: 'User already blocked' },
+  if (!block) {
+    await db.block.create({
+      data: {
+        userId: id,
+        blockedId: userId,
+      },
     });
   }
 
-  await db.block.create({
-    data: {
-      userId: id,
-      blockedId: userId,
-    },
-  });
   return defaultResponse({
     res,
     status: 200,
@@ -44,19 +39,13 @@ export const unblockUser = async (req: Request, res: Response) => {
       blockedId: userId,
     },
   });
-  if (!block) {
-    return defaultResponse({
-      res,
-      status: 400,
-      json: { message: 'User not blocked' },
+  if (block) {
+    await db.block.remove({
+      where: {
+        id: block.id,
+      },
     });
   }
-
-  await db.block.remove({
-    where: {
-      id: block.id,
-    },
-  });
 
   return defaultResponse({
     res,
