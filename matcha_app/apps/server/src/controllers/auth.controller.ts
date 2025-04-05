@@ -106,12 +106,10 @@ export const login = async (req: Request, res: Response) => {
     });
   }
 
-  const token = jwt.sign({ id: user.id }, env.JWT_SECRET, {
-    expiresIn: '5m',
-  });
-  console.log('token : ', token);
-
   if (!user.isActivate) {
+    const token = jwt.sign({ id: user.id }, env.JWT_SECRET, {
+      expiresIn: '5m',
+    });
     await sendEmail({
       to: user.email,
       subject: 'Welcome to Matcha',
@@ -136,12 +134,16 @@ export const login = async (req: Request, res: Response) => {
     return;
   }
 
+  const newToken = jwt.sign({ id: user.id }, env.JWT_SECRET, {
+    expiresIn: 30 * 24 * 60 * 60,
+  });
+
   return defaultResponse({
     res,
     status: 200,
     cookie: {
       name: AUTH_COOKIE_NAME,
-      val: token,
+      val: newToken,
       options: {
         httpOnly: true,
         secure: true,
