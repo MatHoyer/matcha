@@ -161,7 +161,7 @@ export const ProfileForm: React.FC<
               <FormMessage />
             </FormItem>
           )}
-        />{' '}
+        />
       </div>
       <div className="flex flex-col gap-2 md:flex-row">
         <FormField

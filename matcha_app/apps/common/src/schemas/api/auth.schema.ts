@@ -75,6 +75,7 @@ export const sessionSchemas = {
       'name',
       'lastName',
       'email',
+      'username',
       'gender',
       'preference',
       'age',
