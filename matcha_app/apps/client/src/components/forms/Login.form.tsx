@@ -12,6 +12,7 @@ import { closeGlobalDialog } from '@/hooks/use-dialog';
 import { useZodForm } from '@/hooks/useZodForm';
 import { axiosFetch } from '@/lib/fetch-utils/axiosFetch';
 import { defaultHandleSubmit } from '@/lib/fetch-utils/defaultHandleSubmit';
+import { socket } from '@/lib/socket';
 import { getUrl, loginSchemas, TLoginSchemas } from '@matcha/common';
 import { useMutation } from '@tanstack/react-query';
 import { useEffect } from 'react';
@@ -63,6 +64,7 @@ const LoginForm: React.FC<TFormProps<TForm, TLoginSchemas['response']>> = ({
                 },
               })
             );
+            socket.emit('connection');
           },
         },
       });

@@ -58,7 +58,6 @@ export const socketHandler = (io: Server) => {
     const cookies = parse(socket.handshake.headers.cookie || '');
     const token = cookies['auth-token'];
     if (!token) {
-      socket.disconnect();
       return;
     }
     try {
@@ -71,7 +70,6 @@ export const socketHandler = (io: Server) => {
         },
       });
       if (!dbUser) {
-        socket.disconnect();
         return;
       }
       const user = connectedUsers.find((user) => user.id === dbUser.id);
@@ -94,7 +92,6 @@ export const socketHandler = (io: Server) => {
       });
     } catch (error) {
       console.error('Error parsing token', error);
-      socket.disconnect();
       return;
     }
 
