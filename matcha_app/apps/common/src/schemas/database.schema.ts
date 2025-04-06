@@ -10,11 +10,11 @@ export type TOrientation = Infer<typeof orientationSchema>;
 
 export const userSchema = z.object({
   id: z.number(),
-  name: z.string(),
-  lastName: z.string(),
+  name: z.string().min(1),
+  lastName: z.string().min(1),
   email: z.string().email(),
-  username: z.string(),
-  password: z.string(),
+  username: z.string().min(1),
+  password: z.string().min(1),
   age: z.number(),
   birthDate: z
     .date()
