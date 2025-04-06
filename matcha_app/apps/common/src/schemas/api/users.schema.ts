@@ -37,6 +37,7 @@ export const getUserSchemas = {
       'name',
       'lastName',
       'email',
+      'username',
       'gender',
       'preference',
       'age',
@@ -44,6 +45,7 @@ export const getUserSchemas = {
       'biography',
       'lastTimeOnline',
       'isOnline',
+      'isActivate',
     ]),
   }),
 };

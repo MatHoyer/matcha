@@ -1312,3 +1312,35 @@ SELECT
     41.0 + RANDOM() * (51.5 - 41.0),   -- Latitude entre 41.0 et 51.5
     -5.0 + RANDOM() * (9.5 - (-5.0))   -- Longitude entre -5.0 et 9.5
 FROM generate_series(1, 1000);
+
+
+DO $$
+DECLARE
+    user_id INT;
+    liked_id INT;
+    num_likes INT;
+    i INT;
+BEGIN
+    FOR user_id IN 5..1000 LOOP
+        num_likes := floor(random() * 20 + 1);
+        i := 0;
+        
+        WHILE i < num_likes LOOP
+            IF random() < 0.2 THEN
+                liked_id := floor(random() * 46 + 5);
+            ELSE
+                liked_id := floor(random() * 996 + 5);
+            END IF;
+
+            IF liked_id != user_id THEN
+                BEGIN
+                    INSERT INTO "Like" ("userId", "likedId")
+                    VALUES (user_id, liked_id)
+                    ON CONFLICT DO NOTHING;
+                EXCEPTION WHEN OTHERS THEN
+                END;
+                i := i + 1;
+            END IF;
+        END LOOP;
+    END LOOP;
+END $$;
