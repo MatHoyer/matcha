@@ -242,10 +242,8 @@ export const suggestedUsers = async (req: Request, res: Response) => {
           id: {
             $in: [
               req.user.id,
-              ...likedUsers.map(
-                (l) => l.likedId,
-                ...blockedUsers.map((bu) => bu.blockedId)
-              ),
+              ...likedUsers.map((l) => l.likedId),
+              ...blockedUsers.map((bu) => bu.blockedId),
             ],
           },
         },
@@ -256,14 +254,7 @@ export const suggestedUsers = async (req: Request, res: Response) => {
       ),
     },
   });
-  const usersWithOrderLoc = users.map((user, index) => ({
-    user,
-    order: index + 1,
-  }));
-
-  console.log('usersWithOrderLoc :', usersWithOrderLoc);
   const fameResults = await batchPromises(ids.map((id) => fameCalculator(id)));
-  // console.log('fameResults :', fameResults);
   const usersResponse: (TForYouSchema['response']['users'][number] | null)[] =
     await batchPromises(
       users.map(async (user) => {
@@ -318,9 +309,6 @@ export const suggestedUsers = async (req: Request, res: Response) => {
         const similarTagsCount = allTags.filter((tag) =>
           tagIdsInSessionUser.has(tag.id)
         ).length;
-        // console.log('similarTagsCount :', similarTagsCount);
-
-        // const locationOrder =
         const sortedLocationNames = globalLocations
           .map((gl) => gl.name)
           .sort((a, b) => a.localeCompare(b));
