@@ -6,6 +6,7 @@ export const defaultMutationEnding = async <T extends ZodType<D>, D>(data: {
   // eslint-disable-next-line
   res?: AxiosResponse<any, any>;
   successMessage?: string;
+  errorMessage?: string;
   cb?: (data: Infer<T>) => void | Promise<void>;
   responseSchema: T;
 }) => {

@@ -18,7 +18,8 @@ CREATE TABLE "User" (
   "biography" VARCHAR(1000),
   "lastTimeOnline" TIMESTAMP NOT NULL DEFAULT NOW(),
   "isOnline" BOOLEAN NOT NULL DEFAULT FALSE,
-  "isActivate" BOOLEAN NOT NULL DEFAULT FALSE
+  "isActivate" BOOLEAN NOT NULL DEFAULT FALSE,
+  "lastResetPasswordRequest" TIMESTAMP
 );
 CREATE OR REPLACE VIEW "User_v" AS 
 SELECT *, EXTRACT(YEAR FROM age(CURRENT_DATE, "birthDate"))::INT AS "age" FROM "User";
@@ -127,12 +128,12 @@ CREATE TABLE "Image" (
   FOREIGN KEY ("userId") REFERENCES "User" ("id")  ON DELETE CASCADE
 );
 
-INSERT INTO "User" ("name", "lastName", "email", "username", "password", "birthDate", "gender", "preference", "biography") 
-VALUES ('Alice', 'Smith', 'test@mail.com', 'alice', '094513168d4401c9dc5d693b3fbb9382ce68e54bafbd180f990bdf193f7c0948', '1990-01-01', 'Female', 'Bisexual', NULL),
-('David', 'Johnson', 'test2@mail.com', 'david', '094513168d4401c9dc5d693b3fbb9382ce68e54bafbd180f990bdf193f7c0948', '1985-05-15', 'Male', 'Heterosexual', NULL),
-('Emma', 'Brown', 'test3@mail.com', 'emma', '094513168d4401c9dc5d693b3fbb9382ce68e54bafbd180f990bdf193f7c0948', '1995-03-20', 'Female', 'Homosexual', NULL),
-('Michael', 'Williams', 'test4@mail.com', 'michael', '094513168d4401c9dc5d693b3fbb9382ce68e54bafbd180f990bdf193f7c0948', '1980-07-10', 'Male', 'Heterosexual', NULL),
-('Sophia', 'Martinez', 'test5@mail.com', 'sophia', '094513168d4401c9dc5d693b3fbb9382ce68e54bafbd180f990bdf193f7c0948', '1992-11-25', 'Female', 'Heterosexual', NULL);
+INSERT INTO "User" ("name", "lastName", "email", "username", "password", "birthDate", "gender", "preference", "biography", "isActivate") 
+VALUES ('Alice', 'Smith', 'test@mail.com', 'alice', '094513168d4401c9dc5d693b3fbb9382ce68e54bafbd180f990bdf193f7c0948', '1990-01-01', 'Female', 'Bisexual', NULL, TRUE),
+('David', 'Johnson', 'test2@mail.com', 'david', '094513168d4401c9dc5d693b3fbb9382ce68e54bafbd180f990bdf193f7c0948', '1985-05-15', 'Male', 'Heterosexual', NULL, TRUE),
+('Emma', 'Brown', 'test3@mail.com', 'emma', '094513168d4401c9dc5d693b3fbb9382ce68e54bafbd180f990bdf193f7c0948', '1995-03-20', 'Female', 'Homosexual', NULL, TRUE),
+('Michael', 'Williams', 'test4@mail.com', 'michael', '094513168d4401c9dc5d693b3fbb9382ce68e54bafbd180f990bdf193f7c0948', '1980-07-10', 'Male', 'Heterosexual', NULL, TRUE),
+('Sophia', 'Martinez', 'test5@mail.com', 'sophia', '094513168d4401c9dc5d693b3fbb9382ce68e54bafbd180f990bdf193f7c0948', '1992-11-25', 'Female', 'Heterosexual', NULL, TRUE);
 
 INSERT INTO "Tag" ("name") VALUES
 ('Sports'),

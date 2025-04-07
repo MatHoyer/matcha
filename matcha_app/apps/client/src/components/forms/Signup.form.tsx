@@ -77,6 +77,8 @@ const SignupForm: React.FC<TFormProps<TForm, TSignupSchemas['response']>> = ({
           cb: (data) => {
             if (modal) closeGlobalDialog();
             getData?.(data);
+            socket.disconnect();
+            socket.connect();
             navigate(
               getUrl('client-auth', {
                 type: 'wait-confirm',
@@ -85,7 +87,6 @@ const SignupForm: React.FC<TFormProps<TForm, TSignupSchemas['response']>> = ({
                 },
               })
             );
-            socket.emit('connection');
           },
         },
       });

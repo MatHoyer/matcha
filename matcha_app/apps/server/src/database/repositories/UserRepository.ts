@@ -20,7 +20,14 @@ const _userWithOptional = z.object({
     'password',
   ]).shape,
   ...userSchema
-    .pick(['age', 'biography', 'lastTimeOnline', 'isOnline', 'isActivate'])
+    .pick([
+      'age',
+      'biography',
+      'lastTimeOnline',
+      'isOnline',
+      'isActivate',
+      'lastResetPasswordRequest',
+    ])
     .partial().shape,
 });
 type TUserWithOptional = Infer<typeof _userWithOptional>;

@@ -7,7 +7,7 @@ import {
   TUser,
   z,
 } from '@matcha/common';
-import { setHours } from 'date-fns';
+import { differenceInDays, setHours } from 'date-fns';
 import type { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import db from '../database/Database';
@@ -290,8 +290,6 @@ export const getUserFame = async (req: Request, res: Response) => {
 };
 
 export const askResetPassword = async (req: Request, res: Response) => {
-  console.log(req.user);
-
   const user = await db.user.findFirst({
     where: {
       id: req.user.id,
@@ -304,6 +302,28 @@ export const askResetPassword = async (req: Request, res: Response) => {
       json: { message: 'User not found' },
     });
   }
+
+  if (
+    user.lastResetPasswordRequest &&
+    differenceInDays(new Date(), user.lastResetPasswordRequest) < 1
+  ) {
+    return defaultResponse({
+      res,
+      status: 400,
+      json: {
+        message: 'You can only request a password reset once every 24 hours',
+      },
+    });
+  }
+
+  await db.user.update({
+    where: {
+      id: req.user.id,
+    },
+    data: {
+      lastResetPasswordRequest: new Date(),
+    },
+  });
 
   const token = jwt.sign({ ...user }, env.JWT_SECRET, {
     expiresIn: 30 * 24 * 60 * 60,
@@ -325,7 +345,7 @@ export const askResetPassword = async (req: Request, res: Response) => {
   return defaultResponse({
     res,
     status: 200,
-    json: { message: 'Reset password token sent to email' },
+    json: { message: 'Reset password email sent' },
   });
 };
 

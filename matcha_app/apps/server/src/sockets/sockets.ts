@@ -57,6 +57,7 @@ export const socketHandler = (io: Server) => {
   io.on('connection', async (socket: Socket) => {
     const cookies = parse(socket.handshake.headers.cookie || '');
     const token = cookies['auth-token'];
+    console.log('new connection', socket.id);
     if (!token) {
       return;
     }

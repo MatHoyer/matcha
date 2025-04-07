@@ -1,5 +1,6 @@
 import { Infer, ZodType } from '@matcha/common';
 import axios, { AxiosRequestConfig } from 'axios';
+import { toast } from 'sonner';
 import { defaultMutationEnding } from './defaultMutationEnding';
 
 export const axiosFetch = async <
@@ -63,6 +64,9 @@ export const axiosFetch = async <
     })) as Infer<T>;
   } catch (error) {
     if (axios.isAxiosError(error) && error.response) {
+      if (handleEnding?.errorMessage) {
+        toast.error(error.response.data.message);
+      }
       if (form && form.setError) {
         for (const field of error.response.data.fields) {
           form.setError(field.field, {

@@ -57,6 +57,8 @@ const LoginForm: React.FC<TFormProps<TForm, TLoginSchemas['response']>> = ({
           cb: (data) => {
             if (modal) closeGlobalDialog();
             getData?.(data);
+            socket.disconnect();
+            socket.connect();
             if (data.resendToken) {
               navigate(
                 getUrl('client-auth', {
@@ -70,7 +72,6 @@ const LoginForm: React.FC<TFormProps<TForm, TLoginSchemas['response']>> = ({
               return;
             }
             navigate(getUrl('client-home'));
-            socket.emit('connection');
           },
         },
       });

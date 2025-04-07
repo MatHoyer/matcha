@@ -28,6 +28,7 @@ export const userSchema = z.object({
   lastTimeOnline: z.date(),
   isOnline: z.boolean(),
   isActivate: z.boolean(),
+  lastResetPasswordRequest: z.date().optional().nullable(),
 });
 export type TUser = Infer<typeof userSchema>;
 export type TUserWithNames = Pick<TUser, 'id' | 'name' | 'lastName'>;
