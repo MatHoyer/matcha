@@ -24,7 +24,10 @@ export const getNotifications = async (req: Request, res: Response) => {
         return { ...notification, otherUser };
       })
     );
-    // console.log('notif :', notificationsWithUser);
+    console.log(
+      'notif id :',
+      notificationsWithUser.map((n) => n.id)
+    );
     res.status(200).json({ notificationsWithUser });
   } catch (error) {
     console.error('Error fetching messages:', error);
@@ -37,7 +40,7 @@ export const getNotifications = async (req: Request, res: Response) => {
 };
 
 export const updateNotification = async (req: Request, res: Response) => {
-  console.log('updateNotification');
+  // console.log('updateNotification');
   try {
     const { userId, otherUserId, type, read } = req.body;
     await db.notification.update({

@@ -195,7 +195,7 @@ export const socketHandler = (io: Server) => {
                 read: false,
               },
             });
-            await db.notification.create({
+            const notif = await db.notification.create({
               data: {
                 userId: senderLikeId,
                 otherUserId: receiverLikeId,
@@ -204,12 +204,13 @@ export const socketHandler = (io: Server) => {
                 read: false,
               },
             });
+            if (!notif) return;
             const receiverOnline = connectedUsers.find(
               (u) => u.id === receiver.id
             );
             if (receiverOnline) {
               receiverOnline.socket.emit(`notification-${receiver.id}`, {
-                id: nanoid(),
+                id: notif.id,
                 userId: receiverLikeId,
                 otherUserId: senderLikeId,
                 otherUser: sender,
@@ -223,7 +224,7 @@ export const socketHandler = (io: Server) => {
             const senderOnline = connectedUsers.find((u) => u.id === sender.id);
             if (senderOnline) {
               senderOnline.socket.emit(`notification-${sender.id}`, {
-                id: nanoid(),
+                id: notif.id,
                 userId: senderLikeId,
                 otherUserId: receiverLikeId,
                 otherUser: receiver,
@@ -235,7 +236,7 @@ export const socketHandler = (io: Server) => {
             }
           } else {
             // No match just a like
-            await db.notification.create({
+            const notif = await db.notification.create({
               data: {
                 userId: receiverLikeId,
                 otherUserId: senderLikeId,
@@ -244,12 +245,13 @@ export const socketHandler = (io: Server) => {
                 read: false,
               },
             });
+            if (!notif) return;
             const receiverOnline = connectedUsers.find(
               (u) => u.id === receiver.id
             );
             if (receiverOnline) {
               receiverOnline.socket.emit(`notification-${receiver.id}`, {
-                id: nanoid(),
+                id: notif.id,
                 userId: receiverLikeId,
                 otherUserId: senderLikeId,
                 otherUser: sender,
@@ -261,7 +263,7 @@ export const socketHandler = (io: Server) => {
           }
         } else {
           // Unlike notif
-          await db.notification.create({
+          const notif = await db.notification.create({
             data: {
               userId: receiverLikeId,
               otherUserId: senderLikeId,
@@ -270,13 +272,14 @@ export const socketHandler = (io: Server) => {
               read: false,
             },
           });
+          if (!notif) return;
           const receiverOnline = connectedUsers.find(
             (u) => u.id === receiver.id
           );
 
           if (receiverOnline) {
             receiverOnline.socket.emit(`notification-${receiver.id}`, {
-              id: nanoid(),
+              id: notif.id,
               userId: receiverLikeId,
               otherUserId: senderLikeId,
               otherUser: sender,
@@ -290,9 +293,7 @@ export const socketHandler = (io: Server) => {
       },
       'send-view': async (args) => {
         const { senderViewId, receiverViewId } = args;
-        console.log('send view enter');
         if (await isBlocked(senderViewId, receiverViewId)) return;
-        console.log('send view enter 2');
         const senderView = await db.like.findFirst({
           where: {
             userId: senderViewId,
@@ -306,7 +307,6 @@ export const socketHandler = (io: Server) => {
           },
         });
         if (!senderView || !receiverView) {
-          console.log('about to create view');
           await db.view.create({
             data: {
               userId: receiverViewId,
@@ -314,7 +314,7 @@ export const socketHandler = (io: Server) => {
               date: new Date(),
             },
           });
-          await db.notification.create({
+          const notif = await db.notification.create({
             data: {
               userId: receiverViewId,
               otherUserId: senderViewId,
@@ -323,6 +323,7 @@ export const socketHandler = (io: Server) => {
               read: false,
             },
           });
+          if (!notif) return;
           const receiver = await db.user.findFirst({
             where: {
               id: receiverViewId,
@@ -341,6 +342,7 @@ export const socketHandler = (io: Server) => {
 
           if (receiverOnline) {
             receiverOnline.socket.emit(`notification-${receiverViewId}`, {
+              id: notif.id,
               userId: receiverViewId,
               otherUserId: senderViewId,
               otherUser: sender,
