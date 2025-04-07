@@ -162,8 +162,8 @@ export const advancedSearch = async (req: Request, res: Response) => {
         user: user,
         // user: { ...user, age: 30 },
         tags: allTags as { id: number; name: string }[],
-        // fame: fameResults.find((f) => f.userId === user.id)?.fame || 1,
-        fame: Math.floor(Math.random() * 5),
+        fame: fameResults.find((f) => f.userId === user.id)?.fame || 1,
+        // fame: Math.floor(Math.random() * 5),
         location: locationName || 'Unknown',
       };
     })
